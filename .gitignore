@@ -1,0 +1,11 @@
+# Private notes
+my_docs/
+
+# depscan output
+findings.json
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
