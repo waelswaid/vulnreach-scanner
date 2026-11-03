@@ -40,7 +40,9 @@ def find_osv_scanner():
 
 
 def get_osv_scanner_version(exe):
-    result = subprocess.run([exe, "--version"], capture_output=True, text=True)
+    result = subprocess.run(
+        [exe, "--version"], capture_output=True, text=True, encoding="utf-8"
+    )
     match = re.search(r"osv-scanner version:\s*(\S+)", result.stdout)
     return match.group(1) if match else "unknown"
 
@@ -108,23 +110,59 @@ def severity_from_advisories(vulns):
     return best
 
 
-def version_key(version):
-    """Rough sortable key for version strings ("1.10.0" > "1.9.2").
+PRE_RELEASE_RANK = {
+    "dev": 0, "a": 1, "alpha": 1, "b": 2, "beta": 2,
+    "c": 3, "pre": 3, "preview": 3, "rc": 3,
+}
 
+
+def version_key(version):
+    """Rough sortable key for version strings ("1.10.0" > "1.9.2" > "1.9.2rc1").
+
+    Trailing ".0" parts are ignored ("5.4" equals "5.4.0") and common
+    pre-release suffixes (a, b, rc, dev, ...) sort below the final release.
     Good enough for picking a fix version; not a full PEP 440 / semver parser.
     """
-    parts = re.split(r"[.\-+_]", version)
-    return [(0, int(p), "") if p.isdigit() else (1, 0, p) for p in parts]
+    tokens = re.findall(r"\d+|[A-Za-z]+", version)
+    release = []
+    while tokens and tokens[0].isdigit():
+        release.append(int(tokens.pop(0)))
+    while release and release[-1] == 0:
+        release.pop()
+    if not tokens:
+        suffix = (1,)  # final release
+    else:
+        rank = PRE_RELEASE_RANK.get(tokens[0].lower())
+        number = int(tokens[1]) if len(tokens) > 1 and tokens[1].isdigit() else 0
+        if rank is not None:
+            suffix = (0, rank, number)  # pre-release: below the final
+        else:
+            suffix = (2, tokens[0].lower(), number)  # post/local/unknown: above
+    return (tuple(release), suffix)
+
+
+def normalize_name(name, ecosystem=""):
+    """Normalize a package name for comparison.
+
+    PyPI treats "-", "_" and "." in names as interchangeable (PEP 503), so
+    "typing_extensions" and "typing-extensions" are the same package. Other
+    ecosystems are only compared case-insensitively.
+    """
+    if ecosystem == "PyPI":
+        return re.sub(r"[-_.]+", "-", name).lower()
+    return name.lower()
 
 
 def find_fixed_version(vulns, package):
     """Lowest fixed version above the installed version, or None if no fix exists."""
     installed = version_key(package["version"])
+    ecosystem = package.get("ecosystem", "")
+    name = normalize_name(package["name"], ecosystem)
     candidates = set()
     for vuln in vulns:
         for affected in vuln.get("affected", []):
             pkg = affected.get("package", {})
-            if pkg.get("name", "").lower() != package["name"].lower():
+            if normalize_name(pkg.get("name", ""), ecosystem) != name:
                 continue
             for rng in affected.get("ranges", []):
                 for event in rng.get("events", []):
@@ -195,7 +233,7 @@ def parse_findings(osv_json, project_root):
             key = (
                 source,
                 package.get("ecosystem", ""),
-                package["name"].lower(),
+                normalize_name(package["name"], package.get("ecosystem", "")),
                 normalize_version(package["version"]),
             )
             if key in seen:
@@ -203,6 +241,8 @@ def parse_findings(osv_json, project_root):
             seen.add(key)
             vulns_by_id = {v["id"]: v for v in entry.get("vulnerabilities") or []}
             for group in entry.get("groups") or []:
+                if not group.get("ids"):
+                    continue
                 vulns = [vulns_by_id[i] for i in group["ids"] if i in vulns_by_id]
                 primary = pick_primary_id(group["ids"])
                 aliases = sorted(set(group.get("aliases", [])) - {primary})

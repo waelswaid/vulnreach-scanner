@@ -126,6 +126,13 @@ databases that describe the same issue are merged into one finding.
 
 ## Testing
 
+Unit tests cover depscan's parsing and version logic and need nothing
+installed (not even osv-scanner). Run them from the repository root:
+
+```
+python -m unittest
+```
+
 `tests/fixtures/pyyaml_project/` is a small fake project that pins an old,
 vulnerable PyYAML. One file calls the vulnerable function (`yaml.full_load`)
 and another only calls the safe one (`yaml.safe_load`), ready for the future
