@@ -1,0 +1,42 @@
+{
+  "id": "GHSA-65pc-fj4g-8rjx",
+  "aliases": [
+    "CVE-2026-45409",
+    "PYSEC-2026-215"
+  ],
+  "package": "idna",
+  "ecosystem": "PyPI",
+  "status": "found",
+  "fix_commits": [
+    "e1cb465b6376f33306a26f467d197edbcd01c4b9"
+  ],
+  "rejected_commits": [],
+  "vulnerable": [
+    {
+      "name": "idna.core.check_label",
+      "kind": "function"
+    }
+  ],
+  "entry_points": [
+    "idna.encode",
+    "idna.decode",
+    "idna.alabel",
+    "idna.ulabel",
+    "idna.check_label",
+    "idna.codec.Codec",
+    "idna.codec.IncrementalEncoder",
+    "idna.codec.IncrementalDecoder",
+    "idna.codec.StreamWriter",
+    "idna.codec.StreamReader"
+  ],
+  "truth_evidence": [
+    "Affected every release before 3.15; fixed in 3.15 (inputs that bypass the CVE-2024-3651 fix: callers of alabel/ulabel/check_label and the incremental codec had no length cap, so validation is still quadratic).",
+    "The advisory links no commit. The fix is e1cb465 'Enforce early length limits in check_label' (PR #230), in tag v3.15 and not in v3.14; its comment cites GHSA-65pc-fj4g-8rjx. https://github.com/kjd/idna/commit/e1cb465b6376f33306a26f467d197edbcd01c4b9",
+    "check_label: after the empty-label check, raises IDNAError('Label too long') when valid_string_length(label, trailing_dot=True) is false, before any per-code-point validation.",
+    "Entry points: as for GHSA-jjg7-2v4v-x38h; valid_contextj is unchanged here and not listed."
+  ],
+  "notes": [
+    "Between v3.14 and v3.15 the commits 9d86ba6, ab7d46c and c18b804 also touch idna/core.py (lint and tidy refactors). None is the fix. Relevant for phase B."
+  ],
+  "signed_off": false
+}

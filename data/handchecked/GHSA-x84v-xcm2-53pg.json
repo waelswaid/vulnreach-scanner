@@ -1,0 +1,51 @@
+{
+  "id": "GHSA-x84v-xcm2-53pg",
+  "aliases": [
+    "CVE-2018-18074",
+    "PYSEC-2018-28"
+  ],
+  "package": "requests",
+  "ecosystem": "PyPI",
+  "status": "found",
+  "fix_commits": [
+    "c45d7c49ea75133e52ab22a8e9e13173938e36ff"
+  ],
+  "rejected_commits": [],
+  "vulnerable": [
+    {
+      "name": "requests.sessions.SessionRedirectMixin.rebuild_auth",
+      "kind": "method"
+    }
+  ],
+  "entry_points": [
+    "requests.request",
+    "requests.get",
+    "requests.options",
+    "requests.head",
+    "requests.post",
+    "requests.put",
+    "requests.patch",
+    "requests.delete",
+    "requests.Session",
+    "requests.Session.request",
+    "requests.Session.get",
+    "requests.Session.options",
+    "requests.Session.head",
+    "requests.Session.post",
+    "requests.Session.put",
+    "requests.Session.patch",
+    "requests.Session.delete",
+    "requests.Session.send",
+    "requests.Session.resolve_redirects",
+    "requests.Session.rebuild_auth"
+  ],
+  "truth_evidence": [
+    "Affected every release before 2.20.0; fixed in 2.20.0 (Authorization kept on an https -> http redirect to the same host).",
+    "Fix commit c45d7c4, the merge of PR #4718 'Strip Authorization header whenever root URL changes', in tag v2.20.0 and not in v2.19.1. https://github.com/psf/requests/pull/4718",
+    "rebuild_auth's hostname-only comparison is replaced by a call to the new should_strip_auth, which also compares scheme and port.",
+    "Added, not vulnerable: SessionRedirectMixin.should_strip_auth.",
+    "Entry points: resolve_redirects calls rebuild_auth on every redirect, so every request path leads to it; rebuild_auth is itself a public method of Session."
+  ],
+  "notes": [],
+  "signed_off": false
+}

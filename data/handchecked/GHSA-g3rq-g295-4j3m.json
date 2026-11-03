@@ -1,0 +1,39 @@
+{
+  "id": "GHSA-g3rq-g295-4j3m",
+  "aliases": [
+    "CVE-2020-28493",
+    "PYSEC-2021-66",
+    "SNYK-PYTHON-JINJA2-1012994"
+  ],
+  "package": "jinja2",
+  "ecosystem": "PyPI",
+  "status": "found",
+  "fix_commits": [
+    "15ef8f09b659f9100610583938005a7a10472d4d"
+  ],
+  "rejected_commits": [],
+  "vulnerable": [
+    {
+      "name": "jinja2.utils.urlize",
+      "kind": "function"
+    },
+    {
+      "name": "jinja2.utils",
+      "kind": "module_level"
+    }
+  ],
+  "entry_points": [
+    "jinja2.utils.urlize",
+    "jinja2.filters.do_urlize"
+  ],
+  "truth_evidence": [
+    "Affected every release before 2.11.3; fixed in 2.11.3 (ReDoS in the urlize punctuation regex).",
+    "Fix commit 15ef8f0, the merge of PR #1343 'backport urlize speedup', in tag 2.11.3 and not in 2.11.2. https://github.com/pallets/jinja/pull/1343",
+    "Module level in src/jinja2/utils.py: the _punctuation_re regex (the vulnerable pattern) and its neighbours _word_split_re, _simple_email_re, _letters, _digits are removed.",
+    "urlize: rewritten to match leading and trailing punctuation with anchored, non-backtracking patterns.",
+    "Entry points: urlize itself (public), and jinja2.filters.do_urlize, which calls it for the urlize template filter.",
+    "This function is a template filter. Templates reach it through the filter table (jinja2.filters.FILTERS), not through a Python call, so a project that uses the filter in a template has no Python call to it. Python-level call analysis cannot see template usage; the scan side must not report not_found on the strength of Python calls alone for filter advisories."
+  ],
+  "notes": [],
+  "signed_off": false
+}

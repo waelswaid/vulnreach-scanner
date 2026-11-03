@@ -1,0 +1,40 @@
+{
+  "id": "GHSA-gmj6-6f8f-6699",
+  "aliases": [
+    "CVE-2024-56201",
+    "PYSEC-2026-1472"
+  ],
+  "package": "jinja2",
+  "ecosystem": "PyPI",
+  "status": "found",
+  "fix_commits": [
+    "767b23617628419ae3709ccfb02f9602ae9fe51f"
+  ],
+  "rejected_commits": [],
+  "vulnerable": [
+    {
+      "name": "jinja2.compiler.CodeGenerator.visit_FromImport",
+      "kind": "method"
+    }
+  ],
+  "entry_points": [
+    "jinja2.Environment",
+    "jinja2.Environment.compile",
+    "jinja2.Environment.from_string",
+    "jinja2.Environment.get_template",
+    "jinja2.Environment.select_template",
+    "jinja2.Environment.get_or_select_template",
+    "jinja2.Environment.compile_templates",
+    "jinja2.Template",
+    "jinja2.sandbox.SandboxedEnvironment",
+    "jinja2.sandbox.ImmutableSandboxedEnvironment"
+  ],
+  "truth_evidence": [
+    "Affected 3.0.0 to 3.1.4; fixed in 3.1.5 (a template name containing braces is formatted into an f-string in generated code, so a controlled name plus content executes Python, sandbox or not).",
+    "Fix commit 767b236 'fix f-string syntax error in code generation (#1852)', in tag 3.1.5 and not in 3.1.4. It has two parents (48b0687 and 56a7246), so 'git show' prints an empty combined diff; diff against the first parent. https://github.com/pallets/jinja/commit/767b23617628419ae3709ccfb02f9602ae9fe51f",
+    "CodeGenerator.visit_FromImport: self.position(node) is now escaped ('{' -> '{{', '}' -> '}}') before being embedded in the undefined() message that is compiled as an f-string.",
+    "Entry points: everything that compiles a template reaches CodeGenerator (Environment._generate -> compiler.generate), i.e. Environment.compile, from_string, get_template, select_template, get_or_select_template, compile_templates, Template.__new__, and the sandbox subclasses."
+  ],
+  "notes": [],
+  "signed_off": false
+}

@@ -1,0 +1,24 @@
+{
+  "id": "GHSA-xqr8-7jwr-rhp7",
+  "aliases": [
+    "CVE-2023-37920",
+    "PYSEC-2023-135"
+  ],
+  "package": "certifi",
+  "ecosystem": "PyPI",
+  "status": "not_code",
+  "fix_commits": [
+    "8fb96ed81f71e7097ed11bc4d9b19afd7ea5c909"
+  ],
+  "rejected_commits": [],
+  "vulnerable": [],
+  "entry_points": [],
+  "truth_evidence": [
+    "Affected 2015.04.28 to 2023.05.07. The vulnerability is a distrusted root CA bundled in the certificate data, not a defect in Python code.",
+    "Fix commit 8fb96ed '2023.07.22' removes the e-Tugra root certificates from certifi/cacert.pem; the only other change is the version string. https://github.com/certifi/python-certifi/commit/8fb96ed81f71e7097ed11bc4d9b19afd7ea5c909",
+    "The fix commit also bumps __version__ in certifi/__init__.py. That is a module-level change to a .py file and must not be reported as vulnerable code.",
+    "No vulnerable function and no entry point exist; reachability is not a meaningful question for this advisory (every TLS verification using certifi.where() uses the bundle)."
+  ],
+  "notes": [],
+  "signed_off": false
+}

@@ -1,0 +1,54 @@
+{
+  "id": "GHSA-9wx4-h78v-vm56",
+  "aliases": [
+    "CVE-2024-35195",
+    "PYSEC-2026-1873"
+  ],
+  "package": "requests",
+  "ecosystem": "PyPI",
+  "status": "found",
+  "fix_commits": [
+    "a58d7f2ffb4d00b46dca2d70a3932a0b37e22fac"
+  ],
+  "rejected_commits": [],
+  "vulnerable": [
+    {
+      "name": "requests.adapters.HTTPAdapter.send",
+      "kind": "method"
+    }
+  ],
+  "entry_points": [
+    "requests.request",
+    "requests.get",
+    "requests.options",
+    "requests.head",
+    "requests.post",
+    "requests.put",
+    "requests.patch",
+    "requests.delete",
+    "requests.Session",
+    "requests.Session.request",
+    "requests.Session.get",
+    "requests.Session.options",
+    "requests.Session.head",
+    "requests.Session.post",
+    "requests.Session.put",
+    "requests.Session.patch",
+    "requests.Session.delete",
+    "requests.Session.send",
+    "requests.adapters.HTTPAdapter",
+    "requests.adapters.HTTPAdapter.send"
+  ],
+  "truth_evidence": [
+    "Affected every release before 2.32.0; fixed in 2.32.0 (a pooled connection first opened with verify=False is reused for later requests regardless of verify).",
+    "Fix commit a58d7f2, the merge of PR #6655 'Use TLS settings in selecting connection pool', in tag v2.32.0 and not in v2.31.0. https://github.com/psf/requests/pull/6655",
+    "The only pre-fix function modified in src/requests/adapters.py is HTTPAdapter.send: 'conn = self.get_connection(request.url, proxies)' becomes 'conn = self._get_connection(request, verify, proxies)'.",
+    "Added, not vulnerable: _urllib3_request_context (module function) and HTTPAdapter._get_connection.",
+    "HTTPAdapter.get_connection holds the flawed pool selection (it ignores verify) but is left unchanged and deprecated, so by the changed-code rule it is not listed.",
+    "Entry points: Session.send calls adapter.send for every request. HTTPAdapter is not re-exported from the requests package, so its public name is requests.adapters.HTTPAdapter."
+  ],
+  "notes": [
+    "Judgment call: get_connection is arguably the vulnerable function even though it is unchanged."
+  ],
+  "signed_off": false
+}

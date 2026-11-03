@@ -1,0 +1,40 @@
+{
+  "id": "GHSA-fqh9-2qgg-h84h",
+  "aliases": [
+    "CVE-2014-0012",
+    "PYSEC-2014-82"
+  ],
+  "package": "jinja2",
+  "ecosystem": "PyPI",
+  "status": "found",
+  "fix_commits": [
+    "964c61ce79f6748ff8c583e2eb12ec54082bf188"
+  ],
+  "rejected_commits": [
+    {
+      "sha": "acb672b6a179567632e032f547582f30fa2f4aa7",
+      "reason": "Linked, but it is the incomplete fix for CVE-2014-1402 (GHSA-8r7q-cvjq-x353); this advisory exists because that fix was incomplete. It passes a release check against OSV's (wrong) range."
+    }
+  ],
+  "vulnerable": [
+    {
+      "name": "jinja2.bccache.FileSystemBytecodeCache._get_default_cache_dir",
+      "kind": "method"
+    }
+  ],
+  "entry_points": [
+    "jinja2.FileSystemBytecodeCache"
+  ],
+  "truth_evidence": [
+    "NVD: 'FileSystemBytecodeCache in Jinja2 2.7.2 and earlier does not properly create temporary directories ... because of an incomplete fix for CVE-2014-1402.' OSV records the fixed version as 2.7.2, which is wrong: 2.7.2 is affected.",
+    "Fix commit 964c61ce 'Fix CVE-2014-0012' (2014-02-09), in tag 2.7.3 and not in 2.7.2. https://github.com/pallets/jinja/commit/964c61ce79f6748ff8c583e2eb12ec54082bf188",
+    "_get_default_cache_dir (as it exists in 2.7.2): fixes the 'os.name == \"n\"' typo, uses stat.S_IRWXU, and after mkdir checks that the directory is owned by the current uid, is a directory, and is mode 0700.",
+    "In 2.7.1 and earlier the equivalent code lives in FileSystemBytecodeCache.__init__ (see the sibling advisory); the pre-fix name depends on which release is treated as pre-fix.",
+    "Entry point: the class, jinja2.FileSystemBytecodeCache."
+  ],
+  "notes": [
+    "Tricky case: a release check driven by OSV's range (fixed = 2.7.2) rejects the real fix and accepts the linked, incomplete one. The pipeline cannot get this one right from OSV data alone; an override is the expected route.",
+    "PRs #292 and #296 that the advisory links are unrelated 2010-era tickets in the old Jinja tracker, not GitHub pull requests."
+  ],
+  "signed_off": false
+}

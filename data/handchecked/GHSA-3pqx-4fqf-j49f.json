@@ -1,0 +1,40 @@
+{
+  "id": "GHSA-3pqx-4fqf-j49f",
+  "aliases": [
+    "CVE-2019-20477",
+    "PYSEC-2020-176"
+  ],
+  "package": "pyyaml",
+  "ecosystem": "PyPI",
+  "status": "found",
+  "fix_commits": [
+    "8c5e47fe62d7b9e0282a176a4b79b8b2980dc704"
+  ],
+  "rejected_commits": [],
+  "vulnerable": [
+    {
+      "name": "yaml.constructor",
+      "kind": "module_level"
+    }
+  ],
+  "entry_points": [
+    "yaml.load",
+    "yaml.load_all",
+    "yaml.full_load",
+    "yaml.full_load_all",
+    "yaml.FullLoader",
+    "yaml.CFullLoader",
+    "yaml.constructor.FullConstructor"
+  ],
+  "truth_evidence": [
+    "Affected 5.1 to 5.1.2, fixed in 5.2. The advisory links no commit: only the CHANGES file and exploit-db 47655 (which uses !!python/object/apply:subprocess.Popen with full_load).",
+    "Fix commit 8c5e47f 'Move constructor for object/apply to Unsafe' (in tag 5.2, not in 5.1.2). https://github.com/yaml/pyyaml/commit/8c5e47fe62d7b9e0282a176a4b79b8b2980dc704",
+    "The whole change is at module level in lib/yaml/constructor.py and lib3/yaml/constructor.py: the add_multi_constructor registration of 'tag:yaml.org,2002:python/object/apply:' moves from FullConstructor to UnsafeConstructor. No function body changes.",
+    "FullConstructor.construct_python_object_apply is the constructor whose registration moved; its body is unchanged, so it is not listed as modified.",
+    "Entry points: everything that loads with FullLoader, including yaml.load/yaml.load_all, which default to FullLoader in 5.1 to 5.3.1 when no Loader is given."
+  ],
+  "notes": [
+    "Whether the unchanged construct_python_object_apply should count as a vulnerable function is a judgment call; this set follows the spec rule (only changed code is listed) and records it here instead."
+  ],
+  "signed_off": false
+}

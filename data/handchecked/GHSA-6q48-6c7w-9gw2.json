@@ -1,0 +1,25 @@
+{
+  "id": "GHSA-6q48-6c7w-9gw2",
+  "aliases": [
+    "PYSEC-2026-4320"
+  ],
+  "package": "certifi",
+  "ecosystem": "PyPI",
+  "status": "not_code",
+  "fix_commits": [
+    "5cb238caeeb6c30ec1a7309ad3e16a5aa7b10ce8"
+  ],
+  "rejected_commits": [],
+  "vulnerable": [],
+  "entry_points": [],
+  "truth_evidence": [
+    "Affected 2019.03.09 to 2026.07.22. The vulnerability is a distrusted root CA bundled in the certificate data, not a defect in Python code.",
+    "Fix commit 5cb238c 'Remove emsign (#437)' removes the emSign root certificates from certifi/cacert.pem; the only other change is the version string. https://github.com/certifi/python-certifi/commit/5cb238caeeb6c30ec1a7309ad3e16a5aa7b10ce8",
+    "The fix commit also bumps __version__ in certifi/__init__.py. That is a module-level change to a .py file and must not be reported as vulnerable code.",
+    "No vulnerable function and no entry point exist; reachability is not a meaningful question for this advisory (every TLS verification using certifi.where() uses the bundle)."
+  ],
+  "notes": [
+    "No CVE alias at the time of writing; the advisory links no commit. The fix commit was found from tag 2026.10.18."
+  ],
+  "signed_off": false
+}

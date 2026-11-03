@@ -1,0 +1,52 @@
+{
+  "id": "GHSA-9hjg-9r4m-mvj7",
+  "aliases": [
+    "CVE-2024-47081",
+    "PYSEC-2026-1872"
+  ],
+  "package": "requests",
+  "ecosystem": "PyPI",
+  "status": "found",
+  "fix_commits": [
+    "96ba401c1296ab1dda74a2365ef36d88f7d144ef"
+  ],
+  "rejected_commits": [],
+  "vulnerable": [
+    {
+      "name": "requests.utils.get_netrc_auth",
+      "kind": "function"
+    }
+  ],
+  "entry_points": [
+    "requests.request",
+    "requests.get",
+    "requests.options",
+    "requests.head",
+    "requests.post",
+    "requests.put",
+    "requests.patch",
+    "requests.delete",
+    "requests.Session",
+    "requests.Session.request",
+    "requests.Session.get",
+    "requests.Session.options",
+    "requests.Session.head",
+    "requests.Session.post",
+    "requests.Session.put",
+    "requests.Session.patch",
+    "requests.Session.delete",
+    "requests.Session.send",
+    "requests.utils.get_netrc_auth",
+    "requests.Session.prepare_request",
+    "requests.Session.rebuild_auth",
+    "requests.Session.resolve_redirects"
+  ],
+  "truth_evidence": [
+    "Affected every release before 2.32.4; fixed in 2.32.4 (a crafted URL makes the netrc lookup use the wrong host and leak its credentials).",
+    "Fix commit 96ba401 'Only use hostname to do netrc lookup instead of netloc' (PR #6965), in tag v2.32.4 and not in v2.32.3. https://github.com/psf/requests/commit/96ba401c1296ab1dda74a2365ef36d88f7d144ef",
+    "get_netrc_auth: the manual netloc split is replaced by 'host = ri.hostname'.",
+    "Entry points: Session.prepare_request calls get_netrc_auth when trust_env is set (so every Session.request path reaches it), and rebuild_auth calls it on redirects. get_netrc_auth is itself public."
+  ],
+  "notes": [],
+  "signed_off": false
+}

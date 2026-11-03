@@ -1,0 +1,24 @@
+{
+  "id": "GHSA-43fp-rhv2-5gv8",
+  "aliases": [
+    "CVE-2022-23491",
+    "PYSEC-2022-42986"
+  ],
+  "package": "certifi",
+  "ecosystem": "PyPI",
+  "status": "not_code",
+  "fix_commits": [
+    "9e9e840925d7b8e76c76fdac1fab7e6e88c1c3b8"
+  ],
+  "rejected_commits": [],
+  "vulnerable": [],
+  "entry_points": [],
+  "truth_evidence": [
+    "Affected 2017.11.05 to 2022.09.24. The vulnerability is a distrusted root CA bundled in the certificate data, not a defect in Python code.",
+    "Fix commit 9e9e840 '2022.12.07' removes the TrustCor root certificates from certifi/cacert.pem; the only other change is the version string. https://github.com/certifi/python-certifi/commit/9e9e840925d7b8e76c76fdac1fab7e6e88c1c3b8",
+    "The fix commit also bumps __version__ in certifi/__init__.py. That is a module-level change to a .py file and must not be reported as vulnerable code.",
+    "No vulnerable function and no entry point exist; reachability is not a meaningful question for this advisory (every TLS verification using certifi.where() uses the bundle)."
+  ],
+  "notes": [],
+  "signed_off": false
+}

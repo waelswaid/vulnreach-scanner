@@ -1,0 +1,44 @@
+{
+  "id": "GHSA-462w-v97r-4m45",
+  "aliases": [
+    "CVE-2019-10906",
+    "PYSEC-2019-217"
+  ],
+  "package": "jinja2",
+  "ecosystem": "PyPI",
+  "status": "found",
+  "fix_commits": [
+    "a2a6c930bcca591a25d2b316fcfd2d6793897b26"
+  ],
+  "rejected_commits": [],
+  "vulnerable": [
+    {
+      "name": "jinja2.sandbox.inspect_format_method",
+      "kind": "function"
+    },
+    {
+      "name": "jinja2.sandbox.SandboxedEnvironment.format_string",
+      "kind": "method"
+    },
+    {
+      "name": "jinja2.sandbox.SandboxedEnvironment.call",
+      "kind": "method"
+    }
+  ],
+  "entry_points": [
+    "jinja2.sandbox.SandboxedEnvironment",
+    "jinja2.sandbox.ImmutableSandboxedEnvironment",
+    "jinja2.sandbox.SandboxedEnvironment.call",
+    "jinja2.sandbox.SandboxedEnvironment.format_string"
+  ],
+  "truth_evidence": [
+    "Affected every release before 2.10.1; fixed in 2.10.1 (str.format_map bypassed the str.format sandboxing added for CVE-2016-10745).",
+    "The advisory links no commit (only the release blog post). The fix is a2a6c930 'sandbox str.format_map', the only code commit between tags 2.10 and 2.10.1. https://github.com/pallets/jinja/commit/a2a6c930bcca591a25d2b316fcfd2d6793897b26",
+    "inspect_format_method: \"callable.__name__ != 'format'\" becomes \"not in ('format', 'format_map')\".",
+    "SandboxedEnvironment.format_string: gains a format_func parameter and unpacks the single mapping argument for format_map.",
+    "SandboxedEnvironment.call: passes __obj through to format_string.",
+    "Entry points: the sandbox classes; call and format_string are public methods on the path."
+  ],
+  "notes": [],
+  "signed_off": false
+}

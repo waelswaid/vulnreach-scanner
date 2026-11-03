@@ -1,0 +1,47 @@
+{
+  "id": "GHSA-hj2j-77xm-mc5v",
+  "aliases": [
+    "CVE-2016-10745",
+    "PYSEC-2019-220"
+  ],
+  "package": "jinja2",
+  "ecosystem": "PyPI",
+  "status": "found",
+  "fix_commits": [
+    "9b53045c34e61013dc8f09b7e52a555fa16bed16"
+  ],
+  "rejected_commits": [],
+  "vulnerable": [
+    {
+      "name": "jinja2.nodes.Call.as_const",
+      "kind": "method"
+    },
+    {
+      "name": "jinja2.sandbox.SandboxedEnvironment.call",
+      "kind": "method"
+    },
+    {
+      "name": "jinja2.sandbox.is_internal_attribute",
+      "kind": "function"
+    }
+  ],
+  "entry_points": [
+    "jinja2.sandbox.SandboxedEnvironment",
+    "jinja2.sandbox.ImmutableSandboxedEnvironment",
+    "jinja2.sandbox.SandboxedEnvironment.call"
+  ],
+  "truth_evidence": [
+    "Affected every release before 2.8.1; fixed in 2.8.1 (str.format in a sandboxed template reads arbitrary attributes).",
+    "Fix commit 9b53045 'SECURITY: support sandboxing in format expressions', in tag 2.8.1 and not in 2.8. https://github.com/pallets/jinja/commit/9b53045c34e61013dc8f09b7e52a555fa16bed16",
+    "nodes.Call.as_const: 'if eval_ctx.volatile' becomes 'if eval_ctx.volatile or eval_ctx.environment.sandboxed' so format calls are not constant-folded past the sandbox.",
+    "SandboxedEnvironment.call: gains the inspect_format_method check that routes str.format through format_string.",
+    "is_internal_attribute: gains coroutine and async-generator attribute checks in the same commit (hardening bundled with the fix).",
+    "Added, not vulnerable: _MagicFormatMapping, inspect_format_method, SandboxedEnvironment.format_string, SandboxedFormatterMixin, SandboxedFormatter, SandboxedEscapeFormatter, UNSAFE_COROUTINE_ATTRIBUTES, UNSAFE_ASYNC_GENERATOR_ATTRIBUTES. The SandboxedEnvironment docstring change is cosmetic.",
+    "Entry points: the sandbox classes. Compiled templates call environment.call, and the compiler reaches Call.as_const for every environment, but the changed line only matters when environment.sandboxed."
+  ],
+  "notes": [
+    "is_internal_attribute is included because the commit changes its body; whether unrelated hardening in the fix commit should count is a judgment call.",
+    "jinja2.Environment also reaches Call.as_const by call graph; it is not listed because the change is a no-op outside the sandbox. A pipeline that lists it is not penalised."
+  ],
+  "signed_off": false
+}

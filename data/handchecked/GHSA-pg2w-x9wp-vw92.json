@@ -1,0 +1,49 @@
+{
+  "id": "GHSA-pg2w-x9wp-vw92",
+  "aliases": [
+    "CVE-2015-2296",
+    "PYSEC-2015-17"
+  ],
+  "package": "requests",
+  "ecosystem": "PyPI",
+  "status": "found",
+  "fix_commits": [
+    "3bd8afbff29e50b38f889b2f688785a669b9aafc"
+  ],
+  "rejected_commits": [],
+  "vulnerable": [
+    {
+      "name": "requests.sessions.SessionRedirectMixin.resolve_redirects",
+      "kind": "method"
+    }
+  ],
+  "entry_points": [
+    "requests.request",
+    "requests.get",
+    "requests.options",
+    "requests.head",
+    "requests.post",
+    "requests.put",
+    "requests.patch",
+    "requests.delete",
+    "requests.Session",
+    "requests.Session.request",
+    "requests.Session.get",
+    "requests.Session.options",
+    "requests.Session.head",
+    "requests.Session.post",
+    "requests.Session.put",
+    "requests.Session.patch",
+    "requests.Session.delete",
+    "requests.Session.send",
+    "requests.Session.resolve_redirects"
+  ],
+  "truth_evidence": [
+    "Affected 2.1.0 to 2.5.3; fixed in 2.6.0 (session fixation: cookies from a redirect were ascribed to the target domain).",
+    "Fix commit 3bd8afb 'Don't ascribe cookies to the target domain', in tag v2.6.0 and not in v2.5.3. https://github.com/psf/requests/commit/3bd8afbff29e50b38f889b2f688785a669b9aafc",
+    "One line in resolve_redirects: extract_cookies_to_jar(prepared_request._cookies, prepared_request, resp.raw) becomes extract_cookies_to_jar(prepared_request._cookies, req, resp.raw).",
+    "Entry points: every request path reaches resolve_redirects."
+  ],
+  "notes": [],
+  "signed_off": false
+}

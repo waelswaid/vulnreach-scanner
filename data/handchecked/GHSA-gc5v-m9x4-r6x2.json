@@ -1,0 +1,52 @@
+{
+  "id": "GHSA-gc5v-m9x4-r6x2",
+  "aliases": [
+    "CVE-2026-25645",
+    "PYSEC-2026-2275"
+  ],
+  "package": "requests",
+  "ecosystem": "PyPI",
+  "status": "found",
+  "fix_commits": [
+    "66d21cb07bd6255b1280291c4fafb71803cdb3b7"
+  ],
+  "rejected_commits": [],
+  "vulnerable": [
+    {
+      "name": "requests.utils.extract_zipped_paths",
+      "kind": "function"
+    }
+  ],
+  "entry_points": [
+    "requests.request",
+    "requests.get",
+    "requests.options",
+    "requests.head",
+    "requests.post",
+    "requests.put",
+    "requests.patch",
+    "requests.delete",
+    "requests.Session",
+    "requests.Session.request",
+    "requests.Session.get",
+    "requests.Session.options",
+    "requests.Session.head",
+    "requests.Session.post",
+    "requests.Session.put",
+    "requests.Session.patch",
+    "requests.Session.delete",
+    "requests.Session.send",
+    "requests.utils.extract_zipped_paths",
+    "requests.adapters.HTTPAdapter",
+    "requests.adapters.HTTPAdapter.send",
+    "requests.adapters.HTTPAdapter.cert_verify"
+  ],
+  "truth_evidence": [
+    "Affected every release before 2.33.0; fixed in 2.33.0 (a CA bundle extracted from a zip is written to a predictable, reusable temp path).",
+    "Fix commit 66d21cb 'Merge commit from fork' (GitHub's message for a private security fix), in tag v2.33.0 and not in v2.32.5. https://github.com/psf/requests/commit/66d21cb07bd6255b1280291c4fafb71803cdb3b7",
+    "extract_zipped_paths: the os.path.join(tempdir, name) + atomic_open block is replaced by tempfile.mkstemp.",
+    "Entry points: HTTPAdapter.send calls cert_verify (src/requests/adapters.py line 616 at v2.32.5), which calls extract_zipped_paths(DEFAULT_CA_BUNDLE_PATH) (line 300), so every request path reaches it. extract_zipped_paths is itself public."
+  ],
+  "notes": [],
+  "signed_off": false
+}

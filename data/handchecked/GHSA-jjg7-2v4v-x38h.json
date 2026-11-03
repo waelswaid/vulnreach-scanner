@@ -1,0 +1,54 @@
+{
+  "id": "GHSA-jjg7-2v4v-x38h",
+  "aliases": [
+    "CVE-2024-3651",
+    "PYSEC-2024-60"
+  ],
+  "package": "idna",
+  "ecosystem": "PyPI",
+  "status": "found",
+  "fix_commits": [
+    "5beb28b9dd77912c0dd656d8b0fdba3eb80222e7"
+  ],
+  "rejected_commits": [
+    {
+      "sha": "1d365e17e10d72d0b7876316fc7b9ca0eebdd38d",
+      "reason": "Linked, but it is the 'Release v3.7' version bump: it changes only HISTORY.rst, LICENSE.md and __version__ in idna/package_data.py. No fix in it."
+    }
+  ],
+  "vulnerable": [
+    {
+      "name": "idna.core.valid_contextj",
+      "kind": "function"
+    },
+    {
+      "name": "idna.core.check_label",
+      "kind": "function"
+    }
+  ],
+  "entry_points": [
+    "idna.encode",
+    "idna.decode",
+    "idna.alabel",
+    "idna.ulabel",
+    "idna.check_label",
+    "idna.codec.Codec",
+    "idna.codec.IncrementalEncoder",
+    "idna.codec.IncrementalDecoder",
+    "idna.codec.StreamWriter",
+    "idna.codec.StreamReader",
+    "idna.valid_contextj"
+  ],
+  "truth_evidence": [
+    "Affected every release before 3.7; fixed in 3.7 (crafted input makes idna.encode take quadratic time in the CONTEXTJ check).",
+    "Fix commit 5beb28b 'More efficient resolution of joiner contexts' (PR #172), in tag v3.7 and not in v3.6. HISTORY for 3.7: 'Fix issue where specially crafted inputs to encode() would take exceptionally long amount of time to process. [CVE-2024-3651]'. https://github.com/kjd/idna/commit/5beb28b9dd77912c0dd656d8b0fdba3eb80222e7",
+    "valid_contextj: the backwards and forwards scans for joining types now stop at the first non-transparent code point ('else: break') instead of scanning the whole label.",
+    "check_label: the try/except ValueError around valid_contextj is removed (the same hunk).",
+    "The commit also regenerates idna/idnadata.py (data, not code) and tools/idna-data (outside the package).",
+    "Entry points: encode -> alabel -> check_label -> valid_contextj; decode -> ulabel -> check_label; the idna.codec classes call alabel/ulabel. All of idna.core's public functions are re-exported as idna.X."
+  ],
+  "notes": [
+    "068f48f 'Remove redundant steps' (alabel) is also between v3.6 and v3.7 and touches idna/core.py; it is an unrelated refactor, not part of the fix. Relevant for phase B's commit ranking."
+  ],
+  "signed_off": false
+}

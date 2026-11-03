@@ -1,0 +1,40 @@
+{
+  "id": "GHSA-8q59-q68h-6hv4",
+  "aliases": [
+    "CVE-2020-14343",
+    "PYSEC-2021-142"
+  ],
+  "package": "pyyaml",
+  "ecosystem": "PyPI",
+  "status": "found",
+  "fix_commits": [
+    "a001f2782501ad2d24986959f0239a354675f9dc"
+  ],
+  "rejected_commits": [],
+  "vulnerable": [
+    {
+      "name": "yaml.constructor",
+      "kind": "module_level"
+    }
+  ],
+  "entry_points": [
+    "yaml.load",
+    "yaml.load_all",
+    "yaml.full_load",
+    "yaml.full_load_all",
+    "yaml.FullLoader",
+    "yaml.CFullLoader",
+    "yaml.constructor.FullConstructor"
+  ],
+  "truth_evidence": [
+    "Affected every release before 5.4 (in practice 5.1 onwards, when FullLoader appeared). Fixed in 5.4.",
+    "Fix commit a001f27 'Fix for CVE-2020-14343', in tag 5.4 and not in 5.3.1. https://github.com/yaml/pyyaml/commit/a001f2782501ad2d24986959f0239a354675f9dc",
+    "The whole change is at module level in lib/yaml/constructor.py and lib3/yaml/constructor.py: the add_multi_constructor registrations for python/module, python/object and python/object/new move from FullConstructor to UnsafeConstructor. No function body changes.",
+    "The constructors whose registration moved (construct_python_module, construct_python_object, construct_python_object_new) are unchanged and so not listed as modified.",
+    "Entry points: everything that loads with FullLoader, including yaml.load/yaml.load_all without a Loader."
+  ],
+  "notes": [
+    "The design document's example record for this ID lists construct_python_object_new and set_python_instance_state as 'modified in a001f27'. The commit does not modify any function; the example was illustrative and this file is the truth."
+  ],
+  "signed_off": false
+}

@@ -1,0 +1,43 @@
+{
+  "id": "GHSA-6757-jp84-gxfx",
+  "aliases": [
+    "CVE-2020-1747",
+    "PYSEC-2020-96"
+  ],
+  "package": "pyyaml",
+  "ecosystem": "PyPI",
+  "status": "found",
+  "fix_commits": [
+    "5080ba513377b6355a0502104846ee804656f1e0"
+  ],
+  "rejected_commits": [
+    {
+      "sha": "0cedb2a0697b2bc49e4f3841b8d4590b6b15657e",
+      "reason": "Linked, but it is the 5.1 commit that introduced FullLoader (the vulnerable feature), not the fix. It is in tag 5.3 (the last vulnerable release), so the release check rejects it."
+    }
+  ],
+  "vulnerable": [
+    {
+      "name": "yaml.constructor.FullConstructor.set_python_instance_state",
+      "kind": "method"
+    }
+  ],
+  "entry_points": [
+    "yaml.load",
+    "yaml.load_all",
+    "yaml.full_load",
+    "yaml.full_load_all",
+    "yaml.FullLoader",
+    "yaml.CFullLoader",
+    "yaml.constructor.FullConstructor"
+  ],
+  "truth_evidence": [
+    "Affected 5.1b7 to 5.3, fixed in 5.3.1.",
+    "Fix commit 5080ba5 (PR #386, 'Prevents arbitrary code execution during python/object/new constructor'), in tag 5.3.1 and not in 5.3. https://github.com/yaml/pyyaml/commit/5080ba513377b6355a0502104846ee804656f1e0",
+    "FullConstructor.set_python_instance_state (lib3/yaml/constructor.py, line 577 before the fix) gains an 'unsafe' parameter and calls check_state_key on every state key unless unsafe is true. The same change is mirrored in the Python 2 copy lib/yaml/constructor.py.",
+    "Added, not vulnerable: BaseConstructor.check_state_key, FullConstructor.get_state_keys_blacklist, FullConstructor.get_state_keys_blacklist_regexp, UnsafeConstructor.set_python_instance_state (override).",
+    "Entry points: everything that loads with FullLoader. construct_python_object_new -> construct_python_object_apply -> set_python_instance_state; both constructors were still registered on FullConstructor in 5.3."
+  ],
+  "notes": [],
+  "signed_off": false
+}

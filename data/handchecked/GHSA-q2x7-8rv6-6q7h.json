@@ -1,0 +1,55 @@
+{
+  "id": "GHSA-q2x7-8rv6-6q7h",
+  "aliases": [
+    "CVE-2024-56326",
+    "PYSEC-2026-1475"
+  ],
+  "package": "jinja2",
+  "ecosystem": "PyPI",
+  "status": "found",
+  "fix_commits": [
+    "48b0687e05a5466a91cd5812d604fa37ad0943b4"
+  ],
+  "rejected_commits": [],
+  "vulnerable": [
+    {
+      "name": "jinja2.sandbox.inspect_format_method",
+      "kind": "function"
+    },
+    {
+      "name": "jinja2.sandbox.SandboxedEnvironment.format_string",
+      "kind": "method"
+    },
+    {
+      "name": "jinja2.sandbox.SandboxedEnvironment.call",
+      "kind": "method"
+    },
+    {
+      "name": "jinja2.sandbox.SandboxedEnvironment.getattr",
+      "kind": "method"
+    },
+    {
+      "name": "jinja2.sandbox.SandboxedEnvironment.getitem",
+      "kind": "method"
+    }
+  ],
+  "entry_points": [
+    "jinja2.sandbox.SandboxedEnvironment",
+    "jinja2.sandbox.ImmutableSandboxedEnvironment",
+    "jinja2.sandbox.SandboxedEnvironment.call",
+    "jinja2.sandbox.SandboxedEnvironment.format_string",
+    "jinja2.sandbox.SandboxedEnvironment.getattr",
+    "jinja2.sandbox.SandboxedEnvironment.getitem"
+  ],
+  "truth_evidence": [
+    "Affected every release before 3.1.5; fixed in 3.1.5 (an indirect reference to str.format, e.g. via a filter, bypassed the sandboxing done in SandboxedEnvironment.call).",
+    "Fix commit 48b0687 'Merge commit from fork / fix format string vulnerability', in tag 3.1.5 and not in 3.1.4. https://github.com/pallets/jinja/commit/48b0687e05a5466a91cd5812d604fa37ad0943b4",
+    "Deleted: inspect_format_method and SandboxedEnvironment.format_string (the call-time check). Deleted functions count as vulnerable (they are the code the vulnerable versions ran).",
+    "SandboxedEnvironment.call: the inspect_format_method / format_string block is removed.",
+    "SandboxedEnvironment.getattr and getitem: now call wrap_str_format on the value so the check happens at attribute access instead of call time.",
+    "Added, not vulnerable: SandboxedEnvironment.wrap_str_format.",
+    "Entry points: the sandbox classes and the four public methods on the path."
+  ],
+  "notes": [],
+  "signed_off": false
+}

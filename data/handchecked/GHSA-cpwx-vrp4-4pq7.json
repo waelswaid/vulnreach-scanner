@@ -1,0 +1,32 @@
+{
+  "id": "GHSA-cpwx-vrp4-4pq7",
+  "aliases": [
+    "CVE-2025-27516",
+    "PYSEC-2026-1471"
+  ],
+  "package": "jinja2",
+  "ecosystem": "PyPI",
+  "status": "found",
+  "fix_commits": [
+    "90457bbf33b8662926ae65cdde4c4c32e756e403"
+  ],
+  "rejected_commits": [],
+  "vulnerable": [
+    {
+      "name": "jinja2.filters.do_attr",
+      "kind": "function"
+    }
+  ],
+  "entry_points": [
+    "jinja2.filters.do_attr"
+  ],
+  "truth_evidence": [
+    "Affected every release before 3.1.6; fixed in 3.1.6 (the attr filter used plain getattr, so |attr('format') reached an unsandboxed str.format).",
+    "Fix commit 90457bb 'Merge commit from fork / attr filter uses env.getattr', in tag 3.1.6 and not in 3.1.5. https://github.com/pallets/jinja/commit/90457bbf33b8662926ae65cdde4c4c32e756e403",
+    "do_attr: the getattr + is_safe_attribute body is replaced by getattr_static probing followed by environment.getattr(obj, name), which applies the sandbox.",
+    "This function is a template filter. Templates reach it through the filter table (jinja2.filters.FILTERS), not through a Python call, so a project that uses the filter in a template has no Python call to it. Python-level call analysis cannot see template usage; the scan side must not report not_found on the strength of Python calls alone for filter advisories.",
+    "The exposure is in sandboxed environments (the filter is harmless where there is no sandbox to escape)."
+  ],
+  "notes": [],
+  "signed_off": false
+}

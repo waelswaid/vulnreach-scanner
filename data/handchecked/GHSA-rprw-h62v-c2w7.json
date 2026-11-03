@@ -1,0 +1,65 @@
+{
+  "id": "GHSA-rprw-h62v-c2w7",
+  "aliases": [
+    "CVE-2017-18342",
+    "PYSEC-2018-49"
+  ],
+  "package": "pyyaml",
+  "ecosystem": "PyPI",
+  "status": "found",
+  "fix_commits": [
+    "0cedb2a0697b2bc49e4f3841b8d4590b6b15657e",
+    "857dff153d2c9f238d3a68821262b7764aeb44ea"
+  ],
+  "rejected_commits": [
+    {
+      "sha": "7b68405c81db889f83c32846462b238ccae5be80",
+      "reason": "Linked (PR #74, 'Make pyyaml safe by default'). It is an ancestor of tag 5.1, so a 'contained in the fixed tag' check accepts it, but it was reverted by ccc40f3e2ba384858c0d32263ac3e3a6626ab15e before 5.1 shipped (4.1 was retracted). Its changes are not in the 5.1 code."
+    }
+  ],
+  "vulnerable": [
+    {
+      "name": "yaml.load",
+      "kind": "function"
+    },
+    {
+      "name": "yaml.load_all",
+      "kind": "function"
+    },
+    {
+      "name": "yaml.constructor.Constructor.find_python_module",
+      "kind": "method"
+    },
+    {
+      "name": "yaml.constructor.Constructor.find_python_name",
+      "kind": "method"
+    },
+    {
+      "name": "yaml.constructor.Constructor.make_python_instance",
+      "kind": "method"
+    },
+    {
+      "name": "yaml.constructor",
+      "kind": "module_level"
+    }
+  ],
+  "entry_points": [
+    "yaml.load",
+    "yaml.load_all"
+  ],
+  "truth_evidence": [
+    "Affected: every release before 5.1 (last vulnerable tag 3.13; tag 4.1 is retracted). Fixed in 5.1.",
+    "Fix commit 0cedb2a ('Deprecate/warn usage of yaml.load(input)', lib/ = Python 2 copy) and its Python 3 counterpart 857dff1 ('Apply FullLoader/UnsafeLoader changes to lib3'). Both are in tag 5.1 and not in 3.13. https://github.com/yaml/pyyaml/commit/0cedb2a0697b2bc49e4f3841b8d4590b6b15657e",
+    "yaml.load and yaml.load_all change from 'def load(stream, Loader=Loader)' to 'Loader=None' with a warning and FullLoader as the default: the vulnerable behaviour was the unsafe default Loader (lib3/yaml/__init__.py).",
+    "Constructor.find_python_module, find_python_name and make_python_instance gain an 'unsafe' parameter and refuse imports / arbitrary classes when it is false; the class is renamed FullConstructor in the fix (lib3/yaml/constructor.py). They are named by their pre-fix class, Constructor.",
+    "Module level: the add_constructor/add_multi_constructor registrations in yaml/constructor.py move from Constructor to FullConstructor, with python/object/apply and friends later split off to UnsafeConstructor.",
+    "Cosmetic: safe_load and safe_load_all are touched by 857dff1 but only their docstrings change; they are not vulnerable.",
+    "Added, not vulnerable: full_load, full_load_all, unsafe_load, unsafe_load_all, warnings, load_warning, FullLoader, UnsafeLoader, CFullLoader, CUnsafeLoader.",
+    "Entry points are the two public functions themselves; nothing else in the package calls them."
+  ],
+  "notes": [
+    "The explicitly unsafe names (yaml.Loader, yaml.CLoader, yaml.UnsafeLoader) are not listed as entry points: using them is the documented unsafe behaviour, not this advisory.",
+    "The two-commit fix (one per lib/ and lib3/ copy) must merge into one set of names."
+  ],
+  "signed_off": false
+}

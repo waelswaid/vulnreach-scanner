@@ -1,0 +1,53 @@
+{
+  "id": "GHSA-cfj3-7x9c-4p3h",
+  "aliases": [
+    "CVE-2014-1829",
+    "PYSEC-2014-13"
+  ],
+  "package": "requests",
+  "ecosystem": "PyPI",
+  "status": "found",
+  "fix_commits": [
+    "7ba5a534ae9fc24e40b3ae6c480c9075d684727e",
+    "326a22e8880c1dba52698a479eb7b6038d5b2e87",
+    "d9f34c6848b9b313beefa7d3ce05f52fdea28c27"
+  ],
+  "rejected_commits": [],
+  "vulnerable": [
+    {
+      "name": "requests.sessions.SessionRedirectMixin.resolve_redirects",
+      "kind": "method"
+    }
+  ],
+  "entry_points": [
+    "requests.request",
+    "requests.get",
+    "requests.options",
+    "requests.head",
+    "requests.post",
+    "requests.put",
+    "requests.patch",
+    "requests.delete",
+    "requests.Session",
+    "requests.Session.request",
+    "requests.Session.get",
+    "requests.Session.options",
+    "requests.Session.head",
+    "requests.Session.post",
+    "requests.Session.put",
+    "requests.Session.patch",
+    "requests.Session.delete",
+    "requests.Session.send",
+    "requests.Session.resolve_redirects"
+  ],
+  "truth_evidence": [
+    "Affected every release before 2.3.0; fixed in 2.3.0. The Authorization header (including one derived from ~/.netrc) was kept on a redirect to another host.",
+    "The advisory links no commit, only issue #1885. The fix was found with git log -S Authorization between v2.2.1 and v2.3.0 in requests/sessions.py.",
+    "7ba5a534 'Repopulate ~/.netrc auth' (2014-01-29) adds, inside resolve_redirects, the deletion of the Authorization header when the hostname changes and a fresh netrc lookup for the new host. https://github.com/psf/requests/commit/7ba5a534ae9fc24e40b3ae6c480c9075d684727e",
+    "326a22e8 'Better layout for checking' and d9f34c68 'Respect trust_env on redirect' complete the same block (no KeyError dance; netrc only when trust_env).",
+    "97cf16e9 (part of PR #1951, the CVE-2014-1830 fix) later moves this block unchanged into the new rebuild_auth method; it is a refactor of this fix, not part of it.",
+    "Entry points: Session.send calls resolve_redirects for every request with allow_redirects, so every request function and Session method leads to it."
+  ],
+  "notes": [],
+  "signed_off": false
+}

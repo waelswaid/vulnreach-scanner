@@ -1,0 +1,54 @@
+{
+  "id": "GHSA-652x-xj99-gmcc",
+  "aliases": [
+    "CVE-2014-1830",
+    "PYSEC-2014-14"
+  ],
+  "package": "requests",
+  "ecosystem": "PyPI",
+  "status": "found",
+  "fix_commits": [
+    "fe4c4f146124d7fba2e680581a5d6b9d98e3fdf8",
+    "459f8dfccb7ee2e1dc9e041b7aebc2392219c35e"
+  ],
+  "rejected_commits": [],
+  "vulnerable": [
+    {
+      "name": "requests.sessions.SessionRedirectMixin.resolve_redirects",
+      "kind": "method"
+    }
+  ],
+  "entry_points": [
+    "requests.request",
+    "requests.get",
+    "requests.options",
+    "requests.head",
+    "requests.post",
+    "requests.put",
+    "requests.patch",
+    "requests.delete",
+    "requests.Session",
+    "requests.Session.request",
+    "requests.Session.get",
+    "requests.Session.options",
+    "requests.Session.head",
+    "requests.Session.post",
+    "requests.Session.put",
+    "requests.Session.patch",
+    "requests.Session.delete",
+    "requests.Session.send",
+    "requests.Session.resolve_redirects"
+  ],
+  "truth_evidence": [
+    "Affected every release before 2.3.0; fixed in 2.3.0. The Proxy-Authorization header was kept on redirects.",
+    "The advisory links no commit, only issue #1885.",
+    "fe4c4f14 is the merge of PR #1951 'proxyauth' (commits 6d7e8a97, 97cf16e9, 4d8cb324, 4f6dca42, 724038e4, 90f73378). 4d8cb324 adds SessionRedirectMixin.rebuild_proxies, which deletes Proxy-Authorization and re-adds it only from the proxy URL for the new request, and calls it from resolve_redirects. https://github.com/psf/requests/pull/1951",
+    "459f8dfc 'Don't repopulate proxies if we don't trust the env' (2014-04-26, before v2.3.0) adjusts the new method to respect trust_env.",
+    "The only pre-fix function modified is resolve_redirects (the call to rebuild_proxies is inserted into it). rebuild_auth, rebuild_proxies and utils.should_bypass_proxies are added by the fix.",
+    "Entry points: as for the sibling advisory, every request path reaches resolve_redirects."
+  ],
+  "notes": [
+    "Shares its vulnerable function with GHSA-cfj3-7x9c-4p3h: the two 2014 advisories differ only in which header leaked."
+  ],
+  "signed_off": false
+}

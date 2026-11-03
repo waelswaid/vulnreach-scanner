@@ -1,0 +1,50 @@
+{
+  "id": "GHSA-j8r2-6x86-q33q",
+  "aliases": [
+    "CVE-2023-32681",
+    "PYSEC-2023-74"
+  ],
+  "package": "requests",
+  "ecosystem": "PyPI",
+  "status": "found",
+  "fix_commits": [
+    "74ea7cf7a6a27a4eeb2ae24e162bcc942a6706d5"
+  ],
+  "rejected_commits": [],
+  "vulnerable": [
+    {
+      "name": "requests.sessions.SessionRedirectMixin.rebuild_proxies",
+      "kind": "method"
+    }
+  ],
+  "entry_points": [
+    "requests.request",
+    "requests.get",
+    "requests.options",
+    "requests.head",
+    "requests.post",
+    "requests.put",
+    "requests.patch",
+    "requests.delete",
+    "requests.Session",
+    "requests.Session.request",
+    "requests.Session.get",
+    "requests.Session.options",
+    "requests.Session.head",
+    "requests.Session.post",
+    "requests.Session.put",
+    "requests.Session.patch",
+    "requests.Session.delete",
+    "requests.Session.send",
+    "requests.Session.resolve_redirects",
+    "requests.Session.rebuild_proxies"
+  ],
+  "truth_evidence": [
+    "Affected 2.3.0 to 2.30.0; fixed in 2.31.0 (Proxy-Authorization sent to the destination on an https redirect through a proxy).",
+    "Fix commit 74ea7cf 'Merge pull request from GHSA-j8r2-6x86-q33q', in tag v2.31.0 and not in v2.30.0. https://github.com/psf/requests/commit/74ea7cf7a6a27a4eeb2ae24e162bcc942a6706d5",
+    "rebuild_proxies: 'if username and password' becomes 'if not scheme.startswith(\"https\") and username and password' before adding the Proxy-Authorization header.",
+    "Entry points: resolve_redirects calls rebuild_proxies on every redirect; rebuild_proxies is a public Session method."
+  ],
+  "notes": [],
+  "signed_off": false
+}

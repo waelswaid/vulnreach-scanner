@@ -1,0 +1,32 @@
+{
+  "id": "GHSA-8r7q-cvjq-x353",
+  "aliases": [
+    "CVE-2014-1402",
+    "PYSEC-2014-8"
+  ],
+  "package": "jinja2",
+  "ecosystem": "PyPI",
+  "status": "found",
+  "fix_commits": [
+    "acb672b6a179567632e032f547582f30fa2f4aa7"
+  ],
+  "rejected_commits": [],
+  "vulnerable": [
+    {
+      "name": "jinja2.bccache.FileSystemBytecodeCache.__init__",
+      "kind": "method"
+    }
+  ],
+  "entry_points": [
+    "jinja2.FileSystemBytecodeCache"
+  ],
+  "truth_evidence": [
+    "Affected every release before 2.7.2; fixed in 2.7.2 (bytecode cache files written to the shared system temp directory).",
+    "The advisory for this ID links no commit. The fix is acb672b 'Fixed a security issue with temporary files on the filesystem cache on UNIX', in tag 2.7.2 and not in 2.7.1. It is linked from the sibling advisory GHSA-fqh9-2qgg-h84h instead. https://github.com/pallets/jinja/commit/acb672b6a179567632e032f547582f30fa2f4aa7",
+    "FileSystemBytecodeCache.__init__: 'directory = tempfile.gettempdir()' becomes 'directory = self._get_default_cache_dir()'.",
+    "Added, not vulnerable: FileSystemBytecodeCache._get_default_cache_dir. The class docstring change is cosmetic.",
+    "Entry point: the class, re-exported as jinja2.FileSystemBytecodeCache (jinja2/__init__.py line 41 at 2.7.2)."
+  ],
+  "notes": [],
+  "signed_off": false
+}
