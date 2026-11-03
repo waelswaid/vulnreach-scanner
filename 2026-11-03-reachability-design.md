@@ -343,7 +343,12 @@ on) is decided later.
 ### Input
 
 - The findings depscan v0.1 already produces.
-- The vulnerability database records, looked up by `vulnerability_id`.
+- The vulnerability database records, looked up by `vulnerability_id` first,
+  then by the finding's aliases. Records are keyed by GHSA ID, but a finding
+  with no GHSA falls back to the first ID osv-scanner lists (v0.1 behaviour),
+  which can differ between osv-scanner versions and databases. Both the
+  finding and the record carry aliases, so matching through them keeps such a
+  finding from becoming "unknown — no record" when a record exists.
 - The scanned project's Python source files.
 
 ### Analysis (first version: direct calls only)
@@ -367,12 +372,16 @@ environments and installed packages.
 
 ### Status for each finding
 
-- **reachable:** at least one call to a vulnerable function found. Report
-  every call site with file and line.
+- **reachable:** at least one call to a vulnerable function or entry point
+  found. Report every call site with file and line. A call that matches only a
+  `medium` confidence entry point still counts as reachable: a wrong
+  "reachable" makes someone look, a wrong "not found" makes them look away.
 - **not found:** the record is `found` with at least one `high` confidence
-  function, the package's code can be matched to the project's imports, and no
-  call was found. This is worded in the report as "no call found", never as
-  "safe".
+  function **and** at least one `high` confidence entry point, the package's
+  code can be matched to the project's imports, and no call was found. This is
+  worded in the report as "no call found", never as "safe". Silence against
+  guessed-edge (`medium`/`low`) entry points proves nothing, so a record
+  without a `high` entry point can never produce "not found".
 
   *Decided:* "not found" means **the project's own code** makes no call to the
   vulnerable code. It does not rule out another dependency calling it. For
@@ -383,8 +392,9 @@ environments and installed packages.
   code; calls from other packages were not checked".
 - **unknown:** everything else, including:
   - no record exists, or its status is `unknown` or `not_code`;
-  - the record has only `medium`/`low` functions *(my call; the builder may
-    revisit once accuracy numbers exist)*;
+  - the record has only `medium`/`low` functions, or only `medium`/`low`
+    entry points *(my call; the builder may revisit once accuracy numbers
+    exist)*;
   - the package is a **transitive dependency** the project doesn't import
     itself. For example, the urllib3 vulnerabilities in a project that only
     imports requests: requests may call the vulnerable urllib3 code, and
@@ -447,6 +457,10 @@ These limits are why `unknown` is the default whenever there's doubt.
 4. **Accuracy bar,** measured on the hand-checked set:
    - **Functions found:** at least 90% of the true vulnerable functions (recall ≥ 90%).
    - **Wrong functions:** at most 1 in 10 of the reported functions is wrong (precision ≥ 90%).
+   - **Entry points found:** at least 95% of the true entry points (recall ≥ 95%).
+     This is the strictest number on purpose: a missed vulnerable function
+     mostly degrades a finding to `unknown`, but a missed entry point turns
+     directly into a false "not found" — the failure the anti-goals forbid.
    - **Statuses:** every `not_code` and `unknown` status is correct.
 
    The full PyPI run (build step 6) happens only after the pipeline meets this
