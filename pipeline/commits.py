@@ -275,21 +275,42 @@ def _patch_id(repo_dir, sha):
 # ---------------------------------------------------------------------------
 
 def import_folders(repo_dir, sha, package):
-    """Folders holding the package's importable code, e.g. ['lib/yaml', 'lib3/yaml']."""
+    """Folders holding the package's importable code before or after the commit,
+    e.g. ['lib/yaml', 'lib3/yaml']."""
+    folders = []
+    for rev in (f"{sha}^", sha):
+        for folder in import_folders_at(repo_dir, rev, package):
+            if folder not in folders:
+                folders.append(folder)
+    return folders
+
+
+def import_folders_at(repo_dir, rev, package):
+    """Import folders for the package in one revision's tree."""
     wanted = {depscan.normalize_name(package, "PyPI")}
     wanted.update(IMPORT_NAMES.get(depscan.normalize_name(package, "PyPI"), []))
     folders = []
-    for rev in (f"{sha}^", sha):
-        for path in git(repo_dir, "ls-tree", "-r", "--name-only", rev).splitlines():
-            if not path.endswith("/__init__.py"):
-                continue
-            folder = path[: -len("/__init__.py")]
-            parent, _, name = folder.rpartition("/")
-            prefix = parent + "/" if parent else ""
-            if prefix in IMPORT_PREFIXES and depscan.normalize_name(name, "PyPI") in wanted:
-                if folder not in folders:
-                    folders.append(folder)
+    for path in git(repo_dir, "ls-tree", "-r", "--name-only", rev).splitlines():
+        if not path.endswith("/__init__.py"):
+            continue
+        folder = path[: -len("/__init__.py")]
+        parent, _, name = folder.rpartition("/")
+        prefix = parent + "/" if parent else ""
+        if prefix in IMPORT_PREFIXES and depscan.normalize_name(name, "PyPI") in wanted:
+            folders.append(folder)
     return folders
+
+
+def library_files_at(repo_dir, rev, package):
+    """(path, module) for every library .py file of the package in one revision."""
+    folders = import_folders_at(repo_dir, rev, package)
+    files = []
+    for path in git(repo_dir, "ls-tree", "-r", "--name-only", rev).splitlines():
+        folder = next((f for f in folders if path.startswith(f + "/")), None)
+        if folder is None or not path.endswith(".py") or _is_test_path(path):
+            continue
+        files.append((path, module_for_path(path, folder)))
+    return files
 
 
 def module_for_path(path, folder):
