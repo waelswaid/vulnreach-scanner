@@ -332,7 +332,10 @@ evaluating at the start of phase B, but neither is decided.
 ### Keeping the database fresh
 
 Re-running the pipeline only reprocesses advisories whose OSV `modified` date
-changed or whose `pipeline_version` is older than the current one. How the
+changed or whose `pipeline_version` is older than the current one. Every run
+also rebuilds `data/vulnfuncs/index.json`, which maps every record ID and
+alias to its record, so the scan side opens only the index plus the records
+its findings need, never the whole directory. How the
 database is published with depscan (in the repo, as a separate download, and so
 on) is decided later.
 
@@ -348,7 +351,9 @@ on) is decided later.
   with no GHSA falls back to the first ID osv-scanner lists (v0.1 behaviour),
   which can differ between osv-scanner versions and databases. Both the
   finding and the record carry aliases, so matching through them keeps such a
-  finding from becoming "unknown — no record" when a record exists.
+  finding from becoming "unknown — no record" when a record exists. The
+  lookup goes through the pipeline's `index.json` (above), so the scan reads
+  only the index and the records its findings need.
 - The scanned project's Python source files.
 
 ### Analysis (first version: direct calls only)
@@ -439,21 +444,15 @@ These limits are why `unknown` is the default whenever there's doubt.
    because they don't scale.
 2. **"Not found" means no call from the project's own code.** Calls from
    other dependencies aren't checked, and the report says so (Part 2).
-3. **Who writes what:**
-   - **The project owner writes the reachability core by hand:**
-     - finding the changed functions (Part 1, step 6);
-     - finding the entry points (Part 1, step 9);
-     - matching imports, aliases and calls at scan time (Part 2, analysis).
-   - **Claude Code writes the rest:** commit collection, the release check,
-     filters, the record writer, the overrides file, the scan-side plumbing
-     and output, test scaffolding, and reviews of the owner's code.
-   - **The hand-checked set:** Claude Code drafts the correct answers for the
-     28 advisories with evidence for each. The project owner checks and signs
-     them off before any pipeline code is written, so the accuracy numbers
-     don't just check Claude Code against its own answers.
-
-   For the parts the owner writes, the plan provides the interfaces, data
-   shapes and tests, not the implementation.
+3. **Who writes what:** Claude Code writes all of it, test-first — including
+   the reachability core (the changed-function finder, the entry points, and
+   the scan-time import/call matching) that an earlier version of this design
+   reserved for the project owner to write by hand. *(Changed 2026-11-03 by
+   the owner.)* The one step that stays human is **the hand-checked set**:
+   Claude Code drafts the correct answers for the 28 advisories with evidence
+   for each, and the project owner checks and signs them off before any
+   pipeline code is written, so the accuracy numbers don't just check Claude
+   Code against its own answers.
 4. **Accuracy bar,** measured on the hand-checked set:
    - **Functions found:** at least 90% of the true vulnerable functions (recall ≥ 90%).
    - **Wrong functions:** at most 1 in 10 of the reported functions is wrong (precision ≥ 90%).
@@ -469,21 +468,17 @@ These limits are why `unknown` is the default whenever there's doubt.
 
 ## Build order
 
-Steps marked *(owner)* are written by the project owner. For those, the plan
-supplies interfaces and tests.
-
 1. **Hand-checked set:** Claude Code drafts the correct answers for the 28
    research advisories, and the owner signs them off. Each answer covers the
    true fix commit(s), the vulnerable functions and the expected entry points.
 2. **Pipeline core:** run it on one advisory end to end. Collect commits,
-   apply the release check, filter files, find functions *(owner)*, write a
-   record.
+   apply the release check, filter files, find functions, write a record.
 3. **Remaining phase A rules** (version bumps, bundles, duplicates, cosmetic
    changes, class-level changes, the version-range name check, the
    advisory-text cross-check), measured against the hand-checked set after
    each rule.
-4. **Entry points** *(owner)* and the **overrides file**.
-5. **Problem 2 scan side:** imports, aliases and calls *(owner)*, then
+4. **Entry points** and the **overrides file**.
+5. **Problem 2 scan side:** imports, aliases and calls, then
    statuses and output behind `--experimental-reachability`, tested on
    `tests/fixtures/pyyaml_project/`.
 6. **Full PyPI run** and the coverage report.
