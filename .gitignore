@@ -4,6 +4,10 @@ my_docs/
 # depscan output
 findings.json
 
+# reachability pipeline downloads (OSV export, cloned upstream repos)
+data/osv/
+data/repo_cache/
+
 # Python
 __pycache__/
 *.py[cod]
