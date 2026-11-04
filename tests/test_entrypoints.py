@@ -373,11 +373,83 @@ class GraphTest(unittest.TestCase):
         self.assertEqual(graph.public, {
             "pkg.c.Cls": "pkg.Cls",
             "pkg.c.Cls.__init__": "pkg.Cls",
-            "pkg.c.Cls.__call__": "pkg.Cls.__call__",
+            "pkg.c.Cls.__call__": "pkg.Cls",
             "pkg.use.a": "pkg.use.a",
         })
         self.assertEqual(graph.callers["pkg.c._f"], [("pkg.use.a", "high")])
         self.assertEqual(graph.callers["pkg.c.Cls._hidden"], [("pkg.use.a", "high")])
+
+    def test_local_names_never_resolve_to_module_names(self):
+        _, graph = graph_of({
+            "__init__.py": "",
+            "c.py": """
+                class Loader:
+                    def __init__(self, stream):
+                        pass
+
+                    def m(self):
+                        pass
+
+                def load(stream, Loader=None):
+                    Loader(stream)
+
+                def run():
+                    run = print
+                    run()
+
+                def go(Loader):
+                    Loader.m()
+
+                def scoped():
+                    for helper in []:
+                        helper()
+                    with open("f") as fh:
+                        fh()
+                    try:
+                        pass
+                    except Exception as err:
+                        err()
+                    global Loader
+                    Loader(None)
+
+                def helper():
+                    pass
+
+                def fh():
+                    pass
+
+                def err():
+                    pass
+            """,
+        })
+        self.assertEqual(graph.callers, {
+            "pkg.c.Loader.__init__": [("pkg.c.scoped", "high")],
+            "pkg.c.Loader.m": [("pkg.c.go", "medium")],
+        })
+
+    def test_star_import_in_any_module_binds_names_and_bases(self):
+        src, graph = graph_of({
+            "__init__.py": "",
+            "base.py": """
+                class Reader:
+                    def peek(self):
+                        pass
+
+                class _Hidden:
+                    pass
+            """,
+            "loader.py": """
+                from .base import *
+
+                class Loader(Reader):
+                    def load(self):
+                        self.peek()
+            """,
+        })
+        self.assertEqual(graph.bases["pkg.loader.Loader"], ["pkg.base.Reader"])
+        self.assertEqual(graph.callers["pkg.base.Reader.peek"], [("pkg.loader.Loader.load", "high")])
+        result = entrypoints.walk(src, "pkg", [{"name": "pkg.base.Reader.peek", "kind": "method"}])
+        self.assertEqual(by_name(result)["pkg.loader.Loader.load"]["confidence"], "high")
 
 
 if __name__ == "__main__":

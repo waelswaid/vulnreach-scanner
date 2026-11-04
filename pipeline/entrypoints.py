@@ -80,11 +80,10 @@ class _Builder:
         self._parse(sources)
         for module, (tree, path, _) in self.trees.items():
             self._collect(module, tree, path)
+        for module in self.trees:
+            self._collect_stars(module)
         for module, (tree, _, _) in self.trees.items():
             self._collect_bases(module, tree)
-        for module, (_, _, is_init) in self.trees.items():
-            if is_init:
-                self._collect_stars(module)
         self._collect_edges()
         self._collect_public()
 
@@ -181,7 +180,7 @@ class _Builder:
                 self.graph.bases[f"{module}.{node.name}"] = bases
 
     def _collect_stars(self, module):
-        """Names an __init__ module gets from `from .mod import *`."""
+        """Names a module gets from `from .mod import *`."""
         stars = self.stars[module] = {}
         tree = self.trees[module][0]
         for node in _top_level(tree):
@@ -273,17 +272,22 @@ class _Builder:
                 methods_by_name.setdefault(fqn.rsplit(".", 1)[1], []).append(fqn)
         edges = {}
         for caller, node, cls, module in self.bodies:
+            local = _local_names(node)
             for call in _calls(node.body):
-                for callee, confidence in self._targets(call, cls, module, methods_by_name):
+                for callee, confidence in self._targets(call, cls, module, local, methods_by_name):
                     key = (callee, caller)
                     if edges.get(key) != "high":
                         edges[key] = confidence
         for (callee, caller), confidence in sorted(edges.items()):
             self.graph.callers.setdefault(callee, []).append((caller, confidence))
 
-    def _targets(self, call, cls, module, methods_by_name):
+    def _targets(self, call, cls, module, local, methods_by_name):
+        """Callees of one call. A name bound inside the definition (a parameter,
+        an assignment) is a value, never the module-level name it shadows."""
         func = call.func
         if isinstance(func, ast.Name):
+            if func.id in local:
+                return []
             return self._high(self._resolve_expr(func, module))
         if not isinstance(func, ast.Attribute):
             return []
@@ -296,7 +300,7 @@ class _Builder:
             method = self._method(cls, func.attr, include_self=False)
             if method:
                 return [(method, "high")]
-        else:
+        elif _root_name(value) not in local:
             resolved = self._resolve_expr(func, module)
             if resolved:
                 return self._high(resolved)
@@ -343,9 +347,9 @@ class _Builder:
             cls, name = fqn.rsplit(".", 1)
             if cls not in self.graph.public:
                 continue
-            if name == "__init__":
+            if _is_dunder(name):
                 self.graph.public[fqn] = self.graph.public[cls]
-            elif not name.startswith("_") or _is_dunder(name):
+            elif not name.startswith("_"):
                 self.graph.public[fqn] = f"{self.graph.public[cls]}.{name}"
 
 
@@ -379,6 +383,41 @@ def _calls(body):
         if isinstance(node, _DEF_TYPES):
             children = [c for c in children if c not in node.decorator_list]
         stack.extend(reversed(children))
+
+
+def _local_names(node):
+    """Names bound inside a definition or its nested scopes: parameters,
+    assignment, for, with, except, walrus and comprehension targets, nested
+    definitions and imports. Names declared `global` stay module-level."""
+    bound, declared_global = set(), set()
+    for child in ast.walk(node):
+        if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda)):
+            args = child.args
+            for arg in args.posonlyargs + args.args + args.kwonlyargs + [args.vararg, args.kwarg]:
+                if arg is not None:
+                    bound.add(arg.arg)
+            if child is not node and not isinstance(child, ast.Lambda):
+                bound.add(child.name)
+        elif isinstance(child, ast.ClassDef):
+            bound.add(child.name)
+        elif isinstance(child, ast.Name) and isinstance(child.ctx, (ast.Store, ast.Del)):
+            bound.add(child.id)
+        elif isinstance(child, ast.ExceptHandler) and child.name:
+            bound.add(child.name)
+        elif isinstance(child, (ast.Import, ast.ImportFrom)):
+            for alias in child.names:
+                if alias.name != "*":
+                    bound.add(alias.asname or alias.name.split(".")[0])
+        elif isinstance(child, ast.Global):
+            declared_global.update(child.names)
+    return bound - declared_global
+
+
+def _root_name(node):
+    """The Name at the start of an attribute chain (`a` in `a.b.c`), or None."""
+    while isinstance(node, ast.Attribute):
+        node = node.value
+    return node.id if isinstance(node, ast.Name) else None
 
 
 def _is_super_call(node):
