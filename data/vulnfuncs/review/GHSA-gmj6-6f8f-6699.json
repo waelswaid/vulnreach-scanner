@@ -7,6 +7,15 @@
   "entry_points": [
     {
       "confidence": "high",
+      "defined_as": "jinja2.compiler.CodeGenerator",
+      "name": "jinja2.compiler.CodeGenerator",
+      "path": [
+        "jinja2.compiler.CodeGenerator",
+        "jinja2.compiler.CodeGenerator.visit_FromImport"
+      ]
+    },
+    {
+      "confidence": "high",
       "defined_as": "jinja2.compiler.CodeGenerator.visit_FromImport",
       "name": "jinja2.compiler.CodeGenerator.visit_FromImport",
       "path": [
@@ -183,7 +192,7 @@
       "source": "commit_link"
     }
   ],
-  "generated_at": "2026-11-04T04:10:26+00:00",
+  "generated_at": "2026-11-04T04:24:24+00:00",
   "id": "GHSA-gmj6-6f8f-6699",
   "names_verified_for": [
     ">=3.0, <3.2"

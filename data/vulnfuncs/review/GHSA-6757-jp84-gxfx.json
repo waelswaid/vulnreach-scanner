@@ -7,6 +7,15 @@
   "entry_points": [
     {
       "confidence": "high",
+      "defined_as": "yaml.constructor.Constructor",
+      "name": "yaml.constructor.Constructor",
+      "path": [
+        "yaml.constructor.Constructor",
+        "yaml.constructor.FullConstructor.set_python_instance_state"
+      ]
+    },
+    {
+      "confidence": "high",
       "defined_as": "yaml.constructor.FullConstructor.construct_python_object",
       "name": "yaml.constructor.Constructor.construct_python_object",
       "path": [
@@ -158,7 +167,7 @@
       "source": "pr_link"
     }
   ],
-  "generated_at": "2026-11-04T04:07:37+00:00",
+  "generated_at": "2026-11-04T04:19:53+00:00",
   "id": "GHSA-6757-jp84-gxfx",
   "names_verified_for": [
     ">=5.1, <5.4"

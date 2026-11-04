@@ -7,6 +7,20 @@
   "entry_points": [
     {
       "confidence": "medium",
+      "defined_as": "requests.models.PreparedRequest",
+      "name": "requests.PreparedRequest",
+      "path": [
+        "requests.models.PreparedRequest",
+        "requests.models.PreparedRequest.prepare_content_length",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
       "defined_as": "requests.models.PreparedRequest.prepare",
       "name": "requests.PreparedRequest.prepare",
       "path": [
@@ -77,6 +91,23 @@
     },
     {
       "confidence": "medium",
+      "defined_as": "requests.models.Request",
+      "name": "requests.Request",
+      "path": [
+        "requests.models.Request",
+        "requests.models.Request.prepare",
+        "requests.models.PreparedRequest.prepare",
+        "requests.models.PreparedRequest.prepare_cookies",
+        "requests.cookies.get_cookie_header",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
       "defined_as": "requests.models.Request.prepare",
       "name": "requests.Request.prepare",
       "path": [
@@ -84,6 +115,20 @@
         "requests.models.PreparedRequest.prepare",
         "requests.models.PreparedRequest.prepare_cookies",
         "requests.cookies.get_cookie_header",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.models.Response",
+      "name": "requests.Response",
+      "path": [
+        "requests.models.Response",
+        "requests.models.Response.links",
         "requests.sessions.Session.get",
         "requests.sessions.Session.request",
         "requests.sessions.Session.send",
@@ -101,6 +146,15 @@
         "requests.sessions.Session.request",
         "requests.sessions.Session.send",
         "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "requests.sessions.Session",
+      "name": "requests.Session",
+      "path": [
+        "requests.sessions.Session",
         "requests.sessions.SessionRedirectMixin.rebuild_proxies"
       ]
     },
@@ -282,6 +336,21 @@
     },
     {
       "confidence": "medium",
+      "defined_as": "requests.adapters.HTTPAdapter",
+      "name": "requests.adapters.HTTPAdapter",
+      "path": [
+        "requests.adapters.HTTPAdapter",
+        "requests.adapters.HTTPAdapter.build_response",
+        "requests.utils.get_encoding_from_headers",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
       "defined_as": "requests.adapters.HTTPAdapter.build_response",
       "name": "requests.adapters.HTTPAdapter.build_response",
       "path": [
@@ -370,6 +439,20 @@
       "name": "requests.auth.HTTPDigestAuth.handle_401",
       "path": [
         "requests.auth.HTTPDigestAuth.handle_401",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.cookies.MockRequest",
+      "name": "requests.cookies.MockRequest",
+      "path": [
+        "requests.cookies.MockRequest",
+        "requests.cookies.MockRequest.get_full_url",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
         "requests.sessions.Session.send",
         "requests.sessions.SessionRedirectMixin.resolve_redirects",
         "requests.sessions.SessionRedirectMixin.rebuild_proxies"
@@ -711,7 +794,7 @@
       "source": "git_range"
     }
   ],
-  "generated_at": "2026-11-04T04:11:47+00:00",
+  "generated_at": "2026-11-04T04:27:00+00:00",
   "id": "GHSA-j8r2-6x86-q33q",
   "names_verified_for": [
     ">=2.3, <2.31"

@@ -7,6 +7,19 @@
   "entry_points": [
     {
       "confidence": "medium",
+      "defined_as": "requests.models.PreparedRequest",
+      "name": "requests.PreparedRequest",
+      "path": [
+        "requests.models.PreparedRequest",
+        "requests.models.PreparedRequest.prepare_content_length",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.prepare_request",
+        "requests.utils.get_netrc_auth"
+      ]
+    },
+    {
+      "confidence": "medium",
       "defined_as": "requests.models.PreparedRequest.prepare",
       "name": "requests.PreparedRequest.prepare",
       "path": [
@@ -72,6 +85,22 @@
     },
     {
       "confidence": "medium",
+      "defined_as": "requests.models.Request",
+      "name": "requests.Request",
+      "path": [
+        "requests.models.Request",
+        "requests.models.Request.prepare",
+        "requests.models.PreparedRequest.prepare",
+        "requests.models.PreparedRequest.prepare_cookies",
+        "requests.cookies.get_cookie_header",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.prepare_request",
+        "requests.utils.get_netrc_auth"
+      ]
+    },
+    {
+      "confidence": "medium",
       "defined_as": "requests.models.Request.prepare",
       "name": "requests.Request.prepare",
       "path": [
@@ -87,12 +116,35 @@
     },
     {
       "confidence": "medium",
+      "defined_as": "requests.models.Response",
+      "name": "requests.Response",
+      "path": [
+        "requests.models.Response",
+        "requests.models.Response.links",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.prepare_request",
+        "requests.utils.get_netrc_auth"
+      ]
+    },
+    {
+      "confidence": "medium",
       "defined_as": "requests.models.Response.links",
       "name": "requests.Response.links",
       "path": [
         "requests.models.Response.links",
         "requests.sessions.Session.get",
         "requests.sessions.Session.request",
+        "requests.sessions.Session.prepare_request",
+        "requests.utils.get_netrc_auth"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "requests.sessions.Session",
+      "name": "requests.Session",
+      "path": [
+        "requests.sessions.Session",
         "requests.sessions.Session.prepare_request",
         "requests.utils.get_netrc_auth"
       ]
@@ -262,6 +314,20 @@
     },
     {
       "confidence": "medium",
+      "defined_as": "requests.adapters.HTTPAdapter",
+      "name": "requests.adapters.HTTPAdapter",
+      "path": [
+        "requests.adapters.HTTPAdapter",
+        "requests.adapters.HTTPAdapter.build_connection_pool_key_attributes",
+        "requests.adapters._urllib3_request_context",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.prepare_request",
+        "requests.utils.get_netrc_auth"
+      ]
+    },
+    {
+      "confidence": "medium",
       "defined_as": "requests.adapters.HTTPAdapter.build_connection_pool_key_attributes",
       "name": "requests.adapters.HTTPAdapter.build_connection_pool_key_attributes",
       "path": [
@@ -370,6 +436,19 @@
       "name": "requests.auth.HTTPDigestAuth.handle_401",
       "path": [
         "requests.auth.HTTPDigestAuth.handle_401",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.prepare_request",
+        "requests.utils.get_netrc_auth"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.cookies.MockRequest",
+      "name": "requests.cookies.MockRequest",
+      "path": [
+        "requests.cookies.MockRequest",
+        "requests.cookies.MockRequest.get_full_url",
         "requests.sessions.Session.get",
         "requests.sessions.Session.request",
         "requests.sessions.Session.prepare_request",
@@ -683,7 +762,7 @@
       "source": "commit_link"
     }
   ],
-  "generated_at": "2026-11-04T04:09:57+00:00",
+  "generated_at": "2026-11-04T04:23:32+00:00",
   "id": "GHSA-9hjg-9r4m-mvj7",
   "names_verified_for": [
     ">=0.10, <2.33"

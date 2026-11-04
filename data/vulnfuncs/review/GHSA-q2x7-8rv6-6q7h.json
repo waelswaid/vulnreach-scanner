@@ -7,6 +7,17 @@
   "entry_points": [
     {
       "confidence": "medium",
+      "defined_as": "jinja2.compiler.CodeGenerator",
+      "name": "jinja2.compiler.CodeGenerator",
+      "path": [
+        "jinja2.compiler.CodeGenerator",
+        "jinja2.compiler.CodeGenerator.visit_Const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
       "defined_as": "jinja2.compiler.CodeGenerator.visit_Const",
       "name": "jinja2.compiler.CodeGenerator.visit_Const",
       "path": [
@@ -351,10 +362,32 @@
     },
     {
       "confidence": "medium",
+      "defined_as": "jinja2.nodes.Add",
+      "name": "jinja2.nodes.Add",
+      "path": [
+        "jinja2.nodes.Add",
+        "jinja2.nodes.BinExpr.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
       "defined_as": "jinja2.nodes.BinExpr.as_const",
       "name": "jinja2.nodes.Add.as_const",
       "path": [
         "jinja2.nodes.BinExpr.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.And",
+      "name": "jinja2.nodes.And",
+      "path": [
+        "jinja2.nodes.And",
+        "jinja2.nodes.And.as_const",
         "jinja2.nodes.Getitem.as_const",
         "jinja2.sandbox.SandboxedEnvironment.getitem"
       ]
@@ -371,10 +404,32 @@
     },
     {
       "confidence": "medium",
+      "defined_as": "jinja2.nodes.Compare",
+      "name": "jinja2.nodes.Compare",
+      "path": [
+        "jinja2.nodes.Compare",
+        "jinja2.nodes.Compare.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
       "defined_as": "jinja2.nodes.Compare.as_const",
       "name": "jinja2.nodes.Compare.as_const",
       "path": [
         "jinja2.nodes.Compare.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.Concat",
+      "name": "jinja2.nodes.Concat",
+      "path": [
+        "jinja2.nodes.Concat",
+        "jinja2.nodes.Concat.as_const",
         "jinja2.nodes.Getitem.as_const",
         "jinja2.sandbox.SandboxedEnvironment.getitem"
       ]
@@ -391,6 +446,17 @@
     },
     {
       "confidence": "medium",
+      "defined_as": "jinja2.nodes.CondExpr",
+      "name": "jinja2.nodes.CondExpr",
+      "path": [
+        "jinja2.nodes.CondExpr",
+        "jinja2.nodes.CondExpr.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
       "defined_as": "jinja2.nodes.CondExpr.as_const",
       "name": "jinja2.nodes.CondExpr.as_const",
       "path": [
@@ -401,10 +467,33 @@
     },
     {
       "confidence": "medium",
+      "defined_as": "jinja2.nodes.Dict",
+      "name": "jinja2.nodes.Dict",
+      "path": [
+        "jinja2.nodes.Dict",
+        "jinja2.nodes.Dict.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
       "defined_as": "jinja2.nodes.Dict.as_const",
       "name": "jinja2.nodes.Dict.as_const",
       "path": [
         "jinja2.nodes.Dict.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.Filter",
+      "name": "jinja2.nodes.Filter",
+      "path": [
+        "jinja2.nodes.Filter",
+        "jinja2.nodes.Filter.as_const",
+        "jinja2.nodes._FilterTestCommon.as_const",
         "jinja2.nodes.Getitem.as_const",
         "jinja2.sandbox.SandboxedEnvironment.getitem"
       ]
@@ -422,6 +511,16 @@
     },
     {
       "confidence": "medium",
+      "defined_as": "jinja2.nodes.Getattr",
+      "name": "jinja2.nodes.Getattr",
+      "path": [
+        "jinja2.nodes.Getattr",
+        "jinja2.nodes.Getattr.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getattr"
+      ]
+    },
+    {
+      "confidence": "medium",
       "defined_as": "jinja2.nodes.Getattr.as_const",
       "name": "jinja2.nodes.Getattr.as_const",
       "path": [
@@ -431,9 +530,30 @@
     },
     {
       "confidence": "medium",
+      "defined_as": "jinja2.nodes.Getitem",
+      "name": "jinja2.nodes.Getitem",
+      "path": [
+        "jinja2.nodes.Getitem",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
       "defined_as": "jinja2.nodes.Getitem.as_const",
       "name": "jinja2.nodes.Getitem.as_const",
       "path": [
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.Keyword",
+      "name": "jinja2.nodes.Keyword",
+      "path": [
+        "jinja2.nodes.Keyword",
+        "jinja2.nodes.Keyword.as_const",
         "jinja2.nodes.Getitem.as_const",
         "jinja2.sandbox.SandboxedEnvironment.getitem"
       ]
@@ -450,10 +570,32 @@
     },
     {
       "confidence": "medium",
+      "defined_as": "jinja2.nodes.List",
+      "name": "jinja2.nodes.List",
+      "path": [
+        "jinja2.nodes.List",
+        "jinja2.nodes.List.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
       "defined_as": "jinja2.nodes.List.as_const",
       "name": "jinja2.nodes.List.as_const",
       "path": [
         "jinja2.nodes.List.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.MarkSafe",
+      "name": "jinja2.nodes.MarkSafe",
+      "path": [
+        "jinja2.nodes.MarkSafe",
+        "jinja2.nodes.MarkSafe.as_const",
         "jinja2.nodes.Getitem.as_const",
         "jinja2.sandbox.SandboxedEnvironment.getitem"
       ]
@@ -470,10 +612,32 @@
     },
     {
       "confidence": "medium",
+      "defined_as": "jinja2.nodes.MarkSafeIfAutoescape",
+      "name": "jinja2.nodes.MarkSafeIfAutoescape",
+      "path": [
+        "jinja2.nodes.MarkSafeIfAutoescape",
+        "jinja2.nodes.MarkSafeIfAutoescape.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
       "defined_as": "jinja2.nodes.MarkSafeIfAutoescape.as_const",
       "name": "jinja2.nodes.MarkSafeIfAutoescape.as_const",
       "path": [
         "jinja2.nodes.MarkSafeIfAutoescape.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.Neg",
+      "name": "jinja2.nodes.Neg",
+      "path": [
+        "jinja2.nodes.Neg",
+        "jinja2.nodes.UnaryExpr.as_const",
         "jinja2.nodes.Getitem.as_const",
         "jinja2.sandbox.SandboxedEnvironment.getitem"
       ]
@@ -490,10 +654,32 @@
     },
     {
       "confidence": "medium",
+      "defined_as": "jinja2.nodes.Or",
+      "name": "jinja2.nodes.Or",
+      "path": [
+        "jinja2.nodes.Or",
+        "jinja2.nodes.Or.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
       "defined_as": "jinja2.nodes.Or.as_const",
       "name": "jinja2.nodes.Or.as_const",
       "path": [
         "jinja2.nodes.Or.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.Pair",
+      "name": "jinja2.nodes.Pair",
+      "path": [
+        "jinja2.nodes.Pair",
+        "jinja2.nodes.Pair.as_const",
         "jinja2.nodes.Getitem.as_const",
         "jinja2.sandbox.SandboxedEnvironment.getitem"
       ]
@@ -510,6 +696,17 @@
     },
     {
       "confidence": "medium",
+      "defined_as": "jinja2.nodes.Slice",
+      "name": "jinja2.nodes.Slice",
+      "path": [
+        "jinja2.nodes.Slice",
+        "jinja2.nodes.Slice.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
       "defined_as": "jinja2.nodes.Slice.as_const",
       "name": "jinja2.nodes.Slice.as_const",
       "path": [
@@ -520,10 +717,32 @@
     },
     {
       "confidence": "medium",
+      "defined_as": "jinja2.nodes.Test",
+      "name": "jinja2.nodes.Test",
+      "path": [
+        "jinja2.nodes.Test",
+        "jinja2.nodes._FilterTestCommon.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
       "defined_as": "jinja2.nodes._FilterTestCommon.as_const",
       "name": "jinja2.nodes.Test.as_const",
       "path": [
         "jinja2.nodes._FilterTestCommon.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.Tuple",
+      "name": "jinja2.nodes.Tuple",
+      "path": [
+        "jinja2.nodes.Tuple",
+        "jinja2.nodes.Tuple.as_const",
         "jinja2.nodes.Getitem.as_const",
         "jinja2.sandbox.SandboxedEnvironment.getitem"
       ]
@@ -550,11 +769,32 @@
     },
     {
       "confidence": "medium",
+      "defined_as": "jinja2.optimizer.Optimizer",
+      "name": "jinja2.optimizer.Optimizer",
+      "path": [
+        "jinja2.optimizer.Optimizer",
+        "jinja2.optimizer.Optimizer.generic_visit",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
       "defined_as": "jinja2.optimizer.Optimizer.generic_visit",
       "name": "jinja2.optimizer.Optimizer.generic_visit",
       "path": [
         "jinja2.optimizer.Optimizer.generic_visit",
         "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.sandbox.SandboxedFormatter",
+      "name": "jinja2.sandbox.SandboxedFormatter",
+      "path": [
+        "jinja2.sandbox.SandboxedFormatter",
+        "jinja2.sandbox.SandboxedFormatter.get_field",
         "jinja2.sandbox.SandboxedEnvironment.getitem"
       ]
     },
@@ -639,7 +879,7 @@
       "source": "commit_link"
     }
   ],
-  "generated_at": "2026-11-04T04:12:08+00:00",
+  "generated_at": "2026-11-04T04:27:41+00:00",
   "id": "GHSA-q2x7-8rv6-6q7h",
   "names_verified_for": [
     ">=2.8, <3.2"

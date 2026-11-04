@@ -155,7 +155,7 @@
       "source": "commit_link"
     }
   ],
-  "generated_at": "2026-11-04T04:10:47+00:00",
+  "generated_at": "2026-11-04T04:25:04+00:00",
   "id": "GHSA-h75v-3vvj-5mfj",
   "names_verified_for": [
     ">=2.7, <3.2"
