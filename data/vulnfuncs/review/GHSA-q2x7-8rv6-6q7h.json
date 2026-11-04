@@ -1,0 +1,706 @@
+{
+  "aliases": [
+    "CVE-2024-56326",
+    "PYSEC-2026-1475"
+  ],
+  "ecosystem": "PyPI",
+  "entry_points": [
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.compiler.CodeGenerator",
+      "name": "jinja2.compiler.CodeGenerator",
+      "path": [
+        "jinja2.compiler.CodeGenerator",
+        "jinja2.compiler.CodeGenerator.visit_Const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.compiler.CodeGenerator.visit_Const",
+      "name": "jinja2.compiler.CodeGenerator.visit_Const",
+      "path": [
+        "jinja2.compiler.CodeGenerator.visit_Const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.compiler.CodeGenerator.visit_EvalContextModifier",
+      "name": "jinja2.compiler.CodeGenerator.visit_EvalContextModifier",
+      "path": [
+        "jinja2.compiler.CodeGenerator.visit_EvalContextModifier",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.compiler.CodeGenerator.visit_Output",
+      "name": "jinja2.compiler.CodeGenerator.visit_Output",
+      "path": [
+        "jinja2.compiler.CodeGenerator.visit_Output",
+        "jinja2.compiler.CodeGenerator._output_child_to_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.compiler.CodeGenerator.visit_ScopedEvalContextModifier",
+      "name": "jinja2.compiler.CodeGenerator.visit_ScopedEvalContextModifier",
+      "path": [
+        "jinja2.compiler.CodeGenerator.visit_ScopedEvalContextModifier",
+        "jinja2.compiler.CodeGenerator.visit_EvalContextModifier",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.compiler.CodeGenerator.visit_TemplateData",
+      "name": "jinja2.compiler.CodeGenerator.visit_TemplateData",
+      "path": [
+        "jinja2.compiler.CodeGenerator.visit_TemplateData",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.Add",
+      "name": "jinja2.nodes.Add",
+      "path": [
+        "jinja2.nodes.Add",
+        "jinja2.nodes.BinExpr.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.BinExpr.as_const",
+      "name": "jinja2.nodes.Add.as_const",
+      "path": [
+        "jinja2.nodes.BinExpr.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.And",
+      "name": "jinja2.nodes.And",
+      "path": [
+        "jinja2.nodes.And",
+        "jinja2.nodes.And.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.And.as_const",
+      "name": "jinja2.nodes.And.as_const",
+      "path": [
+        "jinja2.nodes.And.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.Compare",
+      "name": "jinja2.nodes.Compare",
+      "path": [
+        "jinja2.nodes.Compare",
+        "jinja2.nodes.Compare.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.Compare.as_const",
+      "name": "jinja2.nodes.Compare.as_const",
+      "path": [
+        "jinja2.nodes.Compare.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.Concat",
+      "name": "jinja2.nodes.Concat",
+      "path": [
+        "jinja2.nodes.Concat",
+        "jinja2.nodes.Concat.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.Concat.as_const",
+      "name": "jinja2.nodes.Concat.as_const",
+      "path": [
+        "jinja2.nodes.Concat.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.CondExpr",
+      "name": "jinja2.nodes.CondExpr",
+      "path": [
+        "jinja2.nodes.CondExpr",
+        "jinja2.nodes.CondExpr.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.CondExpr.as_const",
+      "name": "jinja2.nodes.CondExpr.as_const",
+      "path": [
+        "jinja2.nodes.CondExpr.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.Dict",
+      "name": "jinja2.nodes.Dict",
+      "path": [
+        "jinja2.nodes.Dict",
+        "jinja2.nodes.Dict.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.Dict.as_const",
+      "name": "jinja2.nodes.Dict.as_const",
+      "path": [
+        "jinja2.nodes.Dict.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.Filter",
+      "name": "jinja2.nodes.Filter",
+      "path": [
+        "jinja2.nodes.Filter",
+        "jinja2.nodes.Filter.as_const",
+        "jinja2.nodes._FilterTestCommon.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.Filter.as_const",
+      "name": "jinja2.nodes.Filter.as_const",
+      "path": [
+        "jinja2.nodes.Filter.as_const",
+        "jinja2.nodes._FilterTestCommon.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.Getattr",
+      "name": "jinja2.nodes.Getattr",
+      "path": [
+        "jinja2.nodes.Getattr",
+        "jinja2.nodes.Getattr.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getattr"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.Getattr.as_const",
+      "name": "jinja2.nodes.Getattr.as_const",
+      "path": [
+        "jinja2.nodes.Getattr.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getattr"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.Getitem",
+      "name": "jinja2.nodes.Getitem",
+      "path": [
+        "jinja2.nodes.Getitem",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.Getitem.as_const",
+      "name": "jinja2.nodes.Getitem.as_const",
+      "path": [
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.Keyword",
+      "name": "jinja2.nodes.Keyword",
+      "path": [
+        "jinja2.nodes.Keyword",
+        "jinja2.nodes.Keyword.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.Keyword.as_const",
+      "name": "jinja2.nodes.Keyword.as_const",
+      "path": [
+        "jinja2.nodes.Keyword.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.List",
+      "name": "jinja2.nodes.List",
+      "path": [
+        "jinja2.nodes.List",
+        "jinja2.nodes.List.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.List.as_const",
+      "name": "jinja2.nodes.List.as_const",
+      "path": [
+        "jinja2.nodes.List.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.MarkSafe",
+      "name": "jinja2.nodes.MarkSafe",
+      "path": [
+        "jinja2.nodes.MarkSafe",
+        "jinja2.nodes.MarkSafe.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.MarkSafe.as_const",
+      "name": "jinja2.nodes.MarkSafe.as_const",
+      "path": [
+        "jinja2.nodes.MarkSafe.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.MarkSafeIfAutoescape",
+      "name": "jinja2.nodes.MarkSafeIfAutoescape",
+      "path": [
+        "jinja2.nodes.MarkSafeIfAutoescape",
+        "jinja2.nodes.MarkSafeIfAutoescape.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.MarkSafeIfAutoescape.as_const",
+      "name": "jinja2.nodes.MarkSafeIfAutoescape.as_const",
+      "path": [
+        "jinja2.nodes.MarkSafeIfAutoescape.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.Neg",
+      "name": "jinja2.nodes.Neg",
+      "path": [
+        "jinja2.nodes.Neg",
+        "jinja2.nodes.UnaryExpr.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.UnaryExpr.as_const",
+      "name": "jinja2.nodes.Neg.as_const",
+      "path": [
+        "jinja2.nodes.UnaryExpr.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.Or",
+      "name": "jinja2.nodes.Or",
+      "path": [
+        "jinja2.nodes.Or",
+        "jinja2.nodes.Or.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.Or.as_const",
+      "name": "jinja2.nodes.Or.as_const",
+      "path": [
+        "jinja2.nodes.Or.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.Pair",
+      "name": "jinja2.nodes.Pair",
+      "path": [
+        "jinja2.nodes.Pair",
+        "jinja2.nodes.Pair.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.Pair.as_const",
+      "name": "jinja2.nodes.Pair.as_const",
+      "path": [
+        "jinja2.nodes.Pair.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.Test",
+      "name": "jinja2.nodes.Test",
+      "path": [
+        "jinja2.nodes.Test",
+        "jinja2.nodes._FilterTestCommon.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes._FilterTestCommon.as_const",
+      "name": "jinja2.nodes.Test.as_const",
+      "path": [
+        "jinja2.nodes._FilterTestCommon.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.Tuple",
+      "name": "jinja2.nodes.Tuple",
+      "path": [
+        "jinja2.nodes.Tuple",
+        "jinja2.nodes.Tuple.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.Tuple.as_const",
+      "name": "jinja2.nodes.Tuple.as_const",
+      "path": [
+        "jinja2.nodes.Tuple.as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.nodes.args_as_const",
+      "name": "jinja2.nodes.args_as_const",
+      "path": [
+        "jinja2.nodes.args_as_const",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.optimizer.Optimizer",
+      "name": "jinja2.optimizer.Optimizer",
+      "path": [
+        "jinja2.optimizer.Optimizer",
+        "jinja2.optimizer.Optimizer.generic_visit",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.optimizer.Optimizer.generic_visit",
+      "name": "jinja2.optimizer.Optimizer.generic_visit",
+      "path": [
+        "jinja2.optimizer.Optimizer.generic_visit",
+        "jinja2.nodes.Getitem.as_const",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.sandbox.SandboxedFormatter",
+      "name": "jinja2.sandbox.SandboxedFormatter",
+      "path": [
+        "jinja2.sandbox.SandboxedFormatter",
+        "jinja2.sandbox.SandboxedFormatter.get_field",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "jinja2.sandbox.SandboxedFormatter.get_field",
+      "name": "jinja2.sandbox.SandboxedFormatter.get_field",
+      "path": [
+        "jinja2.sandbox.SandboxedFormatter.get_field",
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "jinja2.sandbox.inspect_format_method",
+      "name": "jinja2.sandbox.inspect_format_method",
+      "path": [
+        "jinja2.sandbox.inspect_format_method"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "jinja2.sandbox.SandboxedEnvironment",
+      "name": "jinja2.sandbox.SandboxedEnvironment",
+      "path": [
+        "jinja2.sandbox.SandboxedEnvironment",
+        "compiled template: environment.call(context, ...) for every Call node when environment.sandboxed (jinja2.compiler.CodeGenerator.visit_Call, compiler.py:1866)",
+        "jinja2.sandbox.SandboxedEnvironment.call",
+        "jinja2.sandbox.SandboxedEnvironment.format_string"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "jinja2.sandbox.ImmutableSandboxedEnvironment",
+      "name": "jinja2.sandbox.ImmutableSandboxedEnvironment",
+      "path": [
+        "jinja2.sandbox.ImmutableSandboxedEnvironment",
+        "compiled template: environment.call(context, ...) for every Call node when environment.sandboxed (jinja2.compiler.CodeGenerator.visit_Call, compiler.py:1866); inherits SandboxedEnvironment.call",
+        "jinja2.sandbox.SandboxedEnvironment.call",
+        "jinja2.sandbox.SandboxedEnvironment.format_string"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "jinja2.sandbox.SandboxedEnvironment.call",
+      "name": "jinja2.sandbox.SandboxedEnvironment.call",
+      "path": [
+        "jinja2.sandbox.SandboxedEnvironment.call",
+        "jinja2.sandbox.inspect_format_method"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "jinja2.sandbox.SandboxedEnvironment.format_string",
+      "name": "jinja2.sandbox.SandboxedEnvironment.format_string",
+      "path": [
+        "jinja2.sandbox.SandboxedEnvironment.format_string"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "jinja2.sandbox.SandboxedEnvironment.getattr",
+      "name": "jinja2.sandbox.SandboxedEnvironment.getattr",
+      "path": [
+        "jinja2.sandbox.SandboxedEnvironment.getattr"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "jinja2.sandbox.SandboxedEnvironment.getitem",
+      "name": "jinja2.sandbox.SandboxedEnvironment.getitem",
+      "path": [
+        "jinja2.sandbox.SandboxedEnvironment.getitem"
+      ]
+    }
+  ],
+  "fix_commits": [
+    {
+      "bundle": false,
+      "in_fixed_release": true,
+      "sha": "48b0687e05a5466a91cd5812d604fa37ad0943b4",
+      "source": "commit_link"
+    }
+  ],
+  "generated_at": "2026-11-04T04:50:11+00:00",
+  "id": "GHSA-q2x7-8rv6-6q7h",
+  "names_verified_for": [
+    ">=2.8, <3.2"
+  ],
+  "notes": [
+    "fix adds jinja2.sandbox.SandboxedEnvironment.wrap_str_format",
+    "Three review reasons, all dead_end_chain: inspect_format_method, SandboxedEnvironment.format_string and SandboxedEnvironment.call (src/jinja2/sandbox.py). Their only resolved callers in the package end at jinja2.ext.InternationalizationExtension._install / _install_null (private, no reference) and jinja2.ext._gettext_alias (assigned to environment.globals['_'], src/jinja2/ext.py:260), so the walker found no public root. The real path is generated code: CodeGenerator.visit_Call writes environment.call(context, ...) for every template call when environment.sandboxed (compiler.py:1866), so any SandboxedEnvironment or ImmutableSandboxedEnvironment rendering a template with a call reaches SandboxedEnvironment.call (sandbox.py:380), which calls inspect_format_method (:388) and, for str.format / format_map, format_string (:390). getattr (:324) and getitem (:301), also changed by the fix, are reached the same way from visit_Getattr / visit_Getitem (environment.getattr / environment.getitem, compiler.py:1734, :1753) and already have walker entry points; they are re-listed so the record carries the truth file's names. The four methods are public and their own entry points. Checked against the record's tree 0871c71 (3.1.4-55-g0871c71d, first parent of the fix 48b0687, which is in 3.1.5 and not 3.1.4) on 2026-11-04."
+  ],
+  "osv_modified": "2026-09-10T03:50:21.662855250Z",
+  "overrides_applied": [
+    "added entry point jinja2.sandbox.SandboxedEnvironment",
+    "added entry point jinja2.sandbox.ImmutableSandboxedEnvironment",
+    "added entry point jinja2.sandbox.SandboxedEnvironment.call",
+    "added entry point jinja2.sandbox.SandboxedEnvironment.format_string",
+    "added entry point jinja2.sandbox.SandboxedEnvironment.getattr",
+    "added entry point jinja2.sandbox.SandboxedEnvironment.getitem",
+    "note added",
+    "reviewed: not applied, unsigned"
+  ],
+  "overrides_fingerprint": "86640152f4b1da733492dbe26f73f6dbe129d0ae771b710e9eac28851c2a9d34",
+  "package": "jinja2",
+  "pipeline_version": "2",
+  "rejected_commits": [],
+  "repo": "https://github.com/pallets/jinja",
+  "review": {
+    "reasons": [
+      {
+        "dead_ends": [
+          {
+            "name": "jinja2.ext._gettext_alias",
+            "references": [
+              {
+                "context": "assigned to environment.globals['_']",
+                "file": "src/jinja2/ext.py",
+                "line": 260
+              }
+            ]
+          }
+        ],
+        "file": "src/jinja2/sandbox.py",
+        "item": "jinja2.sandbox.inspect_format_method",
+        "kind": "dead_end_chain",
+        "references": []
+      },
+      {
+        "dead_ends": [
+          {
+            "name": "jinja2.ext._gettext_alias",
+            "references": [
+              {
+                "context": "assigned to environment.globals['_']",
+                "file": "src/jinja2/ext.py",
+                "line": 260
+              }
+            ]
+          }
+        ],
+        "file": "src/jinja2/sandbox.py",
+        "item": "jinja2.sandbox.SandboxedEnvironment.format_string",
+        "kind": "dead_end_chain",
+        "references": []
+      },
+      {
+        "dead_ends": [
+          {
+            "name": "jinja2.ext._gettext_alias",
+            "references": [
+              {
+                "context": "assigned to environment.globals['_']",
+                "file": "src/jinja2/ext.py",
+                "line": 260
+              }
+            ]
+          }
+        ],
+        "file": "src/jinja2/sandbox.py",
+        "item": "jinja2.sandbox.SandboxedEnvironment.call",
+        "kind": "dead_end_chain",
+        "references": []
+      }
+    ],
+    "resolve": "Do not edit: resolve in data/overrides.json and rerun",
+    "status": "open",
+    "tree": "0871c71d0166152801798c1e59b3b32d3fb7469e"
+  },
+  "status": "found",
+  "vulnerable": [
+    {
+      "confidence": "high",
+      "evidence": [
+        "deleted by the fix (lines 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97 before)"
+      ],
+      "file": "src/jinja2/sandbox.py",
+      "kind": "function",
+      "name": "jinja2.sandbox.inspect_format_method"
+    },
+    {
+      "confidence": "high",
+      "evidence": [
+        "modified by the fix (lines none before, 306, 307, 308 after)",
+        "body changed, not only docstrings or formatting"
+      ],
+      "file": "src/jinja2/sandbox.py",
+      "kind": "method",
+      "name": "jinja2.sandbox.SandboxedEnvironment.getitem"
+    },
+    {
+      "confidence": "high",
+      "evidence": [
+        "modified by the fix (lines none before, 326, 327, 328 after)",
+        "body changed, not only docstrings or formatting"
+      ],
+      "file": "src/jinja2/sandbox.py",
+      "kind": "method",
+      "name": "jinja2.sandbox.SandboxedEnvironment.getattr"
+    },
+    {
+      "confidence": "high",
+      "evidence": [
+        "deleted by the fix (lines 351, 352, 353, 354, 355, 356, 357, 358, 359, 362, 363, 367, 368, 369, 370, 371, 372, 374, 375, 377, 378 before)"
+      ],
+      "file": "src/jinja2/sandbox.py",
+      "kind": "method",
+      "name": "jinja2.sandbox.SandboxedEnvironment.format_string"
+    },
+    {
+      "confidence": "high",
+      "evidence": [
+        "modified by the fix (lines 388, 389, 390 before, none after)",
+        "body changed, not only docstrings or formatting"
+      ],
+      "file": "src/jinja2/sandbox.py",
+      "kind": "method",
+      "name": "jinja2.sandbox.SandboxedEnvironment.call"
+    }
+  ]
+}

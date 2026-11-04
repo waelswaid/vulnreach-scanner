@@ -1,0 +1,831 @@
+{
+  "aliases": [
+    "CVE-2023-32681",
+    "PYSEC-2023-74"
+  ],
+  "ecosystem": "PyPI",
+  "entry_points": [
+    {
+      "confidence": "medium",
+      "defined_as": "requests.models.PreparedRequest",
+      "name": "requests.PreparedRequest",
+      "path": [
+        "requests.models.PreparedRequest",
+        "requests.models.PreparedRequest.prepare_content_length",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.models.PreparedRequest.prepare",
+      "name": "requests.PreparedRequest.prepare",
+      "path": [
+        "requests.models.PreparedRequest.prepare",
+        "requests.models.PreparedRequest.prepare_cookies",
+        "requests.cookies.get_cookie_header",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.models.PreparedRequest.prepare_auth",
+      "name": "requests.PreparedRequest.prepare_auth",
+      "path": [
+        "requests.models.PreparedRequest.prepare_auth",
+        "requests.models.PreparedRequest.prepare_content_length",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.models.PreparedRequest.prepare_body",
+      "name": "requests.PreparedRequest.prepare_body",
+      "path": [
+        "requests.models.PreparedRequest.prepare_body",
+        "requests.models.PreparedRequest.prepare_content_length",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.models.PreparedRequest.prepare_content_length",
+      "name": "requests.PreparedRequest.prepare_content_length",
+      "path": [
+        "requests.models.PreparedRequest.prepare_content_length",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.models.PreparedRequest.prepare_cookies",
+      "name": "requests.PreparedRequest.prepare_cookies",
+      "path": [
+        "requests.models.PreparedRequest.prepare_cookies",
+        "requests.cookies.get_cookie_header",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.models.Request",
+      "name": "requests.Request",
+      "path": [
+        "requests.models.Request",
+        "requests.models.Request.prepare",
+        "requests.models.PreparedRequest.prepare",
+        "requests.models.PreparedRequest.prepare_cookies",
+        "requests.cookies.get_cookie_header",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.models.Request.prepare",
+      "name": "requests.Request.prepare",
+      "path": [
+        "requests.models.Request.prepare",
+        "requests.models.PreparedRequest.prepare",
+        "requests.models.PreparedRequest.prepare_cookies",
+        "requests.cookies.get_cookie_header",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.models.Response",
+      "name": "requests.Response",
+      "path": [
+        "requests.models.Response",
+        "requests.models.Response.links",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.models.Response.links",
+      "name": "requests.Response.links",
+      "path": [
+        "requests.models.Response.links",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "requests.sessions.Session",
+      "name": "requests.Session",
+      "path": [
+        "requests.sessions.Session",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "requests.sessions.Session.delete",
+      "name": "requests.Session.delete",
+      "path": [
+        "requests.sessions.Session.delete",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "requests.sessions.Session.get",
+      "name": "requests.Session.get",
+      "path": [
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "requests.sessions.Session.head",
+      "name": "requests.Session.head",
+      "path": [
+        "requests.sessions.Session.head",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.sessions.Session.merge_environment_settings",
+      "name": "requests.Session.merge_environment_settings",
+      "path": [
+        "requests.sessions.Session.merge_environment_settings",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "requests.sessions.Session.options",
+      "name": "requests.Session.options",
+      "path": [
+        "requests.sessions.Session.options",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "requests.sessions.Session.patch",
+      "name": "requests.Session.patch",
+      "path": [
+        "requests.sessions.Session.patch",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "requests.sessions.Session.post",
+      "name": "requests.Session.post",
+      "path": [
+        "requests.sessions.Session.post",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.sessions.Session.prepare_request",
+      "name": "requests.Session.prepare_request",
+      "path": [
+        "requests.sessions.Session.prepare_request",
+        "requests.sessions.merge_hooks",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "requests.sessions.Session.put",
+      "name": "requests.Session.put",
+      "path": [
+        "requests.sessions.Session.put",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.sessions.SessionRedirectMixin.rebuild_auth",
+      "name": "requests.Session.rebuild_auth",
+      "path": [
+        "requests.sessions.SessionRedirectMixin.rebuild_auth",
+        "requests.sessions.SessionRedirectMixin.should_strip_auth",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "requests.sessions.SessionRedirectMixin.rebuild_proxies",
+      "name": "requests.Session.rebuild_proxies",
+      "path": [
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "requests.sessions.Session.request",
+      "name": "requests.Session.request",
+      "path": [
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "requests.sessions.SessionRedirectMixin.resolve_redirects",
+      "name": "requests.Session.resolve_redirects",
+      "path": [
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "requests.sessions.Session.send",
+      "name": "requests.Session.send",
+      "path": [
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.sessions.SessionRedirectMixin.should_strip_auth",
+      "name": "requests.Session.should_strip_auth",
+      "path": [
+        "requests.sessions.SessionRedirectMixin.should_strip_auth",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.adapters.HTTPAdapter",
+      "name": "requests.adapters.HTTPAdapter",
+      "path": [
+        "requests.adapters.HTTPAdapter",
+        "requests.adapters.HTTPAdapter.build_response",
+        "requests.utils.get_encoding_from_headers",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.adapters.HTTPAdapter.build_response",
+      "name": "requests.adapters.HTTPAdapter.build_response",
+      "path": [
+        "requests.adapters.HTTPAdapter.build_response",
+        "requests.utils.get_encoding_from_headers",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.adapters.HTTPAdapter.get_connection",
+      "name": "requests.adapters.HTTPAdapter.get_connection",
+      "path": [
+        "requests.adapters.HTTPAdapter.get_connection",
+        "requests.utils.select_proxy",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.adapters.HTTPAdapter.request_url",
+      "name": "requests.adapters.HTTPAdapter.request_url",
+      "path": [
+        "requests.adapters.HTTPAdapter.request_url",
+        "requests.utils.select_proxy",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.adapters.HTTPAdapter.send",
+      "name": "requests.adapters.HTTPAdapter.send",
+      "path": [
+        "requests.adapters.HTTPAdapter.send",
+        "requests.adapters.HTTPAdapter.build_response",
+        "requests.utils.get_encoding_from_headers",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.auth.HTTPDigestAuth.__call__",
+      "name": "requests.auth.HTTPDigestAuth",
+      "path": [
+        "requests.auth.HTTPDigestAuth.__call__",
+        "requests.auth.HTTPDigestAuth.build_digest_header",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.auth.HTTPDigestAuth.build_digest_header",
+      "name": "requests.auth.HTTPDigestAuth.build_digest_header",
+      "path": [
+        "requests.auth.HTTPDigestAuth.build_digest_header",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.auth.HTTPDigestAuth.handle_401",
+      "name": "requests.auth.HTTPDigestAuth.handle_401",
+      "path": [
+        "requests.auth.HTTPDigestAuth.handle_401",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.cookies.MockRequest",
+      "name": "requests.cookies.MockRequest",
+      "path": [
+        "requests.cookies.MockRequest",
+        "requests.cookies.MockRequest.get_full_url",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.cookies.MockRequest.get_full_url",
+      "name": "requests.cookies.MockRequest.get_full_url",
+      "path": [
+        "requests.cookies.MockRequest.get_full_url",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.cookies.MockRequest.get_header",
+      "name": "requests.cookies.MockRequest.get_header",
+      "path": [
+        "requests.cookies.MockRequest.get_header",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.cookies.RequestsCookieJar.__setitem__",
+      "name": "requests.cookies.RequestsCookieJar",
+      "path": [
+        "requests.cookies.RequestsCookieJar.__setitem__",
+        "requests.cookies.RequestsCookieJar.set",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.cookies.RequestsCookieJar.set",
+      "name": "requests.cookies.RequestsCookieJar.set",
+      "path": [
+        "requests.cookies.RequestsCookieJar.set",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.cookies.get_cookie_header",
+      "name": "requests.cookies.get_cookie_header",
+      "path": [
+        "requests.cookies.get_cookie_header",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.api.delete",
+      "name": "requests.delete",
+      "path": [
+        "requests.api.delete",
+        "requests.api.request",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.api.get",
+      "name": "requests.get",
+      "path": [
+        "requests.api.get",
+        "requests.api.request",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.api.head",
+      "name": "requests.head",
+      "path": [
+        "requests.api.head",
+        "requests.api.request",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.hooks.dispatch_hook",
+      "name": "requests.hooks.dispatch_hook",
+      "path": [
+        "requests.hooks.dispatch_hook",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.api.options",
+      "name": "requests.options",
+      "path": [
+        "requests.api.options",
+        "requests.api.request",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.api.patch",
+      "name": "requests.patch",
+      "path": [
+        "requests.api.patch",
+        "requests.api.request",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.api.post",
+      "name": "requests.post",
+      "path": [
+        "requests.api.post",
+        "requests.api.request",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.api.put",
+      "name": "requests.put",
+      "path": [
+        "requests.api.put",
+        "requests.api.request",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.api.request",
+      "name": "requests.request",
+      "path": [
+        "requests.api.request",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.sessions.merge_hooks",
+      "name": "requests.sessions.merge_hooks",
+      "path": [
+        "requests.sessions.merge_hooks",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.structures.LookupDict.__getitem__",
+      "name": "requests.structures.LookupDict",
+      "path": [
+        "requests.structures.LookupDict.__getitem__",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.structures.LookupDict.get",
+      "name": "requests.structures.LookupDict.get",
+      "path": [
+        "requests.structures.LookupDict.get",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.utils.get_encoding_from_headers",
+      "name": "requests.utils.get_encoding_from_headers",
+      "path": [
+        "requests.utils.get_encoding_from_headers",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.utils.get_environ_proxies",
+      "name": "requests.utils.get_environ_proxies",
+      "path": [
+        "requests.utils.get_environ_proxies",
+        "requests.utils.should_bypass_proxies",
+        "requests.utils.set_environ",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.utils.get_netrc_auth",
+      "name": "requests.utils.get_netrc_auth",
+      "path": [
+        "requests.utils.get_netrc_auth",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.utils.get_unicode_from_response",
+      "name": "requests.utils.get_unicode_from_response",
+      "path": [
+        "requests.utils.get_unicode_from_response",
+        "requests.utils.get_encoding_from_headers",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.utils.resolve_proxies",
+      "name": "requests.utils.resolve_proxies",
+      "path": [
+        "requests.utils.resolve_proxies",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.utils.select_proxy",
+      "name": "requests.utils.select_proxy",
+      "path": [
+        "requests.utils.select_proxy",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.utils.set_environ",
+      "name": "requests.utils.set_environ",
+      "path": [
+        "requests.utils.set_environ",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    },
+    {
+      "confidence": "medium",
+      "defined_as": "requests.utils.should_bypass_proxies",
+      "name": "requests.utils.should_bypass_proxies",
+      "path": [
+        "requests.utils.should_bypass_proxies",
+        "requests.utils.set_environ",
+        "requests.sessions.Session.get",
+        "requests.sessions.Session.request",
+        "requests.sessions.Session.send",
+        "requests.sessions.SessionRedirectMixin.resolve_redirects",
+        "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+      ]
+    }
+  ],
+  "fix_commits": [
+    {
+      "bundle": false,
+      "in_fixed_release": true,
+      "sha": "74ea7cf7a6a27a4eeb2ae24e162bcc942a6706d5",
+      "source": "git_range"
+    }
+  ],
+  "generated_at": "2026-11-04T04:49:56+00:00",
+  "id": "GHSA-j8r2-6x86-q33q",
+  "names_verified_for": [
+    ">=2.3, <2.31"
+  ],
+  "notes": [],
+  "osv_modified": "2026-09-10T03:50:01.756149727Z",
+  "overrides_applied": [],
+  "overrides_fingerprint": null,
+  "package": "requests",
+  "pipeline_version": "2",
+  "rejected_commits": [],
+  "repo": "https://github.com/psf/requests",
+  "review": {
+    "reasons": [],
+    "resolve": "Do not edit: resolve in data/overrides.json and rerun",
+    "status": "none",
+    "tree": "302225334678490ec66b3614a9dddb8a02c5f4fe"
+  },
+  "status": "found",
+  "vulnerable": [
+    {
+      "confidence": "high",
+      "evidence": [
+        "modified by the fix (lines 327 before, 327, 328, 329 after)",
+        "body changed, not only docstrings or formatting"
+      ],
+      "file": "requests/sessions.py",
+      "kind": "method",
+      "name": "requests.sessions.SessionRedirectMixin.rebuild_proxies"
+    }
+  ]
+}

@@ -1,0 +1,250 @@
+{
+  "aliases": [
+    "CVE-2024-56201",
+    "PYSEC-2026-1472"
+  ],
+  "ecosystem": "PyPI",
+  "entry_points": [
+    {
+      "confidence": "high",
+      "defined_as": "jinja2.compiler.CodeGenerator",
+      "name": "jinja2.compiler.CodeGenerator",
+      "path": [
+        "jinja2.compiler.CodeGenerator",
+        "jinja2.compiler.CodeGenerator.visit_FromImport"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "jinja2.compiler.CodeGenerator.visit_FromImport",
+      "name": "jinja2.compiler.CodeGenerator.visit_FromImport",
+      "path": [
+        "jinja2.compiler.CodeGenerator.visit_FromImport"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "jinja2.environment.Environment",
+      "name": "jinja2.Environment",
+      "path": [
+        "jinja2.environment.Environment",
+        "jinja2.environment.Environment.from_string",
+        "jinja2.environment.Environment.compile",
+        "jinja2.environment.Environment._generate",
+        "jinja2.compiler.generate",
+        "jinja2.visitor.NodeVisitor.visit (generator.visit(node), compiler.py:117)",
+        "jinja2.compiler.CodeGenerator.visit_Template",
+        "jinja2.visitor.NodeVisitor.visit dispatch: getattr(self, f'visit_{type(node).__name__}') for a nodes.FromImport (visitor.py:33)",
+        "jinja2.compiler.CodeGenerator.visit_FromImport"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "jinja2.environment.Environment.compile",
+      "name": "jinja2.Environment.compile",
+      "path": [
+        "jinja2.environment.Environment.compile",
+        "jinja2.environment.Environment._generate",
+        "jinja2.compiler.generate",
+        "jinja2.visitor.NodeVisitor.visit (generator.visit(node), compiler.py:117)",
+        "jinja2.compiler.CodeGenerator.visit_Template",
+        "jinja2.visitor.NodeVisitor.visit dispatch: getattr(self, f'visit_{type(node).__name__}') for a nodes.FromImport (visitor.py:33)",
+        "jinja2.compiler.CodeGenerator.visit_FromImport"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "jinja2.environment.Environment.from_string",
+      "name": "jinja2.Environment.from_string",
+      "path": [
+        "jinja2.environment.Environment.from_string",
+        "jinja2.environment.Environment.compile",
+        "jinja2.environment.Environment._generate",
+        "jinja2.compiler.generate",
+        "jinja2.visitor.NodeVisitor.visit (generator.visit(node), compiler.py:117)",
+        "jinja2.compiler.CodeGenerator.visit_Template",
+        "jinja2.visitor.NodeVisitor.visit dispatch: getattr(self, f'visit_{type(node).__name__}') for a nodes.FromImport (visitor.py:33)",
+        "jinja2.compiler.CodeGenerator.visit_FromImport"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "jinja2.environment.Environment.get_template",
+      "name": "jinja2.Environment.get_template",
+      "path": [
+        "jinja2.environment.Environment.get_template",
+        "jinja2.environment.Environment._load_template",
+        "jinja2.loaders.BaseLoader.load (environment.compile(source, name, filename), loaders.py:138)",
+        "jinja2.environment.Environment.compile",
+        "jinja2.environment.Environment._generate",
+        "jinja2.compiler.generate",
+        "jinja2.visitor.NodeVisitor.visit (generator.visit(node), compiler.py:117)",
+        "jinja2.compiler.CodeGenerator.visit_Template",
+        "jinja2.visitor.NodeVisitor.visit dispatch: getattr(self, f'visit_{type(node).__name__}') for a nodes.FromImport (visitor.py:33)",
+        "jinja2.compiler.CodeGenerator.visit_FromImport"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "jinja2.environment.Environment.select_template",
+      "name": "jinja2.Environment.select_template",
+      "path": [
+        "jinja2.environment.Environment.select_template",
+        "jinja2.environment.Environment._load_template",
+        "jinja2.loaders.BaseLoader.load (environment.compile(source, name, filename), loaders.py:138)",
+        "jinja2.environment.Environment.compile",
+        "jinja2.environment.Environment._generate",
+        "jinja2.compiler.generate",
+        "jinja2.visitor.NodeVisitor.visit (generator.visit(node), compiler.py:117)",
+        "jinja2.compiler.CodeGenerator.visit_Template",
+        "jinja2.visitor.NodeVisitor.visit dispatch: getattr(self, f'visit_{type(node).__name__}') for a nodes.FromImport (visitor.py:33)",
+        "jinja2.compiler.CodeGenerator.visit_FromImport"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "jinja2.environment.Environment.get_or_select_template",
+      "name": "jinja2.Environment.get_or_select_template",
+      "path": [
+        "jinja2.environment.Environment.get_or_select_template",
+        "jinja2.environment.Environment.get_template",
+        "jinja2.environment.Environment._load_template",
+        "jinja2.loaders.BaseLoader.load (environment.compile(source, name, filename), loaders.py:138)",
+        "jinja2.environment.Environment.compile",
+        "jinja2.environment.Environment._generate",
+        "jinja2.compiler.generate",
+        "jinja2.visitor.NodeVisitor.visit (generator.visit(node), compiler.py:117)",
+        "jinja2.compiler.CodeGenerator.visit_Template",
+        "jinja2.visitor.NodeVisitor.visit dispatch: getattr(self, f'visit_{type(node).__name__}') for a nodes.FromImport (visitor.py:33)",
+        "jinja2.compiler.CodeGenerator.visit_FromImport"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "jinja2.environment.Environment.compile_templates",
+      "name": "jinja2.Environment.compile_templates",
+      "path": [
+        "jinja2.environment.Environment.compile_templates",
+        "jinja2.environment.Environment.compile",
+        "jinja2.environment.Environment._generate",
+        "jinja2.compiler.generate",
+        "jinja2.visitor.NodeVisitor.visit (generator.visit(node), compiler.py:117)",
+        "jinja2.compiler.CodeGenerator.visit_Template",
+        "jinja2.visitor.NodeVisitor.visit dispatch: getattr(self, f'visit_{type(node).__name__}') for a nodes.FromImport (visitor.py:33)",
+        "jinja2.compiler.CodeGenerator.visit_FromImport"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "jinja2.environment.Template",
+      "name": "jinja2.Template",
+      "path": [
+        "jinja2.environment.Template",
+        "jinja2.environment.Template.__new__ (env.from_string(source, template_class=cls), environment.py:1211)",
+        "jinja2.environment.Environment.from_string",
+        "jinja2.environment.Environment.compile",
+        "jinja2.environment.Environment._generate",
+        "jinja2.compiler.generate",
+        "jinja2.visitor.NodeVisitor.visit (generator.visit(node), compiler.py:117)",
+        "jinja2.compiler.CodeGenerator.visit_Template",
+        "jinja2.visitor.NodeVisitor.visit dispatch: getattr(self, f'visit_{type(node).__name__}') for a nodes.FromImport (visitor.py:33)",
+        "jinja2.compiler.CodeGenerator.visit_FromImport"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "jinja2.sandbox.SandboxedEnvironment",
+      "name": "jinja2.sandbox.SandboxedEnvironment",
+      "path": [
+        "jinja2.sandbox.SandboxedEnvironment",
+        "jinja2.environment.Environment.from_string",
+        "jinja2.environment.Environment.compile",
+        "jinja2.environment.Environment._generate",
+        "jinja2.compiler.generate",
+        "jinja2.visitor.NodeVisitor.visit (generator.visit(node), compiler.py:117)",
+        "jinja2.compiler.CodeGenerator.visit_Template",
+        "jinja2.visitor.NodeVisitor.visit dispatch: getattr(self, f'visit_{type(node).__name__}') for a nodes.FromImport (visitor.py:33)",
+        "jinja2.compiler.CodeGenerator.visit_FromImport"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "jinja2.sandbox.ImmutableSandboxedEnvironment",
+      "name": "jinja2.sandbox.ImmutableSandboxedEnvironment",
+      "path": [
+        "jinja2.sandbox.ImmutableSandboxedEnvironment",
+        "jinja2.environment.Environment.from_string",
+        "jinja2.environment.Environment.compile",
+        "jinja2.environment.Environment._generate",
+        "jinja2.compiler.generate",
+        "jinja2.visitor.NodeVisitor.visit (generator.visit(node), compiler.py:117)",
+        "jinja2.compiler.CodeGenerator.visit_Template",
+        "jinja2.visitor.NodeVisitor.visit dispatch: getattr(self, f'visit_{type(node).__name__}') for a nodes.FromImport (visitor.py:33)",
+        "jinja2.compiler.CodeGenerator.visit_FromImport"
+      ]
+    }
+  ],
+  "fix_commits": [
+    {
+      "bundle": false,
+      "in_fixed_release": true,
+      "sha": "767b23617628419ae3709ccfb02f9602ae9fe51f",
+      "source": "commit_link"
+    }
+  ],
+  "generated_at": "2026-11-04T04:49:09+00:00",
+  "id": "GHSA-gmj6-6f8f-6699",
+  "names_verified_for": [
+    ">=3.0, <3.2"
+  ],
+  "notes": [
+    "visit_FromImport (src/jinja2/compiler.py:1126, review reason no_reference) is never called or referenced by name: NodeVisitor.visit dispatches on the node class with getattr(self, f'visit_{type(node).__name__}') (visitor.py:33), so it runs for every {% from ... import %} node while CodeGenerator walks a template (compiler.generate builds the generator and calls generator.visit(node), compiler.py:117; visit_Template then visits the body). Every template compile reaches compiler.generate: Environment.compile (environment.py:729) -> _generate (:679, return generate(...) at :691); from_string (:1089) calls self.compile (:1108); get_template (:979) and select_template (:1016) go through _load_template (:954) -> self.loader.load (:972) -> BaseLoader.load -> environment.compile (loaders.py:138); get_or_select_template (:1070) calls get_template / select_template; compile_templates calls self.compile (:879); Template.__new__ calls env.from_string (:1211). The sandbox classes subclass Environment and inherit all of these; the bug is in generated code, so it applies sandbox or not. Checked against the record's tree 48b0687 (3.1.4-57-g48b0687e, first parent of the fix) on 2026-11-04."
+  ],
+  "osv_modified": "2026-09-10T03:50:56.152882717Z",
+  "overrides_applied": [
+    "added entry point jinja2.Environment",
+    "added entry point jinja2.Environment.compile",
+    "added entry point jinja2.Environment.from_string",
+    "added entry point jinja2.Environment.get_template",
+    "added entry point jinja2.Environment.select_template",
+    "added entry point jinja2.Environment.get_or_select_template",
+    "added entry point jinja2.Environment.compile_templates",
+    "added entry point jinja2.Template",
+    "added entry point jinja2.sandbox.SandboxedEnvironment",
+    "added entry point jinja2.sandbox.ImmutableSandboxedEnvironment",
+    "note added",
+    "reviewed: not applied, unsigned"
+  ],
+  "overrides_fingerprint": "ff57f449f6267a050b350d3efe48818965765d6a294d4a62b9799e09ec36c80d",
+  "package": "jinja2",
+  "pipeline_version": "2",
+  "rejected_commits": [],
+  "repo": "https://github.com/pallets/jinja",
+  "review": {
+    "reasons": [
+      {
+        "dead_ends": [],
+        "file": "src/jinja2/compiler.py",
+        "item": "jinja2.compiler.CodeGenerator.visit_FromImport",
+        "kind": "no_reference",
+        "references": []
+      }
+    ],
+    "resolve": "Do not edit: resolve in data/overrides.json and rerun",
+    "status": "open",
+    "tree": "48b0687e05a5466a91cd5812d604fa37ad0943b4"
+  },
+  "status": "found",
+  "vulnerable": [
+    {
+      "confidence": "high",
+      "evidence": [
+        "modified by the fix (lines 1146 before, 1144, 1145, 1146, 1147, 1148, 1151 after)",
+        "body changed, not only docstrings or formatting"
+      ],
+      "file": "src/jinja2/compiler.py",
+      "kind": "method",
+      "name": "jinja2.compiler.CodeGenerator.visit_FromImport"
+    }
+  ]
+}

@@ -1,0 +1,754 @@
+"""The call graph inside a package and the public names that reach a vulnerable item.
+
+The walker is strict: an edge exists only for a call it can resolve to a
+definition in the package (`high`), or for a method call on an object whose
+class it cannot resolve, matched by method name alone (`medium`). A function
+used as a value (a dict entry, an argument), a decorator, or a name built at
+runtime makes no edge, and neither does a call inside a nested function,
+lambda or class body (it runs only when that nested scope does). Walking `callers` backwards from a vulnerable item
+gives every definition that can lead to it; the public ones are its entry
+points.
+
+Uses as a value are recorded separately as references, and so are resolved
+calls inside a nested scope; inside a class, `self.m` and `cls.m` and bare
+method names in the class body resolve to the class's methods. An item no clean root
+(a public definition with no caller and no reference) reaches gets a review
+reason saying why.
+"""
+
+import ast
+from collections import deque
+from pathlib import Path
+
+from pipeline import commits
+from pipeline.repos import git
+
+_FUNC_TYPES = (ast.FunctionDef, ast.AsyncFunctionDef)
+_DEF_TYPES = _FUNC_TYPES + (ast.ClassDef,)
+_TOP_TYPES = _DEF_TYPES + (ast.Import, ast.ImportFrom, ast.Assign)
+
+
+# ---------------------------------------------------------------------------
+# Sources
+# ---------------------------------------------------------------------------
+
+def sources_at(repo_dir, rev, package):
+    """Every library file of the package (PyPI name) at `rev`, with its source."""
+    return [
+        {"module": module, "path": path, "source": git(repo_dir, "show", f"{rev}:{path}")}
+        for path, module in commits.library_files_at(repo_dir, rev, package)
+    ]
+
+
+def sources_from_tree(root, package):
+    """Every root/<package>/**/*.py file, with its module and root-relative path."""
+    root = Path(root)
+    sources = []
+    for file in sorted((root / package).rglob("*.py")):
+        path = file.relative_to(root).as_posix()
+        sources.append({
+            "module": commits.module_for_path(path, package),
+            "path": path,
+            "source": file.read_text(encoding="utf-8"),
+        })
+    return sources
+
+
+# ---------------------------------------------------------------------------
+# Graph
+# ---------------------------------------------------------------------------
+
+class Graph:
+    """Definitions, call edges and public names of one package."""
+
+    def __init__(self):
+        self.defs = {}        # FQN -> {"kind", "module", "file", "line"}
+        self.callers = {}     # callee FQN -> [(caller FQN, "high" | "medium")]
+        self.public = {}      # FQN -> shortest public import path
+        self.references = {}  # FQN -> [{"file", "line", "context"}] where it is used as a value
+        self.notes = []       # skipped files
+        self.bases = {}       # class FQN -> base class FQNs in the package
+        self.modules = {}     # module -> file of the copy that was analysed
+
+
+def build_graph(sources, package):
+    """Build the call graph of a package; `package` is its import name."""
+    return _Builder(sources, package).graph
+
+
+class _Builder:
+    def __init__(self, sources, package):
+        self.package = package
+        self.graph = Graph()
+        self.trees = {}       # module -> (ast.Module, path, is_init)
+        self.tables = {}      # module -> {name: binding}
+        self.stars = {}       # __init__ module -> {name: binding} from `import *`
+        self.all_names = {}   # module -> __all__ list of strings
+        self.bodies = []      # (FQN, def node, enclosing class FQN or None, module)
+        self.class_nodes = {}   # id(ClassDef node) -> class FQN
+        self.method_class = {}  # id(method node) -> class FQN
+        self.nested_refs = []   # (callee FQN, reference) for calls inside nested scopes
+        self._parse(sources)
+        for module, (tree, path, _) in self.trees.items():
+            self._collect(module, tree, path)
+        for module in self.trees:
+            self._collect_stars(module)
+        for module, (tree, _, _) in self.trees.items():
+            self._collect_bases(module, tree)
+        self._collect_edges()
+        self._collect_references()
+        self._collect_public()
+
+    # -- pass 1: modules, definitions, name tables --------------------------
+
+    def _parse(self, sources):
+        for source in sources:
+            module, path = source["module"], source["path"]
+            if module in self.trees:
+                self.graph.notes.append(f"{path}: duplicate module {module}, skipped")
+                continue
+            try:
+                tree = ast.parse(source["source"])
+            except RecursionError:
+                self.graph.notes.append(f"{path}: does not parse (RecursionError), skipped")
+                continue
+            except (SyntaxError, ValueError) as error:
+                line = getattr(error, "lineno", None) or 0
+                message = getattr(error, "msg", None) or str(error)
+                self.graph.notes.append(f"{path}: does not parse (line {line}: {message}), skipped")
+                continue
+            is_init = path == "__init__.py" or path.endswith("/__init__.py")
+            self.trees[module] = (tree, path, is_init)
+            self.graph.modules[module] = path
+
+    def _collect(self, module, tree, path):
+        table = self.tables[module] = {}
+        for node in _top_level(tree):
+            if isinstance(node, ast.Import):
+                for alias in node.names:
+                    if alias.asname:
+                        table[alias.asname] = self._module_binding(alias.name)
+                    else:
+                        top = alias.name.split(".")[0]
+                        table[top] = self._module_binding(top)
+            elif isinstance(node, ast.ImportFrom):
+                target = self._import_target(module, node)
+                for alias in node.names:
+                    if alias.name == "*":
+                        continue
+                    name = alias.asname or alias.name
+                    if target is None:
+                        table[name] = None
+                    elif f"{target}.{alias.name}" in self.trees:
+                        table[name] = ("module", f"{target}.{alias.name}")
+                    else:
+                        table[name] = ("from", target, alias.name)
+            elif isinstance(node, ast.Assign):
+                names = _string_list(node)
+                if names is not None:
+                    self.all_names[module] = names
+            else:
+                fqn = f"{module}.{node.name}"
+                kind = "class" if isinstance(node, ast.ClassDef) else "function"
+                self._add_def(fqn, kind, module, path, node)
+                table[node.name] = ("def", fqn)
+                if kind == "function":
+                    self.bodies.append((fqn, node, None, module))
+                else:
+                    self.class_nodes[id(node)] = fqn
+                    for child in _top_level(node):
+                        if isinstance(child, _FUNC_TYPES):
+                            method = f"{fqn}.{child.name}"
+                            self._add_def(method, "method", module, path, child)
+                            self.bodies.append((method, child, fqn, module))
+                            self.method_class[id(child)] = fqn
+
+    def _add_def(self, fqn, kind, module, path, node):
+        self.graph.defs[fqn] = {"kind": kind, "module": module, "file": path, "line": node.lineno}
+
+    def _in_package(self, dotted):
+        return dotted == self.package or dotted.startswith(self.package + ".")
+
+    def _module_binding(self, dotted):
+        return ("module", dotted) if self._in_package(dotted) else None
+
+    def _import_target(self, module, node):
+        """The package module an ImportFrom reads from, or None outside the package."""
+        if node.level:
+            is_init = self.trees[module][2]
+            parts = module.split(".") if is_init else module.split(".")[:-1]
+            if node.level - 1 > len(parts) - 1:
+                return None
+            parts = parts[: len(parts) - (node.level - 1)]
+            if node.module:
+                parts += node.module.split(".")
+            target = ".".join(parts)
+        else:
+            target = node.module
+        return target if self._in_package(target) else None
+
+    def _collect_bases(self, module, tree):
+        for node in _top_level(tree):
+            if isinstance(node, ast.ClassDef):
+                bases = []
+                for base in node.bases:
+                    resolved = self._resolve_expr(base, module)
+                    if resolved and resolved[0] == "def" and self._kind(resolved[1]) == "class":
+                        bases.append(resolved[1])
+                self.graph.bases[f"{module}.{node.name}"] = bases
+
+    def _collect_stars(self, module):
+        """Names a module gets from `from .mod import *`."""
+        stars = self.stars[module] = {}
+        tree = self.trees[module][0]
+        for node in _top_level(tree):
+            if not isinstance(node, ast.ImportFrom) or node.names[0].name != "*":
+                continue
+            target = self._import_target(module, node)
+            if target not in self.trees:
+                continue
+            if target in self.all_names:
+                for name in self.all_names[target]:
+                    stars[name] = ("from", target, name)
+            else:
+                for fqn, info in self.graph.defs.items():
+                    name = fqn[len(target) + 1:]
+                    if (info["module"] == target and info["kind"] != "method"
+                            and not name.startswith("_")):
+                        stars[name] = ("def", fqn)
+
+    # -- name resolution -----------------------------------------------------
+
+    def _kind(self, fqn):
+        info = self.graph.defs.get(fqn)
+        return info["kind"] if info else None
+
+    def _lookup(self, module, name, seen):
+        """Resolve a name bound in a module: ("module", m), ("def", fqn) or None."""
+        binding = self.tables.get(module, {}).get(name)
+        if binding is None:
+            binding = self.stars.get(module, {}).get(name)
+        return self._resolve_binding(binding, seen)
+
+    def _resolve_binding(self, binding, seen=None):
+        if binding is None or binding[0] in ("module", "def"):
+            return binding
+        _, target, name = binding
+        seen = set() if seen is None else seen
+        if (target, name) in seen:
+            return None
+        seen.add((target, name))
+        return self._member(target, name, seen)
+
+    def _member(self, module, name, seen=None):
+        """What `module.name` is in the package."""
+        if f"{module}.{name}" in self.trees:
+            return ("module", f"{module}.{name}")
+        resolved = self._lookup(module, name, set() if seen is None else seen)
+        if resolved is None and self._kind(f"{module}.{name}") in ("function", "class"):
+            resolved = ("def", f"{module}.{name}")
+        return resolved
+
+    def _resolve_expr(self, node, module):
+        """Resolve a Name or Attribute chain to a package module or definition."""
+        if isinstance(node, ast.Name):
+            return self._lookup(module, node.id, set())
+        if isinstance(node, ast.Attribute):
+            base = self._resolve_expr(node.value, module)
+            if base is None:
+                return None
+            if base[0] == "module":
+                return self._member(base[1], node.attr)
+            if self._kind(base[1]) == "class":
+                method = self._method(base[1], node.attr)
+                return ("def", method) if method else None
+        return None
+
+    def _method(self, cls, name, include_self=True, seen=None):
+        """The first definition of method `name` in cls or its bases, depth-first."""
+        seen = set() if seen is None else seen
+        if cls in seen:
+            return None
+        seen.add(cls)
+        if include_self and self._kind(f"{cls}.{name}") == "method":
+            return f"{cls}.{name}"
+        for base in self.graph.bases.get(cls, []):
+            found = self._method(base, name, True, seen)
+            if found:
+                return found
+        return None
+
+    def _constructor(self, cls):
+        return self._method(cls, "__init__") or cls
+
+    # -- pass 2: edges ---------------------------------------------------------
+
+    def _collect_edges(self):
+        methods_by_name = {}
+        for fqn, info in self.graph.defs.items():
+            if info["kind"] == "method":
+                methods_by_name.setdefault(fqn.rsplit(".", 1)[1], []).append(fqn)
+        edges = {}
+        for caller, node, cls, module in self.bodies:
+            local = _local_names(node)
+            path = self.trees[module][1]
+            for call, nested in _calls(node.body):
+                targets = self._targets(call, cls, module, local, methods_by_name)
+                if nested:
+                    # Runs only if the nested scope runs: a reference, not an
+                    # edge. Name-only (medium) matches are guesses, left out.
+                    for callee, confidence in targets:
+                        if confidence == "high":
+                            self.nested_refs.append((callee, {
+                                "file": path, "line": call.lineno,
+                                "context": f"called inside a nested scope of {node.name}",
+                            }))
+                    continue
+                for callee, confidence in targets:
+                    key = (callee, caller)
+                    if edges.get(key) != "high":
+                        edges[key] = confidence
+        for (callee, caller), confidence in sorted(edges.items()):
+            self.graph.callers.setdefault(callee, []).append((caller, confidence))
+
+    def _targets(self, call, cls, module, local, methods_by_name):
+        """Callees of one call. A name bound inside the definition (a parameter,
+        an assignment) is a value, never the module-level name it shadows."""
+        func = call.func
+        if isinstance(func, ast.Name):
+            if func.id in local:
+                return []
+            return self._high(self._resolve_expr(func, module))
+        if not isinstance(func, ast.Attribute):
+            return []
+        value = func.value
+        if cls and isinstance(value, ast.Name) and value.id in ("self", "cls"):
+            method = self._method(cls, func.attr)
+            if method:
+                return [(method, "high")]
+        elif cls and _is_super_call(value):
+            method = self._method(cls, func.attr, include_self=False)
+            if method:
+                return [(method, "high")]
+        elif _root_name(value) not in local:
+            resolved = self._resolve_expr(func, module)
+            if resolved:
+                return self._high(resolved)
+            receiver = self._resolve_expr(value, module)
+            if receiver and receiver[0] == "module":
+                return []
+        return [(method, "medium") for method in methods_by_name.get(func.attr, [])]
+
+    def _high(self, resolved):
+        if resolved is None or resolved[0] != "def":
+            return []
+        kind = self._kind(resolved[1])
+        if kind == "class":
+            return [(self._constructor(resolved[1]), "high")]
+        return [(resolved[1], "high")]
+
+    # -- pass 3: value references ---------------------------------------------
+
+    def _collect_references(self):
+        for module, (tree, path, _) in self.trees.items():
+            self._scan(tree, module, path)
+        for callee, reference in self.nested_refs:
+            self.graph.references.setdefault(callee, []).append(reference)
+
+    def _scan(self, tree, module, path):
+        """Record every Name or Attribute chain that resolves to a package
+        definition and is not called. Iterative, so a deep expression cannot
+        exhaust the stack. Each entry carries the node, its parent and the
+        parent's parent (for the context), the names bound in the enclosing
+        function, that function's name and the class scope (see
+        _scan_children)."""
+        stack = [(tree, None, None, frozenset(), None, None)]
+        while stack:
+            node, parent, owner, local, def_name, scope = stack.pop()
+            children = self._scan_children(node, local, def_name, scope)
+            if isinstance(node, (ast.Name, ast.Attribute)):
+                self._reference(node, parent, owner, module, path, local, def_name, scope)
+            for child, child_local, child_name, child_scope in reversed(children):
+                stack.append((child, node, parent, child_local, child_name, child_scope))
+
+    def _scan_children(self, node, local, def_name, scope):
+        """(child, local names, def name, class scope) for each child to scan.
+        Decorators are skipped; defaults, annotations and bases belong to the
+        enclosing scope; a definition's body sees its own local names. The
+        class scope is ("body", C) in the body of package class C and
+        ("self", C) in its methods and the functions and lambdas nested in
+        them; elsewhere None."""
+        if isinstance(node, (ast.Name, ast.Attribute)):
+            # The prefix of a chain (`Cls` in `Cls.m`) is not a value use of its own.
+            base = node
+            while isinstance(base, ast.Attribute):
+                base = base.value
+            return [] if isinstance(base, ast.Name) else [(base, local, def_name, scope)]
+        if isinstance(node, ast.ClassDef):
+            cls = self.class_nodes.get(id(node))
+            body_scope = ("body", cls) if cls else None
+            return ([(child, local, def_name, scope) for child in node.bases + node.keywords]
+                    + [(child, local, def_name, body_scope) for child in node.body])
+        if isinstance(node, _FUNC_TYPES + (ast.Lambda,)):
+            children = [(node.args, local, def_name, scope)]
+            if getattr(node, "returns", None) is not None:
+                children.append((node.returns, local, def_name, scope))
+            body_local = local | _local_names(node)
+            if id(node) in self.method_class:
+                body_scope = ("self", self.method_class[id(node)])
+            else:
+                body_scope = scope if scope and scope[0] == "self" else None
+            if isinstance(node, ast.Lambda):
+                return children + [(node.body, body_local, def_name, body_scope)]
+            return children + [(child, body_local, node.name, body_scope) for child in node.body]
+        if isinstance(node, (ast.ListComp, ast.SetComp, ast.DictComp, ast.GeneratorExp)):
+            local = local | _local_names(node)
+        return [(child, local, def_name, scope) for child in ast.iter_child_nodes(node)]
+
+    def _reference(self, node, parent, owner, module, path, local, def_name, scope):
+        if not isinstance(node.ctx, ast.Load):
+            return
+        if isinstance(parent, ast.Call) and parent.func is node:
+            return
+        resolved = self._class_scoped(node, scope)
+        if resolved is None:
+            if _root_name(node) in local:
+                return
+            resolved = self._resolve_expr(node, module)
+        if resolved is None or resolved[0] != "def":
+            return
+        self.graph.references.setdefault(resolved[1], []).append({
+            "file": path, "line": node.lineno, "context": _context(node, parent, owner, def_name),
+        })
+
+    def _class_scoped(self, node, scope):
+        """A method of the enclosing class named by `self.m` / `cls.m` in a
+        method, or by a bare name in the class body; None otherwise."""
+        if scope is None:
+            return None
+        kind, cls = scope
+        if (kind == "self" and isinstance(node, ast.Attribute)
+                and isinstance(node.value, ast.Name) and node.value.id in ("self", "cls")):
+            method = self._method(cls, node.attr)
+        elif kind == "body" and isinstance(node, ast.Name):
+            method = self._method(cls, node.id)
+        else:
+            return None
+        return ("def", method) if method else None
+
+    # -- public names ------------------------------------------------------------
+
+    def _collect_public(self):
+        module_paths = {module: {module} for module in self.trees}
+        def_paths = {}
+        for module, (_, _, is_init) in self.trees.items():
+            if not is_init:
+                continue
+            names = list(self.tables[module]) + list(self.stars[module])
+            for name in names:
+                resolved = self._lookup(module, name, set())
+                if resolved is None:
+                    continue
+                paths = module_paths if resolved[0] == "module" else def_paths
+                paths.setdefault(resolved[1], set()).add(f"{module}.{name}")
+        for fqn, info in self.graph.defs.items():
+            if info["kind"] == "method":
+                continue
+            name = fqn[len(info["module"]) + 1:]
+            candidates = {f"{path}.{name}" for path in module_paths.get(info["module"], ())}
+            candidates |= def_paths.get(fqn, set())
+            best = _shortest(p for p in candidates if _is_public(p))
+            if best:
+                self.graph.public[fqn] = best
+        subclasses = {}
+        for cls, bases in self.graph.bases.items():
+            for base in bases:
+                subclasses.setdefault(base, []).append(cls)
+        for fqn, info in self.graph.defs.items():
+            if info["kind"] != "method":
+                continue
+            cls, name = fqn.rsplit(".", 1)
+            if not _is_dunder(name) and name.startswith("_"):
+                continue
+            # The defining class and every package subclass that inherits the
+            # method without overriding it: users reach it through any of them.
+            paths = []
+            for owner in _descendants(cls, subclasses):
+                if owner in self.graph.public and self._method(owner, name) == fqn:
+                    path = self.graph.public[owner]
+                    paths.append(path if _is_dunder(name) else f"{path}.{name}")
+            best = _shortest(paths)
+            if best:
+                self.graph.public[fqn] = best
+
+
+def _descendants(cls, subclasses):
+    """cls and every package class below it in `bases`, each once."""
+    found, stack = [], [cls]
+    while stack:
+        current = stack.pop()
+        if current not in found:
+            found.append(current)
+            stack.extend(subclasses.get(current, []))
+    return found
+
+
+def _top_level(node):
+    """Definitions, imports and assignments directly in a module or class body,
+    looking through if/try/with/for/while blocks but not into definitions."""
+    for child in ast.iter_child_nodes(node):
+        if isinstance(child, _TOP_TYPES):
+            yield child
+        elif isinstance(child, ast.stmt) or isinstance(child, ast.excepthandler):
+            yield from _top_level(child)
+
+
+def _string_list(node):
+    """The strings of `__all__ = [...]`, or None for any other assignment."""
+    if (len(node.targets) == 1 and isinstance(node.targets[0], ast.Name)
+            and node.targets[0].id == "__all__" and isinstance(node.value, ast.List)
+            and all(isinstance(e, ast.Constant) and isinstance(e.value, str) for e in node.value.elts)):
+        return [e.value for e in node.value.elts]
+    return None
+
+
+def _calls(body):
+    """(call, nested) for every ast.Call in a definition body; nested is True
+    inside the body of a nested function, lambda or class. Defaults,
+    annotations and bases run with the enclosing scope; decorators of nested
+    definitions are skipped."""
+    stack = [(node, False) for node in reversed(body)]
+    while stack:
+        node, nested = stack.pop()
+        if isinstance(node, ast.Call):
+            yield node, nested
+        if isinstance(node, _FUNC_TYPES + (ast.Lambda,)):
+            outer = [node.args] + ([node.returns] if getattr(node, "returns", None) else [])
+            inner = [node.body] if isinstance(node, ast.Lambda) else node.body
+        elif isinstance(node, ast.ClassDef):
+            outer, inner = node.bases + node.keywords, node.body
+        else:
+            outer, inner = list(ast.iter_child_nodes(node)), []
+        children = [(child, nested) for child in outer] + [(child, True) for child in inner]
+        stack.extend(reversed(children))
+
+
+def _local_names(node):
+    """Names bound inside a definition or its nested scopes: parameters,
+    assignment, for, with, except, walrus and comprehension targets, nested
+    definitions and imports. Names declared `global` stay module-level."""
+    bound, declared_global = set(), set()
+    for child in ast.walk(node):
+        if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda)):
+            args = child.args
+            for arg in args.posonlyargs + args.args + args.kwonlyargs + [args.vararg, args.kwarg]:
+                if arg is not None:
+                    bound.add(arg.arg)
+            if child is not node and not isinstance(child, ast.Lambda):
+                bound.add(child.name)
+        elif isinstance(child, ast.ClassDef):
+            bound.add(child.name)
+        elif isinstance(child, ast.Name) and isinstance(child.ctx, (ast.Store, ast.Del)):
+            bound.add(child.id)
+        elif isinstance(child, ast.ExceptHandler) and child.name:
+            bound.add(child.name)
+        elif isinstance(child, (ast.Import, ast.ImportFrom)):
+            for alias in child.names:
+                if alias.name != "*":
+                    bound.add(alias.asname or alias.name.split(".")[0])
+        elif isinstance(child, ast.Global):
+            declared_global.update(child.names)
+    return bound - declared_global
+
+
+_LITERALS = {ast.List: "list", ast.Tuple: "tuple", ast.Set: "set"}
+
+
+def _context(node, parent, owner, def_name):
+    """Where a reference sits, in words, from its parent node (and the
+    parent's parent `owner`)."""
+    if isinstance(parent, ast.Dict) and any(value is node for value in parent.values):
+        if (isinstance(owner, ast.Assign) and owner.value is parent and len(owner.targets) == 1
+                and isinstance(owner.targets[0], ast.Name)):
+            return f"value in dict literal {owner.targets[0].id}"
+        return "value in dict literal"
+    if type(parent) in _LITERALS:
+        return f"element of {_LITERALS[type(parent)]} literal"
+    if isinstance(parent, ast.keyword):
+        parent = owner
+    if isinstance(parent, ast.Call):
+        if isinstance(parent.func, ast.Name):
+            return f"argument to {parent.func.id}"
+        if isinstance(parent.func, ast.Attribute):
+            return f"argument to {parent.func.attr}"
+    if isinstance(parent, ast.Assign) and parent.value is node:
+        return "assigned to " + " = ".join(ast.unparse(target) for target in parent.targets)
+    if isinstance(parent, ast.AnnAssign) and parent.value is node:
+        return f"assigned to {ast.unparse(parent.target)}"
+    if isinstance(parent, ast.arguments):
+        return f"default argument of {getattr(owner, 'name', 'lambda')}"
+    if isinstance(parent, ast.Return) and def_name:
+        return f"returned from {def_name}"
+    return "referenced"
+
+
+def _root_name(node):
+    """The Name at the start of an attribute chain (`a` in `a.b.c`), or None."""
+    while isinstance(node, ast.Attribute):
+        node = node.value
+    return node.id if isinstance(node, ast.Name) else None
+
+
+def _is_super_call(node):
+    return (isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+            and node.func.id == "super")
+
+
+def _is_dunder(part):
+    return len(part) > 4 and part.startswith("__") and part.endswith("__")
+
+
+def _is_public(path):
+    return not any(part.startswith("_") for part in path.split("."))
+
+
+def _shortest(paths):
+    paths = list(paths)
+    if not paths:
+        return None
+    return min(paths, key=lambda p: (p.count("."), len(p), p))
+
+
+# ---------------------------------------------------------------------------
+# Walk
+# ---------------------------------------------------------------------------
+
+def walk(sources, package, vulnerable):
+    """Entry points of the vulnerable items: every public definition whose call
+    chains reach an item, with the shortest chain as evidence."""
+    graph = build_graph(sources, package)
+    entries, reasons, notes = {}, [], list(graph.notes)
+    for item in vulnerable:
+        target = item["name"]
+        any_next = _backward(graph, target, ("high", "medium"))
+        high_next = _backward(graph, target, ("high",))
+        reason = _reason(graph, item, any_next)
+        if reason is _SELF_ONLY:
+            notes.append(f"self-only entry point: {target} has no caller or reference inside the package")
+        elif reason is not None:
+            reasons.append(reason)
+        for fqn in any_next:
+            if fqn not in graph.public:
+                continue
+            high = fqn in high_next
+            entry = {
+                "name": graph.public[fqn],
+                "defined_as": fqn,
+                "confidence": "high" if high else "medium",
+                "path": _chain(fqn, high_next if high else any_next),
+            }
+            current = entries.get(entry["name"])
+            if current is None or _better(entry, current):
+                entries[entry["name"]] = entry
+    _add_owning_classes(graph, entries)
+    return {
+        "entry_points": [entries[name] for name in sorted(entries)],
+        "reasons": reasons,
+        "notes": notes,
+    }
+
+
+def _add_owning_classes(graph, entries):
+    """List a public class when a method listed under its public path is an
+    entry point (users reach the method through the class). Naming only: the
+    class entry takes the best such method's confidence and path. A class
+    name already listed is kept as it is."""
+    classes = {graph.public[fqn]: fqn for fqn, info in graph.defs.items()
+               if info["kind"] == "class" and fqn in graph.public}
+    found = {}
+    for entry in list(entries.values()):
+        if graph.defs.get(entry["defined_as"], {}).get("kind") != "method":
+            continue
+        owner = entry["name"].rsplit(".", 1)[0]
+        if owner not in classes or owner in entries:
+            continue
+        candidate = {
+            "name": owner,
+            "defined_as": classes[owner],
+            "confidence": entry["confidence"],
+            "path": [classes[owner]] + entry["path"],
+        }
+        if owner not in found or _better(candidate, found[owner]):
+            found[owner] = candidate
+    entries.update(found)
+
+
+_SELF_ONLY = "self-only"
+
+
+def _reason(graph, item, closure):
+    """The review reason for one vulnerable item, None when it is connected
+    (a clean root other than itself reaches it), or _SELF_ONLY for a public
+    function nothing in the package calls or references."""
+    target, kind = item["name"], item["kind"]
+    roots = sorted(fqn for fqn in closure if not graph.callers.get(fqn))
+    if any(root != target and root in graph.public and not graph.references.get(root)
+           for root in roots):
+        return None
+    references = list(graph.references.get(target, []))
+    info = graph.defs.get(target)
+    if kind == "module_level":
+        file = graph.modules.get(target)
+    else:
+        file = info["file"] if info else None
+
+    def reason(reason_kind, dead_ends=(), detail=None):
+        found = {"item": target, "kind": reason_kind, "file": file,
+                 "references": references, "dead_ends": list(dead_ends)}
+        if detail:
+            found["detail"] = detail
+        return found
+
+    if kind == "module_level":
+        return reason("module_level")
+    if kind == "class_level":
+        return None if target in graph.public else reason("class_level")
+    if info is None:
+        return reason("no_reference", detail="not defined in the analysed tree")
+    if roots == [target]:
+        if references:
+            return reason("referenced_not_called")
+        if info["kind"] == "function" and target in graph.public:
+            return _SELF_ONLY
+        return reason("no_reference")
+    if not roots:
+        return reason("dead_end_chain", detail="no root: every caller is itself called")
+    return reason("dead_end_chain", [
+        {"name": root, "references": list(graph.references.get(root, []))} for root in roots
+    ])
+
+
+def _backward(graph, target, confidences):
+    """Breadth-first over callers: {definition: next step towards target}."""
+    next_step = {target: None}
+    queue = deque([target])
+    while queue:
+        callee = queue.popleft()
+        for caller, confidence in graph.callers.get(callee, []):
+            if confidence in confidences and caller not in next_step:
+                next_step[caller] = callee
+                queue.append(caller)
+    return next_step
+
+
+def _chain(start, next_step):
+    chain = [start]
+    while next_step[chain[-1]] is not None:
+        chain.append(next_step[chain[-1]])
+    return chain
+
+
+def _better(new, old):
+    if new["confidence"] != old["confidence"]:
+        return new["confidence"] == "high"
+    return len(new["path"]) < len(old["path"])

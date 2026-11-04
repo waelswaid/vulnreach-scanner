@@ -3,17 +3,25 @@
 One JSON file per advisory. Confidence follows the commit a function was
 found in (high: passed the release check and not a bundle; medium
 otherwise), and a function named in the advisory text is raised to high.
-Hand overrides are applied after the pipeline runs and are listed in the
-record, so regenerating the database never loses a correction.
+Hand overrides apply in three passes (fix commits before the diff, vulnerable
+names before the entry-point walk, then entry points, the note and the review
+sign-off on the built record) and are listed in the record, so regenerating
+the database never loses a correction.
 """
 
 import copy
+import hashlib
 import json
 import re
 from datetime import datetime, timezone
 from pathlib import Path
 
-PIPELINE_VERSION = "1"
+from pipeline.repos import PipelineError
+
+PIPELINE_VERSION = "2"
+
+# Written into every record's review field: review state is derived, never hand-edited.
+REVIEW_RESOLVE = "Do not edit: resolve in data/overrides.json and rerun"
 
 # A function or method mentioned in prose: `idna.encode()`, `extract_zipped_paths()`.
 _MENTION_RE = re.compile(r"(?<![\w.])([A-Za-z_][\w.]*[\w])\(\)")
@@ -85,40 +93,71 @@ def build_record(merged, analysis):
                      + ", ".join(f"{m}()" for m in check["unmatched_mentions"])
                      + ", which match no changed function")
 
+    status = analysis.get("status", "unknown")
+    given = analysis.get("review") or {}
+    reasons = [copy.deepcopy(r) for r in given.get("reasons") or []]
+    if not (reasons and status == "found"):
+        reasons = []
+    review = {
+        "status": "open" if reasons else "none",
+        "tree": given.get("tree"),
+        "reasons": reasons,
+        "resolve": REVIEW_RESOLVE,
+    }
+
     return {
         "id": merged["id"],
         "aliases": list(merged.get("aliases") or []),
         "package": merged["package"],
         "ecosystem": merged.get("ecosystem", "PyPI"),
         "repo": analysis.get("repo"),
-        "status": analysis.get("status", "unknown"),
+        "status": status,
         "fix_commits": fix_commits,
         "rejected_commits": [dict(c) for c in analysis.get("rejected_commits") or []],
         "vulnerable": vulnerable,
         "entry_points": [dict(e) for e in analysis.get("entry_points") or []],
         "names_verified_for": list(analysis.get("names_verified_for") or []),
         "notes": notes,
-        "overrides_applied": [],
+        "overrides_applied": list(analysis.get("overrides_applied") or []),
+        "review": review,
+        "overrides_fingerprint": None,
         "pipeline_version": PIPELINE_VERSION,
         "osv_modified": merged.get("modified"),
         "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
     }
 
 
-def apply_overrides(record, overrides):
-    """Apply the hand-written corrections for this record's ID; returns a new record.
+def overrides_fingerprint(spec):
+    """SHA-256 of the canonical JSON of one advisory's override spec; None when absent."""
+    if not spec:
+        return None
+    text = json.dumps(spec, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
-    Override keys: status, fix_commits (replace, SHAs), add_vulnerable /
-    remove_vulnerable (entries / names), add_entry_points /
-    remove_entry_points (entries / names), note. Every operation is listed
-    in overrides_applied.
-    """
-    result = copy.deepcopy(record)
-    spec = overrides.get(record["id"])
+
+def validate_overrides(overrides):
+    """Raise PipelineError, naming the advisory, for a malformed review override."""
+    for advisory_id, spec in overrides.items():
+        if not isinstance(spec, dict):
+            continue
+        if "reviewed" in spec:
+            reviewed = spec["reviewed"]
+            if not spec.get("note"):
+                raise PipelineError(f"{advisory_id}: override marks items reviewed without a note")
+            is_names = isinstance(reviewed, list) and all(isinstance(n, str) for n in reviewed)
+            if not (is_names or reviewed is True):
+                raise PipelineError(
+                    f"{advisory_id}: reviewed must be a list of item names or true")
+        if "signed_off" in spec and not isinstance(spec["signed_off"], bool):
+            raise PipelineError(f"{advisory_id}: signed_off must be true or false")
+
+
+def override_commits(analysis, spec):
+    """Pass 1: apply status and fix_commits; returns a new dict."""
+    result = copy.deepcopy(analysis)
     if not spec:
         return result
-    applied = result["overrides_applied"]
-
+    applied = result.setdefault("overrides_applied", [])
     if "status" in spec:
         result["status"] = spec["status"]
         applied.append(f"status set to {spec['status']}")
@@ -128,13 +167,31 @@ def apply_overrides(record, overrides):
             for sha in spec["fix_commits"]
         ]
         applied.append("fix_commits replaced: " + ", ".join(s[:7] for s in spec["fix_commits"]))
+    return result
+
+
+def override_vulnerable(analysis, spec):
+    """Pass 2: apply remove_vulnerable then add_vulnerable; returns a new dict.
+
+    Review reasons about a removed item go with it.
+    """
+    result = copy.deepcopy(analysis)
+    if not spec:
+        return result
+    applied = result.setdefault("overrides_applied", [])
+    vulnerable = result.setdefault("vulnerable", [])
 
     for name in spec.get("remove_vulnerable") or []:
-        result["vulnerable"] = [v for v in result["vulnerable"] if v["name"] != name]
+        vulnerable = [v for v in vulnerable if v["name"] != name]
         applied.append(f"removed vulnerable {name}")
+        review = result.get("review")
+        if review and review.get("reasons"):
+            review["reasons"] = [r for r in review["reasons"] if r.get("item") != name]
+            if not review["reasons"] and review.get("status") == "open":
+                review["status"] = "none"
     for entry in spec.get("add_vulnerable") or []:
-        result["vulnerable"] = [v for v in result["vulnerable"] if v["name"] != entry["name"]]
-        result["vulnerable"].append({
+        vulnerable = [v for v in vulnerable if v["name"] != entry["name"]]
+        vulnerable.append({
             "name": entry["name"],
             "kind": entry.get("kind", "function"),
             "file": entry.get("file"),
@@ -142,6 +199,16 @@ def apply_overrides(record, overrides):
             "evidence": list(entry.get("evidence") or []) + ["hand override"],
         })
         applied.append(f"added vulnerable {entry['name']}")
+    result["vulnerable"] = vulnerable
+    return result
+
+
+def override_entry_points(record, spec):
+    """Pass 3: entry points, note, then the review sign-off; returns a new record."""
+    result = copy.deepcopy(record)
+    if not spec:
+        return result
+    applied = result["overrides_applied"]
 
     for name in spec.get("remove_entry_points") or []:
         result["entry_points"] = [e for e in result["entry_points"] if e["name"] != name]
@@ -159,7 +226,48 @@ def apply_overrides(record, overrides):
     if spec.get("note"):
         result["notes"].append(spec["note"])
         applied.append("note added")
+
+    reviewed = spec.get("reviewed")
+    if reviewed and not spec.get("note"):
+        raise PipelineError(f"{record['id']}: override marks items reviewed without a note")
+    review = result["review"]
+    if reviewed:
+        if spec.get("signed_off") is not True:
+            applied.append("reviewed: not applied, unsigned")
+        else:
+            open_items = [r["item"] for r in review["reasons"]] if review["status"] == "open" else []
+            names = open_items if reviewed is True else reviewed
+            if reviewed is True and not open_items:
+                applied.append("reviewed: no open reason")
+            for name in names:
+                if name in open_items:
+                    applied.append(f"reviewed {name}")
+                else:
+                    applied.append(f"reviewed {name}: no open reason")
+            if open_items and all(item in names for item in open_items):
+                review["status"] = "resolved"
+    if result["status"] != "found":
+        review["status"] = "none"
+        review["reasons"] = []
+
+    result["overrides_fingerprint"] = overrides_fingerprint(spec)
     return result
+
+
+def apply_overrides(record, overrides):
+    """Apply the hand-written corrections for this record's ID; returns a new record.
+
+    Override keys: status, fix_commits (replace, SHAs), add_vulnerable /
+    remove_vulnerable (entries / names), add_entry_points /
+    remove_entry_points (entries / names), note, reviewed (item names or
+    true; needs a note), signed_off (bool; reviewed counts only when true).
+    Three passes: commits, vulnerable names, entry points and review. Every
+    operation is listed in overrides_applied.
+    """
+    spec = overrides.get(record["id"])
+    result = override_commits(record, spec)
+    result = override_vulnerable(result, spec)
+    return override_entry_points(result, spec)
 
 
 def write_record(record, out_dir):
@@ -171,9 +279,36 @@ def write_record(record, out_dir):
     return path
 
 
+def record_dir(record, out_dir):
+    """<out_dir>/review for a record with open review reasons, else out_dir."""
+    out_dir = Path(out_dir)
+    return out_dir / "review" if record["review"]["status"] == "open" else out_dir
+
+
+def place_record(record, out_dir):
+    """Write the record into its folder and delete any copy in the other one."""
+    out_dir = Path(out_dir)
+    target = record_dir(record, out_dir)
+    path = write_record(record, target)
+    other = out_dir if target != out_dir else out_dir / "review"
+    (other / path.name).unlink(missing_ok=True)
+    return path
+
+
+def folder_conflicts(records_dir):
+    """Sorted IDs that have a file in both records_dir and records_dir/review."""
+    records_dir = Path(records_dir)
+    main = {p.stem for p in records_dir.glob("*.json") if p.name != "index.json"}
+    review = {p.stem for p in (records_dir / "review").glob("*.json")}
+    return sorted(main & review)
+
+
 def write_index(records_dir):
     """Rebuild <records_dir>/index.json: every record ID and alias -> record ID."""
     records_dir = Path(records_dir)
+    conflicts = folder_conflicts(records_dir)
+    if conflicts:
+        raise PipelineError("records in both folders: " + ", ".join(conflicts))
     index = {}
     for path in sorted(records_dir.glob("*.json")):
         if path.name == "index.json":

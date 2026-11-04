@@ -1,1 +1,611 @@
-{}
+{
+  "GHSA-8q59-q68h-6hv4": {
+    "reviewed": [
+      "yaml.constructor"
+    ],
+    "signed_off": false,
+    "add_entry_points": [
+      {
+        "name": "yaml.load",
+        "defined_as": "yaml.load",
+        "path": [
+          "yaml.load",
+          "Loader defaults to FullLoader (lib3/yaml/__init__.py:110), loader = Loader(stream)",
+          "yaml.constructor.BaseConstructor.get_single_data",
+          "yaml.constructor.BaseConstructor.construct_document",
+          "yaml.constructor.BaseConstructor.construct_object",
+          "lookup: self.yaml_multi_constructors[tag_prefix] for the python/module:, python/object: and python/object/new: prefixes (lib3/yaml/constructor.py:82-85, called at :102), a table filled by the module-level FullConstructor.add_multi_constructor registrations at :713-723",
+          "yaml.constructor"
+        ]
+      },
+      {
+        "name": "yaml.load_all",
+        "defined_as": "yaml.load_all",
+        "path": [
+          "yaml.load_all",
+          "Loader defaults to FullLoader (lib3/yaml/__init__.py:125), loader = Loader(stream)",
+          "yaml.constructor.BaseConstructor.get_data",
+          "yaml.constructor.BaseConstructor.construct_document",
+          "yaml.constructor.BaseConstructor.construct_object",
+          "lookup: self.yaml_multi_constructors[tag_prefix] for the python/module:, python/object: and python/object/new: prefixes (lib3/yaml/constructor.py:82-85, called at :102), a table filled by the module-level FullConstructor.add_multi_constructor registrations at :713-723",
+          "yaml.constructor"
+        ]
+      },
+      {
+        "name": "yaml.full_load",
+        "defined_as": "yaml.full_load",
+        "path": [
+          "yaml.full_load",
+          "yaml.load (Loader=FullLoader, lib3/yaml/__init__.py:142)",
+          "yaml.constructor.BaseConstructor.get_single_data",
+          "yaml.constructor.BaseConstructor.construct_document",
+          "yaml.constructor.BaseConstructor.construct_object",
+          "lookup: self.yaml_multi_constructors[tag_prefix] for the python/module:, python/object: and python/object/new: prefixes (lib3/yaml/constructor.py:82-85, called at :102), a table filled by the module-level FullConstructor.add_multi_constructor registrations at :713-723",
+          "yaml.constructor"
+        ]
+      },
+      {
+        "name": "yaml.full_load_all",
+        "defined_as": "yaml.full_load_all",
+        "path": [
+          "yaml.full_load_all",
+          "yaml.load_all (Loader=FullLoader, lib3/yaml/__init__.py:152)",
+          "yaml.constructor.BaseConstructor.get_data",
+          "yaml.constructor.BaseConstructor.construct_document",
+          "yaml.constructor.BaseConstructor.construct_object",
+          "lookup: self.yaml_multi_constructors[tag_prefix] for the python/module:, python/object: and python/object/new: prefixes (lib3/yaml/constructor.py:82-85, called at :102), a table filled by the module-level FullConstructor.add_multi_constructor registrations at :713-723",
+          "yaml.constructor"
+        ]
+      },
+      {
+        "name": "yaml.FullLoader",
+        "defined_as": "yaml.loader.FullLoader",
+        "path": [
+          "yaml.loader.FullLoader",
+          "yaml.constructor.BaseConstructor.get_single_data",
+          "yaml.constructor.BaseConstructor.construct_document",
+          "yaml.constructor.BaseConstructor.construct_object",
+          "lookup: self.yaml_multi_constructors[tag_prefix] for the python/module:, python/object: and python/object/new: prefixes (lib3/yaml/constructor.py:82-85, called at :102), a table filled by the module-level FullConstructor.add_multi_constructor registrations at :713-723",
+          "yaml.constructor"
+        ]
+      },
+      {
+        "name": "yaml.CFullLoader",
+        "defined_as": "yaml.cyaml.CFullLoader",
+        "path": [
+          "yaml.cyaml.CFullLoader",
+          "yaml.constructor.BaseConstructor.get_single_data",
+          "yaml.constructor.BaseConstructor.construct_document",
+          "yaml.constructor.BaseConstructor.construct_object",
+          "lookup: self.yaml_multi_constructors[tag_prefix] for the python/module:, python/object: and python/object/new: prefixes (lib3/yaml/constructor.py:82-85, called at :102), a table filled by the module-level FullConstructor.add_multi_constructor registrations at :713-723",
+          "yaml.constructor"
+        ]
+      },
+      {
+        "name": "yaml.constructor.FullConstructor",
+        "defined_as": "yaml.constructor.FullConstructor",
+        "path": [
+          "yaml.constructor.FullConstructor",
+          "yaml.constructor.BaseConstructor.construct_document",
+          "yaml.constructor.BaseConstructor.construct_object",
+          "lookup: self.yaml_multi_constructors[tag_prefix] for the python/module:, python/object: and python/object/new: prefixes (lib3/yaml/constructor.py:82-85, called at :102), a table filled by the module-level FullConstructor.add_multi_constructor registrations at :713-723",
+          "yaml.constructor"
+        ]
+      }
+    ],
+    "note": "Review reason: module_level yaml.constructor (lib3/yaml/constructor.py). The vulnerable code is not a function but three module-level statements, FullConstructor.add_multi_constructor for the python/module:, python/object: and python/object/new: tag prefixes (:713-723), which the fix moves to UnsafeConstructor. They run when yaml.constructor is imported and store construct_python_module, construct_python_object and construct_python_object_new in FullConstructor.yaml_multi_constructors (add_multi_constructor, :166). BaseConstructor.construct_object (:67) looks every node's tag prefix up in that table (:82-85) and calls the constructor (:102), so any FullConstructor-based load of a document with one of those tags uses the registrations. construct_object is reached from get_single_data / get_data -> construct_document (:47, :42, :54), which yaml.load and yaml.load_all call on the loader they build (__init__.py:114, :130); both default to FullLoader (:110, :125), and full_load / full_load_all pass FullLoader explicitly (:142, :152). FullLoader (loader.py:21) and CFullLoader (cyaml.py:30, exported as yaml.CFullLoader only when libyaml is installed) inherit FullConstructor and so its table. Paths end at the module item yaml.constructor. Checked against the record's tree fe15062 (5.3.1-15-gfe15062, first parent of the fix a001f27, which is in 5.4b1 and 5.4) on 2026-11-04, lib3/ copy (lib/ is the Python 2 copy)."
+  },
+  "GHSA-6757-jp84-gxfx": {
+    "reviewed": [
+      "yaml.constructor.FullConstructor.set_python_instance_state"
+    ],
+    "signed_off": false,
+    "add_entry_points": [
+      {
+        "name": "yaml.load",
+        "defined_as": "yaml.load",
+        "path": [
+          "yaml.load",
+          "Loader defaults to FullLoader (lib3/yaml/__init__.py:110), loader = Loader(stream)",
+          "yaml.constructor.BaseConstructor.get_single_data",
+          "yaml.constructor.BaseConstructor.construct_document",
+          "yaml.constructor.BaseConstructor.construct_object",
+          "lookup: self.yaml_multi_constructors['tag:yaml.org,2002:python/object/new:'] (registered by FullConstructor.add_multi_constructor, lib3/yaml/constructor.py:698-700)",
+          "yaml.constructor.FullConstructor.construct_python_object_new",
+          "yaml.constructor.FullConstructor.construct_python_object_apply",
+          "yaml.constructor.FullConstructor.set_python_instance_state"
+        ]
+      },
+      {
+        "name": "yaml.load_all",
+        "defined_as": "yaml.load_all",
+        "path": [
+          "yaml.load_all",
+          "Loader defaults to FullLoader (lib3/yaml/__init__.py:125), loader = Loader(stream)",
+          "yaml.constructor.BaseConstructor.get_data",
+          "yaml.constructor.BaseConstructor.construct_document",
+          "yaml.constructor.BaseConstructor.construct_object",
+          "lookup: self.yaml_multi_constructors['tag:yaml.org,2002:python/object/new:'] (registered by FullConstructor.add_multi_constructor, lib3/yaml/constructor.py:698-700)",
+          "yaml.constructor.FullConstructor.construct_python_object_new",
+          "yaml.constructor.FullConstructor.construct_python_object_apply",
+          "yaml.constructor.FullConstructor.set_python_instance_state"
+        ]
+      },
+      {
+        "name": "yaml.full_load",
+        "defined_as": "yaml.full_load",
+        "path": [
+          "yaml.full_load",
+          "yaml.load (Loader=FullLoader, lib3/yaml/__init__.py:142)",
+          "yaml.constructor.BaseConstructor.get_single_data",
+          "yaml.constructor.BaseConstructor.construct_document",
+          "yaml.constructor.BaseConstructor.construct_object",
+          "lookup: self.yaml_multi_constructors['tag:yaml.org,2002:python/object/new:'] (registered by FullConstructor.add_multi_constructor, lib3/yaml/constructor.py:698-700)",
+          "yaml.constructor.FullConstructor.construct_python_object_new",
+          "yaml.constructor.FullConstructor.construct_python_object_apply",
+          "yaml.constructor.FullConstructor.set_python_instance_state"
+        ]
+      },
+      {
+        "name": "yaml.full_load_all",
+        "defined_as": "yaml.full_load_all",
+        "path": [
+          "yaml.full_load_all",
+          "yaml.load_all (Loader=FullLoader, lib3/yaml/__init__.py:152)",
+          "yaml.constructor.BaseConstructor.get_data",
+          "yaml.constructor.BaseConstructor.construct_document",
+          "yaml.constructor.BaseConstructor.construct_object",
+          "lookup: self.yaml_multi_constructors['tag:yaml.org,2002:python/object/new:'] (registered by FullConstructor.add_multi_constructor, lib3/yaml/constructor.py:698-700)",
+          "yaml.constructor.FullConstructor.construct_python_object_new",
+          "yaml.constructor.FullConstructor.construct_python_object_apply",
+          "yaml.constructor.FullConstructor.set_python_instance_state"
+        ]
+      },
+      {
+        "name": "yaml.FullLoader",
+        "defined_as": "yaml.loader.FullLoader",
+        "path": [
+          "yaml.loader.FullLoader",
+          "yaml.constructor.BaseConstructor.get_single_data",
+          "yaml.constructor.BaseConstructor.construct_document",
+          "yaml.constructor.BaseConstructor.construct_object",
+          "lookup: self.yaml_multi_constructors['tag:yaml.org,2002:python/object/new:'] (registered by FullConstructor.add_multi_constructor, lib3/yaml/constructor.py:698-700)",
+          "yaml.constructor.FullConstructor.construct_python_object_new",
+          "yaml.constructor.FullConstructor.construct_python_object_apply",
+          "yaml.constructor.FullConstructor.set_python_instance_state"
+        ]
+      },
+      {
+        "name": "yaml.CFullLoader",
+        "defined_as": "yaml.cyaml.CFullLoader",
+        "path": [
+          "yaml.cyaml.CFullLoader",
+          "yaml.constructor.BaseConstructor.get_single_data",
+          "yaml.constructor.BaseConstructor.construct_document",
+          "yaml.constructor.BaseConstructor.construct_object",
+          "lookup: self.yaml_multi_constructors['tag:yaml.org,2002:python/object/new:'] (registered by FullConstructor.add_multi_constructor, lib3/yaml/constructor.py:698-700)",
+          "yaml.constructor.FullConstructor.construct_python_object_new",
+          "yaml.constructor.FullConstructor.construct_python_object_apply",
+          "yaml.constructor.FullConstructor.set_python_instance_state"
+        ]
+      },
+      {
+        "name": "yaml.constructor.FullConstructor",
+        "defined_as": "yaml.constructor.FullConstructor",
+        "path": [
+          "yaml.constructor.FullConstructor",
+          "yaml.constructor.BaseConstructor.construct_document",
+          "yaml.constructor.BaseConstructor.construct_object",
+          "lookup: self.yaml_multi_constructors['tag:yaml.org,2002:python/object/new:'] (registered by FullConstructor.add_multi_constructor, lib3/yaml/constructor.py:698-700)",
+          "yaml.constructor.FullConstructor.construct_python_object_new",
+          "yaml.constructor.FullConstructor.construct_python_object_apply",
+          "yaml.constructor.FullConstructor.set_python_instance_state"
+        ]
+      }
+    ],
+    "note": "set_python_instance_state is called by construct_python_object (constructor.py:598) and construct_python_object_apply (:627); construct_python_object_new calls construct_python_object_apply (:636). The walker stops because construct_python_object and construct_python_object_new are only referenced as arguments to add_multi_constructor (review reasons: lib3/yaml/constructor.py:696 and :700). Those registrations put them in FullConstructor.yaml_multi_constructors under the python/object: and python/object/new: tag prefixes, and BaseConstructor.construct_object (:74-95) looks the node's tag prefix up in that table and calls the constructor, so a document with !!python/object/new: (or !!python/object:) and a state reaches set_python_instance_state. construct_object is reached from get_single_data / get_data -> construct_document, which yaml.load and yaml.load_all call on the loader they build; both default to FullLoader in 5.3 (__init__.py:110, :125), and full_load / full_load_all pass FullLoader explicitly (:142, :152). FullLoader (loader.py:21) and CFullLoader (cyaml.py:30, exported as yaml.CFullLoader only when libyaml is installed) inherit FullConstructor and so its table. Checked against the record's tree 2f463cf (tag 5.3), lib3/ copy (lib/ is the Python 2 copy of the same code) on 2026-11-04."
+  },
+  "GHSA-cpwx-vrp4-4pq7": {
+    "reviewed": [
+      "jinja2.filters.do_attr"
+    ],
+    "signed_off": false,
+    "add_entry_points": [
+      {
+        "name": "jinja2.filters.do_attr",
+        "defined_as": "jinja2.filters.do_attr",
+        "path": [
+          "jinja2.filters.do_attr"
+        ]
+      },
+      {
+        "name": "jinja2.sandbox.SandboxedEnvironment",
+        "defined_as": "jinja2.sandbox.SandboxedEnvironment",
+        "path": [
+          "jinja2.sandbox.SandboxedEnvironment",
+          "jinja2.environment.Environment.__init__ (self.filters = DEFAULT_FILTERS.copy(), environment.py:351; DEFAULT_FILTERS is jinja2.filters.FILTERS, defaults.py:3)",
+          "compiled template: t_N = environment.filters['attr'] (written by jinja2.compiler.CodeGenerator.pull_dependencies, compiler.py:570), called at the filter use site",
+          "jinja2.filters.do_attr"
+        ]
+      },
+      {
+        "name": "jinja2.sandbox.ImmutableSandboxedEnvironment",
+        "defined_as": "jinja2.sandbox.ImmutableSandboxedEnvironment",
+        "path": [
+          "jinja2.sandbox.ImmutableSandboxedEnvironment",
+          "jinja2.environment.Environment.__init__ (self.filters = DEFAULT_FILTERS.copy(), environment.py:351; DEFAULT_FILTERS is jinja2.filters.FILTERS, defaults.py:3)",
+          "compiled template: t_N = environment.filters['attr'] (written by jinja2.compiler.CodeGenerator.pull_dependencies, compiler.py:570), called at the filter use site",
+          "jinja2.filters.do_attr"
+        ]
+      },
+      {
+        "name": "jinja2.Environment.call_filter",
+        "defined_as": "jinja2.environment.Environment.call_filter",
+        "path": [
+          "jinja2.environment.Environment.call_filter",
+          "jinja2.environment.Environment._filter_test_common (func = env_map.get(name) with env_map = self.filters, environment.py:515; return func(...), :550)",
+          "jinja2.filters.do_attr"
+        ]
+      }
+    ],
+    "note": "do_attr's only reference is the FILTERS dict literal (review reason: src/jinja2/filters.py:1825). defaults.py:3 imports FILTERS as DEFAULT_FILTERS and Environment.__init__ copies it into self.filters (environment.py:351). It runs two ways: compiled template code, where CodeGenerator.pull_dependencies (compiler.py:538, writeline at :570) emits t_N = environment.filters['attr'] and the |attr use site calls t_N; and Environment.call_filter (:552) -> _filter_test_common, which does func = env_map.get(name) with env_map = self.filters (:515) and calls it (:550). Exposure is sandbox-only (the plain getattr inside do_attr is what escapes the sandbox), so the entry points are the two sandbox classes (both inherit Environment.__init__ and its filter table) and call_filter, which they inherit; plain Environment and Template are deliberately not listed. Checked against the record's tree 033c200 (3.1.5-5-g033c2001, first parent of the fix) on 2026-11-04."
+  },
+  "GHSA-gmj6-6f8f-6699": {
+    "reviewed": [
+      "jinja2.compiler.CodeGenerator.visit_FromImport"
+    ],
+    "signed_off": false,
+    "add_entry_points": [
+      {
+        "name": "jinja2.Environment",
+        "defined_as": "jinja2.environment.Environment",
+        "path": [
+          "jinja2.environment.Environment",
+          "jinja2.environment.Environment.from_string",
+          "jinja2.environment.Environment.compile",
+          "jinja2.environment.Environment._generate",
+          "jinja2.compiler.generate",
+          "jinja2.visitor.NodeVisitor.visit (generator.visit(node), compiler.py:117)",
+          "jinja2.compiler.CodeGenerator.visit_Template",
+          "jinja2.visitor.NodeVisitor.visit dispatch: getattr(self, f'visit_{type(node).__name__}') for a nodes.FromImport (visitor.py:33)",
+          "jinja2.compiler.CodeGenerator.visit_FromImport"
+        ]
+      },
+      {
+        "name": "jinja2.Environment.compile",
+        "defined_as": "jinja2.environment.Environment.compile",
+        "path": [
+          "jinja2.environment.Environment.compile",
+          "jinja2.environment.Environment._generate",
+          "jinja2.compiler.generate",
+          "jinja2.visitor.NodeVisitor.visit (generator.visit(node), compiler.py:117)",
+          "jinja2.compiler.CodeGenerator.visit_Template",
+          "jinja2.visitor.NodeVisitor.visit dispatch: getattr(self, f'visit_{type(node).__name__}') for a nodes.FromImport (visitor.py:33)",
+          "jinja2.compiler.CodeGenerator.visit_FromImport"
+        ]
+      },
+      {
+        "name": "jinja2.Environment.from_string",
+        "defined_as": "jinja2.environment.Environment.from_string",
+        "path": [
+          "jinja2.environment.Environment.from_string",
+          "jinja2.environment.Environment.compile",
+          "jinja2.environment.Environment._generate",
+          "jinja2.compiler.generate",
+          "jinja2.visitor.NodeVisitor.visit (generator.visit(node), compiler.py:117)",
+          "jinja2.compiler.CodeGenerator.visit_Template",
+          "jinja2.visitor.NodeVisitor.visit dispatch: getattr(self, f'visit_{type(node).__name__}') for a nodes.FromImport (visitor.py:33)",
+          "jinja2.compiler.CodeGenerator.visit_FromImport"
+        ]
+      },
+      {
+        "name": "jinja2.Environment.get_template",
+        "defined_as": "jinja2.environment.Environment.get_template",
+        "path": [
+          "jinja2.environment.Environment.get_template",
+          "jinja2.environment.Environment._load_template",
+          "jinja2.loaders.BaseLoader.load (environment.compile(source, name, filename), loaders.py:138)",
+          "jinja2.environment.Environment.compile",
+          "jinja2.environment.Environment._generate",
+          "jinja2.compiler.generate",
+          "jinja2.visitor.NodeVisitor.visit (generator.visit(node), compiler.py:117)",
+          "jinja2.compiler.CodeGenerator.visit_Template",
+          "jinja2.visitor.NodeVisitor.visit dispatch: getattr(self, f'visit_{type(node).__name__}') for a nodes.FromImport (visitor.py:33)",
+          "jinja2.compiler.CodeGenerator.visit_FromImport"
+        ]
+      },
+      {
+        "name": "jinja2.Environment.select_template",
+        "defined_as": "jinja2.environment.Environment.select_template",
+        "path": [
+          "jinja2.environment.Environment.select_template",
+          "jinja2.environment.Environment._load_template",
+          "jinja2.loaders.BaseLoader.load (environment.compile(source, name, filename), loaders.py:138)",
+          "jinja2.environment.Environment.compile",
+          "jinja2.environment.Environment._generate",
+          "jinja2.compiler.generate",
+          "jinja2.visitor.NodeVisitor.visit (generator.visit(node), compiler.py:117)",
+          "jinja2.compiler.CodeGenerator.visit_Template",
+          "jinja2.visitor.NodeVisitor.visit dispatch: getattr(self, f'visit_{type(node).__name__}') for a nodes.FromImport (visitor.py:33)",
+          "jinja2.compiler.CodeGenerator.visit_FromImport"
+        ]
+      },
+      {
+        "name": "jinja2.Environment.get_or_select_template",
+        "defined_as": "jinja2.environment.Environment.get_or_select_template",
+        "path": [
+          "jinja2.environment.Environment.get_or_select_template",
+          "jinja2.environment.Environment.get_template",
+          "jinja2.environment.Environment._load_template",
+          "jinja2.loaders.BaseLoader.load (environment.compile(source, name, filename), loaders.py:138)",
+          "jinja2.environment.Environment.compile",
+          "jinja2.environment.Environment._generate",
+          "jinja2.compiler.generate",
+          "jinja2.visitor.NodeVisitor.visit (generator.visit(node), compiler.py:117)",
+          "jinja2.compiler.CodeGenerator.visit_Template",
+          "jinja2.visitor.NodeVisitor.visit dispatch: getattr(self, f'visit_{type(node).__name__}') for a nodes.FromImport (visitor.py:33)",
+          "jinja2.compiler.CodeGenerator.visit_FromImport"
+        ]
+      },
+      {
+        "name": "jinja2.Environment.compile_templates",
+        "defined_as": "jinja2.environment.Environment.compile_templates",
+        "path": [
+          "jinja2.environment.Environment.compile_templates",
+          "jinja2.environment.Environment.compile",
+          "jinja2.environment.Environment._generate",
+          "jinja2.compiler.generate",
+          "jinja2.visitor.NodeVisitor.visit (generator.visit(node), compiler.py:117)",
+          "jinja2.compiler.CodeGenerator.visit_Template",
+          "jinja2.visitor.NodeVisitor.visit dispatch: getattr(self, f'visit_{type(node).__name__}') for a nodes.FromImport (visitor.py:33)",
+          "jinja2.compiler.CodeGenerator.visit_FromImport"
+        ]
+      },
+      {
+        "name": "jinja2.Template",
+        "defined_as": "jinja2.environment.Template",
+        "path": [
+          "jinja2.environment.Template",
+          "jinja2.environment.Template.__new__ (env.from_string(source, template_class=cls), environment.py:1211)",
+          "jinja2.environment.Environment.from_string",
+          "jinja2.environment.Environment.compile",
+          "jinja2.environment.Environment._generate",
+          "jinja2.compiler.generate",
+          "jinja2.visitor.NodeVisitor.visit (generator.visit(node), compiler.py:117)",
+          "jinja2.compiler.CodeGenerator.visit_Template",
+          "jinja2.visitor.NodeVisitor.visit dispatch: getattr(self, f'visit_{type(node).__name__}') for a nodes.FromImport (visitor.py:33)",
+          "jinja2.compiler.CodeGenerator.visit_FromImport"
+        ]
+      },
+      {
+        "name": "jinja2.sandbox.SandboxedEnvironment",
+        "defined_as": "jinja2.sandbox.SandboxedEnvironment",
+        "path": [
+          "jinja2.sandbox.SandboxedEnvironment",
+          "jinja2.environment.Environment.from_string",
+          "jinja2.environment.Environment.compile",
+          "jinja2.environment.Environment._generate",
+          "jinja2.compiler.generate",
+          "jinja2.visitor.NodeVisitor.visit (generator.visit(node), compiler.py:117)",
+          "jinja2.compiler.CodeGenerator.visit_Template",
+          "jinja2.visitor.NodeVisitor.visit dispatch: getattr(self, f'visit_{type(node).__name__}') for a nodes.FromImport (visitor.py:33)",
+          "jinja2.compiler.CodeGenerator.visit_FromImport"
+        ]
+      },
+      {
+        "name": "jinja2.sandbox.ImmutableSandboxedEnvironment",
+        "defined_as": "jinja2.sandbox.ImmutableSandboxedEnvironment",
+        "path": [
+          "jinja2.sandbox.ImmutableSandboxedEnvironment",
+          "jinja2.environment.Environment.from_string",
+          "jinja2.environment.Environment.compile",
+          "jinja2.environment.Environment._generate",
+          "jinja2.compiler.generate",
+          "jinja2.visitor.NodeVisitor.visit (generator.visit(node), compiler.py:117)",
+          "jinja2.compiler.CodeGenerator.visit_Template",
+          "jinja2.visitor.NodeVisitor.visit dispatch: getattr(self, f'visit_{type(node).__name__}') for a nodes.FromImport (visitor.py:33)",
+          "jinja2.compiler.CodeGenerator.visit_FromImport"
+        ]
+      }
+    ],
+    "note": "visit_FromImport (src/jinja2/compiler.py:1126, review reason no_reference) is never called or referenced by name: NodeVisitor.visit dispatches on the node class with getattr(self, f'visit_{type(node).__name__}') (visitor.py:33), so it runs for every {% from ... import %} node while CodeGenerator walks a template (compiler.generate builds the generator and calls generator.visit(node), compiler.py:117; visit_Template then visits the body). Every template compile reaches compiler.generate: Environment.compile (environment.py:729) -> _generate (:679, return generate(...) at :691); from_string (:1089) calls self.compile (:1108); get_template (:979) and select_template (:1016) go through _load_template (:954) -> self.loader.load (:972) -> BaseLoader.load -> environment.compile (loaders.py:138); get_or_select_template (:1070) calls get_template / select_template; compile_templates calls self.compile (:879); Template.__new__ calls env.from_string (:1211). The sandbox classes subclass Environment and inherit all of these; the bug is in generated code, so it applies sandbox or not. Checked against the record's tree 48b0687 (3.1.4-57-g48b0687e, first parent of the fix) on 2026-11-04."
+  },
+  "GHSA-h75v-3vvj-5mfj": {
+    "reviewed": [
+      "jinja2.filters.do_xmlattr",
+      "jinja2.filters"
+    ],
+    "signed_off": false,
+    "add_entry_points": [
+      {
+        "name": "jinja2.filters.do_xmlattr",
+        "defined_as": "jinja2.filters.do_xmlattr",
+        "path": [
+          "jinja2.filters.do_xmlattr"
+        ]
+      },
+      {
+        "name": "jinja2.Environment",
+        "defined_as": "jinja2.environment.Environment",
+        "path": [
+          "jinja2.environment.Environment",
+          "jinja2.environment.Environment.__init__ (self.filters = DEFAULT_FILTERS.copy(), environment.py:351; DEFAULT_FILTERS is jinja2.filters.FILTERS, defaults.py:3)",
+          "compiled template: t_N = environment.filters['xmlattr'] (written by jinja2.compiler.CodeGenerator.pull_dependencies, compiler.py:570), called at the filter use site",
+          "jinja2.filters.do_xmlattr"
+        ]
+      },
+      {
+        "name": "jinja2.Template",
+        "defined_as": "jinja2.environment.Template",
+        "path": [
+          "jinja2.environment.Template",
+          "jinja2.environment.Template.render",
+          "compiled template root_render_func(ctx) (environment.py:1302)",
+          "compiled template: t_N = environment.filters['xmlattr'] (written by jinja2.compiler.CodeGenerator.pull_dependencies, compiler.py:570), called at the filter use site",
+          "jinja2.filters.do_xmlattr"
+        ]
+      },
+      {
+        "name": "jinja2.Template.render",
+        "defined_as": "jinja2.environment.Template.render",
+        "path": [
+          "jinja2.environment.Template.render",
+          "compiled template root_render_func(ctx) (environment.py:1302)",
+          "compiled template: t_N = environment.filters['xmlattr'] (written by jinja2.compiler.CodeGenerator.pull_dependencies, compiler.py:570), called at the filter use site",
+          "jinja2.filters.do_xmlattr"
+        ]
+      },
+      {
+        "name": "jinja2.Template.render_async",
+        "defined_as": "jinja2.environment.Template.render_async",
+        "path": [
+          "jinja2.environment.Template.render_async",
+          "compiled template root_render_func(ctx) (environment.py:1324)",
+          "compiled template: t_N = environment.filters['xmlattr'] (written by jinja2.compiler.CodeGenerator.pull_dependencies, compiler.py:570), called at the filter use site",
+          "jinja2.filters.do_xmlattr"
+        ]
+      },
+      {
+        "name": "jinja2.Template.generate",
+        "defined_as": "jinja2.environment.Template.generate",
+        "path": [
+          "jinja2.environment.Template.generate",
+          "compiled template root_render_func(ctx) (environment.py:1355)",
+          "compiled template: t_N = environment.filters['xmlattr'] (written by jinja2.compiler.CodeGenerator.pull_dependencies, compiler.py:570), called at the filter use site",
+          "jinja2.filters.do_xmlattr"
+        ]
+      },
+      {
+        "name": "jinja2.Template.generate_async",
+        "defined_as": "jinja2.environment.Template.generate_async",
+        "path": [
+          "jinja2.environment.Template.generate_async",
+          "compiled template root_render_func(ctx) (environment.py:1373)",
+          "compiled template: t_N = environment.filters['xmlattr'] (written by jinja2.compiler.CodeGenerator.pull_dependencies, compiler.py:570), called at the filter use site",
+          "jinja2.filters.do_xmlattr"
+        ]
+      },
+      {
+        "name": "jinja2.Template.stream",
+        "defined_as": "jinja2.environment.Template.stream",
+        "path": [
+          "jinja2.environment.Template.stream",
+          "jinja2.environment.Template.generate",
+          "compiled template root_render_func(ctx) (environment.py:1355)",
+          "compiled template: t_N = environment.filters['xmlattr'] (written by jinja2.compiler.CodeGenerator.pull_dependencies, compiler.py:570), called at the filter use site",
+          "jinja2.filters.do_xmlattr"
+        ]
+      },
+      {
+        "name": "jinja2.Template.make_module",
+        "defined_as": "jinja2.environment.Template.make_module",
+        "path": [
+          "jinja2.environment.Template.make_module",
+          "jinja2.environment.TemplateModule.__init__ (template.root_render_func(context))",
+          "compiled template: t_N = environment.filters['xmlattr'] (written by jinja2.compiler.CodeGenerator.pull_dependencies, compiler.py:570), called at the filter use site",
+          "jinja2.filters.do_xmlattr"
+        ]
+      },
+      {
+        "name": "jinja2.Template.make_module_async",
+        "defined_as": "jinja2.environment.Template.make_module_async",
+        "path": [
+          "jinja2.environment.Template.make_module_async",
+          "compiled template root_render_func(ctx) (environment.py:1425)",
+          "compiled template: t_N = environment.filters['xmlattr'] (written by jinja2.compiler.CodeGenerator.pull_dependencies, compiler.py:570), called at the filter use site",
+          "jinja2.filters.do_xmlattr"
+        ]
+      },
+      {
+        "name": "jinja2.Environment.call_filter",
+        "defined_as": "jinja2.environment.Environment.call_filter",
+        "path": [
+          "jinja2.environment.Environment.call_filter",
+          "jinja2.environment.Environment._filter_test_common (func = env_map.get(name) with env_map = self.filters, environment.py:512; return func(...), :547)",
+          "jinja2.filters.do_xmlattr"
+        ]
+      },
+      {
+        "name": "jinja2.sandbox.SandboxedEnvironment",
+        "defined_as": "jinja2.sandbox.SandboxedEnvironment",
+        "path": [
+          "jinja2.sandbox.SandboxedEnvironment",
+          "jinja2.environment.Environment.__init__ (self.filters = DEFAULT_FILTERS.copy(), environment.py:351; DEFAULT_FILTERS is jinja2.filters.FILTERS, defaults.py:3)",
+          "compiled template: t_N = environment.filters['xmlattr'] (written by jinja2.compiler.CodeGenerator.pull_dependencies, compiler.py:570), called at the filter use site",
+          "jinja2.filters.do_xmlattr"
+        ]
+      },
+      {
+        "name": "jinja2.sandbox.ImmutableSandboxedEnvironment",
+        "defined_as": "jinja2.sandbox.ImmutableSandboxedEnvironment",
+        "path": [
+          "jinja2.sandbox.ImmutableSandboxedEnvironment",
+          "jinja2.environment.Environment.__init__ (self.filters = DEFAULT_FILTERS.copy(), environment.py:351; DEFAULT_FILTERS is jinja2.filters.FILTERS, defaults.py:3)",
+          "compiled template: t_N = environment.filters['xmlattr'] (written by jinja2.compiler.CodeGenerator.pull_dependencies, compiler.py:570), called at the filter use site",
+          "jinja2.filters.do_xmlattr"
+        ]
+      }
+    ],
+    "note": "Two review reasons. (1) do_xmlattr's only reference is the FILTERS dict literal (src/jinja2/filters.py:1852). defaults.py:3 imports FILTERS as DEFAULT_FILTERS, Environment.__init__ copies it into self.filters (environment.py:351), and the filter runs from compiled template code (CodeGenerator.pull_dependencies, compiler.py:538, emits t_N = environment.filters['xmlattr'] at :570, called at the |xmlattr use site) or from Environment.call_filter (:549) -> _filter_test_common (env_map.get(name) with env_map = self.filters at :512, called at :547). Compiled code runs from Template.render (root_render_func at :1302), render_async (:1324), generate (:1355), generate_async (:1373), stream (via generate, :1333), make_module (TemplateModule, :1408) and make_module_async (:1425). No sandbox is needed for the injection, so plain Environment and Template are listed with the sandbox classes. (2) module_level jinja2.filters (src/jinja2/filters.py): the changed module statement is _space_re = re.compile(r'\\s') (:253), whose only use is inside do_xmlattr (:292), so it is reached exactly when do_xmlattr is; the same entry points cover it and the paths end at do_xmlattr. Checked against the record's tree a7863ba (3.1.3-8-ga7863ba9, first parent of the fix) on 2026-11-04."
+  },
+  "GHSA-q2x7-8rv6-6q7h": {
+    "reviewed": [
+      "jinja2.sandbox.inspect_format_method",
+      "jinja2.sandbox.SandboxedEnvironment.format_string",
+      "jinja2.sandbox.SandboxedEnvironment.call"
+    ],
+    "signed_off": false,
+    "add_entry_points": [
+      {
+        "name": "jinja2.sandbox.SandboxedEnvironment",
+        "defined_as": "jinja2.sandbox.SandboxedEnvironment",
+        "path": [
+          "jinja2.sandbox.SandboxedEnvironment",
+          "compiled template: environment.call(context, ...) for every Call node when environment.sandboxed (jinja2.compiler.CodeGenerator.visit_Call, compiler.py:1866)",
+          "jinja2.sandbox.SandboxedEnvironment.call",
+          "jinja2.sandbox.SandboxedEnvironment.format_string"
+        ]
+      },
+      {
+        "name": "jinja2.sandbox.ImmutableSandboxedEnvironment",
+        "defined_as": "jinja2.sandbox.ImmutableSandboxedEnvironment",
+        "path": [
+          "jinja2.sandbox.ImmutableSandboxedEnvironment",
+          "compiled template: environment.call(context, ...) for every Call node when environment.sandboxed (jinja2.compiler.CodeGenerator.visit_Call, compiler.py:1866); inherits SandboxedEnvironment.call",
+          "jinja2.sandbox.SandboxedEnvironment.call",
+          "jinja2.sandbox.SandboxedEnvironment.format_string"
+        ]
+      },
+      {
+        "name": "jinja2.sandbox.SandboxedEnvironment.call",
+        "defined_as": "jinja2.sandbox.SandboxedEnvironment.call",
+        "path": [
+          "jinja2.sandbox.SandboxedEnvironment.call",
+          "jinja2.sandbox.inspect_format_method"
+        ]
+      },
+      {
+        "name": "jinja2.sandbox.SandboxedEnvironment.format_string",
+        "defined_as": "jinja2.sandbox.SandboxedEnvironment.format_string",
+        "path": [
+          "jinja2.sandbox.SandboxedEnvironment.format_string"
+        ]
+      },
+      {
+        "name": "jinja2.sandbox.SandboxedEnvironment.getattr",
+        "defined_as": "jinja2.sandbox.SandboxedEnvironment.getattr",
+        "path": [
+          "jinja2.sandbox.SandboxedEnvironment.getattr"
+        ]
+      },
+      {
+        "name": "jinja2.sandbox.SandboxedEnvironment.getitem",
+        "defined_as": "jinja2.sandbox.SandboxedEnvironment.getitem",
+        "path": [
+          "jinja2.sandbox.SandboxedEnvironment.getitem"
+        ]
+      }
+    ],
+    "note": "Three review reasons, all dead_end_chain: inspect_format_method, SandboxedEnvironment.format_string and SandboxedEnvironment.call (src/jinja2/sandbox.py). Their only resolved callers in the package end at jinja2.ext.InternationalizationExtension._install / _install_null (private, no reference) and jinja2.ext._gettext_alias (assigned to environment.globals['_'], src/jinja2/ext.py:260), so the walker found no public root. The real path is generated code: CodeGenerator.visit_Call writes environment.call(context, ...) for every template call when environment.sandboxed (compiler.py:1866), so any SandboxedEnvironment or ImmutableSandboxedEnvironment rendering a template with a call reaches SandboxedEnvironment.call (sandbox.py:380), which calls inspect_format_method (:388) and, for str.format / format_map, format_string (:390). getattr (:324) and getitem (:301), also changed by the fix, are reached the same way from visit_Getattr / visit_Getitem (environment.getattr / environment.getitem, compiler.py:1734, :1753) and already have walker entry points; they are re-listed so the record carries the truth file's names. The four methods are public and their own entry points. Checked against the record's tree 0871c71 (3.1.4-55-g0871c71d, first parent of the fix 48b0687, which is in 3.1.5 and not 3.1.4) on 2026-11-04."
+  }
+}

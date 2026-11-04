@@ -159,6 +159,8 @@ Spec-implied failure modes no spec example exercises; each line's test is added 
 - Create: `pipeline/record.py`, `data/overrides.json` (initial content `{}`)
 - Test: `tests/test_record.py`
 
+Modified by `docs/superpowers/plans/2026-11-04-review-folder.md` Task 1.
+
 **Interfaces:**
 - Consumes: merged advisory dicts; analysis results injected as plain dicts (no dependency on Tasks 5 or 9).
 - Produces:
@@ -178,56 +180,15 @@ Spec-implied failure modes no spec example exercises; each line's test is added 
 
 ### Task 8: Evaluation harness — `pipeline/evaluate.py`
 
-**Files:**
-- Create: `pipeline/evaluate.py`
-- Test: `tests/test_evaluate.py`
-
-**Interfaces:**
-- Consumes: record files (Task 7 shape), truth files (Task 1 shape).
-- Produces:
-  - `evaluate(records_dir: Path, truth_dir: Path) -> dict` — keys: `function_recall`, `function_precision`, `entrypoint_recall` (floats 0–1), `statuses_correct: bool`, `wrong_statuses: list[str]`, `per_advisory: dict`, `meets_bar: bool` (Global Constraints numbers: 0.90 / 0.90 / 0.95 / all statuses). Raises `PipelineError` on any truth file with `signed_off: false`.
-  - `main(argv=None) -> int` — prints a per-advisory table and the four headline numbers; exit 0 when `meets_bar` else 1.
-
-- [ ] **Step 1: Write failing tests** on tmp dirs with 2–3 synthetic record/truth pairs: `test_recall_precision_counted_by_name`, `test_entrypoint_recall_counted_separately`, `test_missing_record_counts_as_all_functions_missed`, `test_wrong_status_listed_and_fails_bar`, `test_meets_bar_thresholds` (exactly at 0.90/0.90/0.95 passes; just under fails), `test_unsigned_truth_file_refused`.
-- [ ] **Step 2: Run tests** — expected: ERROR, module missing.
-- [ ] **Step 3: Implement `pipeline/evaluate.py`.**
-- [ ] **Step 4: Run `python -m unittest`** — expected: all pass.
-- [ ] **Step 5: Commit.**
+Superseded by `docs/superpowers/plans/2026-11-04-review-folder.md` Task 4.
 
 ### Task 9: Entry points — `pipeline/entrypoints.py`
 
-**Files:**
-- Create: `pipeline/entrypoints.py`
-- Test: `tests/test_entrypoints.py`
-
-**Interfaces:**
-- Consumes: a checked-out pre-fix package source tree.
-- Produces: `entry_points(package_root: Path, package: str, vulnerable: list[str]) -> list[dict]` — each `{"name": str, "defined_as": str, "confidence": "high"|"medium", "path": list[str]}` per the spec's record format. Spec rules: build the intra-package call graph, walk backwards from each vulnerable FQN to public names (no leading underscore anywhere in the dotted path); resolve `__init__.py` re-exports so every public import name is listed (`yaml.full_load`, and `yaml.FullConstructor` with `defined_as: "yaml.constructor.FullConstructor"`); an entry point reached only through a name-matched (guessed) edge is `medium`.
-
-- [ ] **Step 1: Write failing tests** against a small fake package written into tmp (`pkg/__init__.py` re-exporting from `pkg/core.py`, `pkg/_internal.py`): `test_public_caller_of_vulnerable_function_found`, `test_reexport_listed_under_public_name_with_defined_as`, `test_underscore_module_path_not_public`, `test_vulnerable_public_function_is_its_own_entry_point`, `test_guessed_method_edge_marked_medium`, `test_path_ends_at_vulnerable_function`.
-- [ ] **Step 2: Run tests** — expected: ERROR, module missing.
-- [ ] **Step 3: Implement `pipeline/entrypoints.py`.**
-- [ ] **Step 4: Run `python -m unittest`** — expected: all pass.
-- [ ] **Step 5: Commit.**
+Superseded by `docs/superpowers/plans/2026-11-04-review-folder.md` Tasks 2–3.
 
 ### Task 10: Pipeline driver — `pipeline/run.py`
 
-**Files:**
-- Create: `pipeline/run.py`
-- Test: `tests/test_run.py`
-
-**Interfaces:**
-- Consumes: every pipeline module; `functions.changed_functions` and `entrypoints.entry_points` are called through module attributes so tests can monkeypatch them with hand-written stand-ins, keeping these tests isolated from Tasks 5 and 9.
-- Produces:
-  - `process_advisory(merged: dict, cache_dir: Path, out_dir: Path, overrides: dict) -> dict` — the full phase A sequence: repo → candidates → resolve → release check / bump / bundle filters → backport grouping → library files → changed functions → name verification → entry points → cross-check → record (with overrides) → write. No usable repo or no surviving candidates → record with `status: "unknown"` and the reason in `notes` (never a crash).
-  - `main(argv=None) -> int` — `--advisory ID`, `--all`, `--packages name,name`, `--export data/osv`, `--cache data/repo_cache`, `--out data/vulnfuncs`, `--force`. Freshness (spec "Keeping the database fresh"): skip an advisory whose existing record has the same `osv_modified` and current `pipeline_version`, unless `--force`. After processing, rebuild the index via `record.write_index(out_dir)`.
-
-- [ ] **Step 1: Write failing tests** with monkeypatched analysis functions and a setUp git repo: `test_end_to_end_single_advisory_writes_record` (assert status `found`, the stand-in's function name present, confidence `high`), `test_version_bump_only_candidate_gives_unknown_status`, `test_non_github_repo_gives_unknown_with_note`, `test_freshness_skips_unchanged_and_force_overrides`, `test_bundle_commit_caps_confidence_medium`, `test_index_rebuilt_after_run` (index.json exists and covers the written record's ID and aliases).
-- [ ] **Step 2: Run tests** — expected: ERROR, module missing.
-- [ ] **Step 3: Implement `pipeline/run.py`.**
-- [ ] **Step 4: Run `python -m unittest`** — expected: all pass.
-- [ ] **Step 5: Golden-advisory smoke run** (needs network): `python -m pipeline.run --advisory GHSA-8q59-q68h-6hv4 --export data/osv --out data/vulnfuncs` after `download_export`. Expected: a record naming `yaml.constructor.FullConstructor.construct_python_object_new` with confidence `high` (fix commit `a001f27`, per spec), and `data/vulnfuncs/index.json` listing its aliases.
-- [ ] **Step 6: Commit.**
+Superseded by `docs/superpowers/plans/2026-11-04-review-folder.md` Task 5.
 
 ### Task 11: Scan-side records and version check — `reachability.py` (part 1)
 
@@ -238,7 +199,7 @@ Spec-implied failure modes no spec example exercises; each line's test is added 
 **Interfaces:**
 - Consumes: record JSON files and `index.json` (Task 7 shapes); `depscan.version_key`.
 - Produces (stdlib only):
-  - `load_db(db_dir: Path) -> dict` — reads `index.json` and returns `{"dir": db_dir, "index": {key: record_id}}` without opening any record file; when `index.json` is missing, builds the same index by scanning the record files instead; a missing or empty dir returns an empty index (reachability then reports unknown, it never crashes the scan).
+  - `load_db(db_dir: Path) -> dict` — reads `index.json` and returns `{"dir": db_dir, "index": {key: record_id}}` without opening any record file; when `index.json` is missing, builds the same index by scanning the record files instead; a missing or empty dir returns an empty index (reachability then reports unknown, it never crashes the scan). The fallback scan reads `db_dir/*.json` only and never `review/`; a record in `review/` is absent.
   - `record_for(finding: dict, db: dict) -> dict | None` — resolves `vulnerability_id`, then each of the finding's `aliases`, through the index (the design's alias-fallback rule), and loads `<dir>/<record_id>.json` on demand.
   - `version_in_ranges(version: str, ranges: list[str]) -> bool` — parses only the restricted `">=X, <Y"` form; compares with `depscan.version_key`; an unparseable specifier or version returns False (which downstream means unknown, the safe direction).
   - `project_python_files(root: Path) -> list[Path]` — every `*.py` under root, excluding directory names `.venv`, `venv`, `env`, `site-packages`, `node_modules`, `__pycache__`, and any dot-directory.
@@ -269,6 +230,8 @@ Spec-implied failure modes no spec example exercises; each line's test is added 
 - [ ] **Step 3: Implement `check_reachability`.**
 - [ ] **Step 4: Run `python -m unittest`** — expected: all pass.
 - [ ] **Step 5: Commit.**
+
+**Human gate 2:** the six review records must reach the main folder (signed overrides, see the review-folder plan Task 7) before Tasks 13 to 15 run.
 
 ### Task 13: CLI integration — `depscan.py`
 
