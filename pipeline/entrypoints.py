@@ -588,11 +588,37 @@ def walk(sources, package, vulnerable):
             current = entries.get(entry["name"])
             if current is None or _better(entry, current):
                 entries[entry["name"]] = entry
+    _add_owning_classes(graph, entries)
     return {
         "entry_points": [entries[name] for name in sorted(entries)],
         "reasons": reasons,
         "notes": notes,
     }
+
+
+def _add_owning_classes(graph, entries):
+    """List a public class when a method listed under its public path is an
+    entry point (users reach the method through the class). Naming only: the
+    class entry takes the best such method's confidence and path. A class
+    name already listed is kept as it is."""
+    classes = {graph.public[fqn]: fqn for fqn, info in graph.defs.items()
+               if info["kind"] == "class" and fqn in graph.public}
+    found = {}
+    for entry in list(entries.values()):
+        if graph.defs.get(entry["defined_as"], {}).get("kind") != "method":
+            continue
+        owner = entry["name"].rsplit(".", 1)[0]
+        if owner not in classes or owner in entries:
+            continue
+        candidate = {
+            "name": owner,
+            "defined_as": classes[owner],
+            "confidence": entry["confidence"],
+            "path": [classes[owner]] + entry["path"],
+        }
+        if owner not in found or _better(candidate, found[owner]):
+            found[owner] = candidate
+    entries.update(found)
 
 
 _SELF_ONLY = "self-only"

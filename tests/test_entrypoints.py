@@ -142,7 +142,7 @@ class WalkTest(unittest.TestCase):
             """,
         }, ("pkg.core._v", "function"))
         self.assertEqual(names(result),
-                         ["pkg.Loader.load", "pkg.load_all", "pkg.loader.load_one", "pkg.run"])
+                         ["pkg.Loader", "pkg.Loader.load", "pkg.load_all", "pkg.loader.load_one", "pkg.run"])
         self.assertEqual(by_name(result)["pkg.Loader.load"]["defined_as"], "pkg.core.Loader.load")
 
     def test_underscore_module_path_is_not_public(self):
@@ -215,11 +215,15 @@ class WalkTest(unittest.TestCase):
                     def _v(self):
                         pass
 
+                    def go(self):
+                        self._v()
+
                 def make():
                     return Cls()
             """,
         }, ("pkg.c.Cls._v", "method"))
-        self.assertEqual(names(result), ["pkg.c.Cls", "pkg.c.make"])
+        # Cls is listed once, through __init__, although its method go is an entry point too.
+        self.assertEqual(names(result), ["pkg.c.Cls", "pkg.c.Cls.go", "pkg.c.make"])
         entries = by_name(result)
         self.assertEqual(entries["pkg.c.Cls"]["defined_as"], "pkg.c.Cls.__init__")
         self.assertEqual(entries["pkg.c.make"]["path"],
@@ -516,9 +520,16 @@ class GraphTest(unittest.TestCase):
 
                 class Session(Mixin):
                     pass
+
+                class Other:
+                    def ping(self):
+                        pass
             """,
         }, ("pkg.sessions.Mixin._v", "method"))
         self.assertEqual(result["entry_points"], [{
+            "name": "pkg.Session", "defined_as": "pkg.sessions.Session", "confidence": "high",
+            "path": ["pkg.sessions.Session", "pkg.sessions.Mixin.resolve", "pkg.sessions.Mixin._v"],
+        }, {
             "name": "pkg.Session.resolve", "defined_as": "pkg.sessions.Mixin.resolve",
             "confidence": "high", "path": ["pkg.sessions.Mixin.resolve", "pkg.sessions.Mixin._v"],
         }])
@@ -616,7 +627,7 @@ class ReasonTest(unittest.TestCase):
                 {"file": "pkg/c.py", "line": 12, "context": "argument to add_multi_constructor"},
             ]}],
         }])
-        self.assertEqual(names(result), ["pkg.c.Cls.apply", "pkg.c.set_state"])
+        self.assertEqual(names(result), ["pkg.c.Cls", "pkg.c.Cls.apply", "pkg.c.set_state"])
 
     def test_module_level_item_is_a_reason(self):
         result = walk({"__init__.py": "", "c.py": "X = 1\n"},
@@ -685,7 +696,7 @@ class ReasonTest(unittest.TestCase):
             {"item": "pkg.c.Cls.m", "kind": "no_reference", "file": "pkg/c.py", "references": [], "dead_ends": []},
             {"item": "pkg.c._f", "kind": "no_reference", "file": "pkg/c.py", "references": [], "dead_ends": []},
         ])
-        self.assertEqual(names(result), ["pkg.c.Cls.m"])
+        self.assertEqual(names(result), ["pkg.c.Cls", "pkg.c.Cls.m"])
         self.assertEqual(result["notes"], [])
 
     def test_item_missing_from_tree_is_no_reference_with_detail(self):
@@ -736,7 +747,7 @@ class ReasonTest(unittest.TestCase):
             """,
         }, ("pkg.c._v", "function"))
         self.assertEqual(result["reasons"], [])
-        self.assertEqual(names(result), ["pkg.c.Cls.apply", "pkg.c.run"])
+        self.assertEqual(names(result), ["pkg.c.Cls", "pkg.c.Cls.apply", "pkg.c.run"])
 
     def test_medium_only_chain_is_connected(self):
         result = walk({
@@ -777,7 +788,7 @@ class ReasonTest(unittest.TestCase):
         self.assertEqual(graph.references, {})
         result = entrypoints.walk(src, "pkg", [{"name": "pkg.c._v", "kind": "function"}])
         self.assertEqual(result["reasons"], [])
-        self.assertEqual(names(result), ["pkg.c.Cls.run"])
+        self.assertEqual(names(result), ["pkg.c.Cls", "pkg.c.Cls.run"])
 
 
 if __name__ == "__main__":
