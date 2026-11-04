@@ -492,6 +492,17 @@ class GraphTest(unittest.TestCase):
             {"file": "pkg/c.py", "line": 17, "context": "assigned to obj.attr"},
         ]})
 
+    def test_deep_expression_does_not_stop_the_reference_scan(self):
+        source = 'def f():\n    pass\nTABLE = {"k": f}\nX = ' + " + ".join(["1"] * 1500) + "\n"
+        src = [
+            {"module": "pkg", "path": "pkg/__init__.py", "source": ""},
+            {"module": "pkg.c", "path": "pkg/c.py", "source": source},
+        ]
+        graph = entrypoints.build_graph(src, "pkg")
+        self.assertEqual(graph.references, {"pkg.c.f": [
+            {"file": "pkg/c.py", "line": 3, "context": "value in dict literal TABLE"},
+        ]})
+
 
 class ReasonTest(unittest.TestCase):
     def test_dict_value_registration_is_referenced_not_called(self):

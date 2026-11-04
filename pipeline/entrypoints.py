@@ -328,59 +328,58 @@ class _Builder:
 
     def _collect_references(self):
         for module, (tree, path, _) in self.trees.items():
-            self._scan(tree, [], module, path, frozenset(), None)
+            self._scan(tree, module, path)
 
-    def _scan(self, node, parents, module, path, local, def_name):
+    def _scan(self, tree, module, path):
         """Record every Name or Attribute chain that resolves to a package
-        definition and is not called. `parents` is the ancestor stack, `local`
-        the names bound in the enclosing function, `def_name` its name."""
+        definition and is not called. Iterative, so a deep expression cannot
+        exhaust the stack. Each entry carries the node, its parent and the
+        parent's parent (for the context), the names bound in the enclosing
+        function and that function's name."""
+        stack = [(tree, None, None, frozenset(), None)]
+        while stack:
+            node, parent, owner, local, def_name = stack.pop()
+            children = self._scan_children(node, local, def_name)
+            if isinstance(node, (ast.Name, ast.Attribute)):
+                self._reference(node, parent, owner, module, path, local, def_name)
+            for child, child_local, child_name in reversed(children):
+                stack.append((child, node, parent, child_local, child_name))
+
+    @staticmethod
+    def _scan_children(node, local, def_name):
+        """(child, local names, def name) for each child to scan. Decorators are
+        skipped; defaults, annotations and bases belong to the enclosing scope;
+        a definition's body sees its own local names."""
         if isinstance(node, (ast.Name, ast.Attribute)):
-            self._reference(node, parents, module, path, local, def_name)
             # The prefix of a chain (`Cls` in `Cls.m`) is not a value use of its own.
             base = node
             while isinstance(base, ast.Attribute):
                 base = base.value
-            if not isinstance(base, ast.Name):
-                self._scan(base, parents + [node], module, path, local, def_name)
-            return
-        if isinstance(node, _DEF_TYPES + (ast.Lambda,)):
-            self._scan_definition(node, parents, module, path, local, def_name)
-            return
+            return [] if isinstance(base, ast.Name) else [(base, local, def_name)]
+        if isinstance(node, ast.ClassDef):
+            return [(child, local, def_name) for child in node.bases + node.keywords + node.body]
+        if isinstance(node, _FUNC_TYPES + (ast.Lambda,)):
+            children = [(node.args, local, def_name)]
+            if getattr(node, "returns", None) is not None:
+                children.append((node.returns, local, def_name))
+            body_local = local | _local_names(node)
+            if isinstance(node, ast.Lambda):
+                return children + [(node.body, body_local, def_name)]
+            return children + [(child, body_local, node.name) for child in node.body]
         if isinstance(node, (ast.ListComp, ast.SetComp, ast.DictComp, ast.GeneratorExp)):
             local = local | _local_names(node)
-        for child in ast.iter_child_nodes(node):
-            self._scan(child, parents + [node], module, path, local, def_name)
+        return [(child, local, def_name) for child in ast.iter_child_nodes(node)]
 
-    def _scan_definition(self, node, parents, module, path, local, def_name):
-        """Decorators are skipped; defaults, annotations and bases belong to the
-        enclosing scope; the body sees the definition's own local names."""
-        inside = parents + [node]
-        if isinstance(node, ast.ClassDef):
-            for child in node.bases + node.keywords:
-                self._scan(child, inside, module, path, local, def_name)
-            for child in node.body:
-                self._scan(child, inside, module, path, local, def_name)
-            return
-        self._scan(node.args, inside, module, path, local, def_name)
-        if getattr(node, "returns", None) is not None:
-            self._scan(node.returns, inside, module, path, local, def_name)
-        body_local = local | _local_names(node)
-        body_name = def_name if isinstance(node, ast.Lambda) else node.name
-        body = [node.body] if isinstance(node, ast.Lambda) else node.body
-        for child in body:
-            self._scan(child, inside, module, path, body_local, body_name)
-
-    def _reference(self, node, parents, module, path, local, def_name):
+    def _reference(self, node, parent, owner, module, path, local, def_name):
         if not isinstance(node.ctx, ast.Load) or _root_name(node) in local:
             return
-        parent = parents[-1] if parents else None
         if isinstance(parent, ast.Call) and parent.func is node:
             return
         resolved = self._resolve_expr(node, module)
         if resolved is None or resolved[0] != "def":
             return
         self.graph.references.setdefault(resolved[1], []).append({
-            "file": path, "line": node.lineno, "context": _context(node, parents, def_name),
+            "file": path, "line": node.lineno, "context": _context(node, parent, owner, def_name),
         })
 
     # -- public names ------------------------------------------------------------
@@ -482,10 +481,9 @@ def _local_names(node):
 _LITERALS = {ast.List: "list", ast.Tuple: "tuple", ast.Set: "set"}
 
 
-def _context(node, parents, def_name):
-    """Where a reference sits, in words, from its parent node."""
-    parent = parents[-1] if parents else None
-    owner = parents[-2] if len(parents) > 1 else None
+def _context(node, parent, owner, def_name):
+    """Where a reference sits, in words, from its parent node (and the
+    parent's parent `owner`)."""
     if isinstance(parent, ast.Dict) and any(value is node for value in parent.values):
         if (isinstance(owner, ast.Assign) and owner.value is parent and len(owner.targets) == 1
                 and isinstance(owner.targets[0], ast.Name)):
