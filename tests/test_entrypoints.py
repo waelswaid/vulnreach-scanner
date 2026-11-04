@@ -496,6 +496,102 @@ class GraphTest(unittest.TestCase):
             {"file": "pkg/c.py", "line": 17, "context": "assigned to obj.attr"},
         ]})
 
+    def test_parser_recursion_error_is_a_does_not_parse_note(self):
+        # Python 3.14 reports the reviewer's nested-parentheses example as a
+        # SyntaxError (tokenizer limit); a long flat sum overflows the
+        # compiler's stack instead and raises RecursionError.
+        src = [
+            {"module": "pkg", "path": "pkg/__init__.py", "source": ""},
+            {"module": "pkg.deep", "path": "pkg/deep.py", "source": "X = " + "1+" * 100000 + "1\n"},
+            {"module": "pkg.nested", "path": "pkg/nested.py",
+             "source": "X = " + "(" * 2000 + "1" + ")" * 2000 + "\n"},
+        ]
+        graph = entrypoints.build_graph(src, "pkg")
+        self.assertEqual(graph.notes[0], "pkg/deep.py: does not parse (RecursionError), skipped")
+        self.assertRegex(graph.notes[1], r"^pkg/nested\.py: does not parse \(.+\), skipped$")
+        self.assertEqual(sorted(graph.modules), ["pkg"])
+
+    def test_calls_in_nested_scopes_are_references_not_edges(self):
+        src, graph = graph_of({
+            "__init__.py": "",
+            "core.py": """\
+                def _vuln(x):
+                    pass
+                REG = {}
+                def register(tag, fn):
+                    REG[tag] = fn
+                def setup():
+                    register('t', lambda n: _vuln(n))
+                def setup2():
+                    def inner(n):
+                        return _vuln(n)
+                    register('u', inner)
+                def setup3():
+                    def inner(cb=_vuln(1)):
+                        pass
+                    class Local:
+                        _vuln(2)
+            """,
+        })
+        self.assertEqual(graph.callers["pkg.core._vuln"], [("pkg.core.setup3", "high")])
+        self.assertEqual(sorted(graph.callers["pkg.core.register"]),
+                         [("pkg.core.setup", "high"), ("pkg.core.setup2", "high")])
+        self.assertEqual(graph.references["pkg.core._vuln"], [
+            {"file": "pkg/core.py", "line": 7, "context": "called inside a nested scope of setup"},
+            {"file": "pkg/core.py", "line": 10, "context": "called inside a nested scope of setup2"},
+            {"file": "pkg/core.py", "line": 16, "context": "called inside a nested scope of setup3"},
+        ])
+
+    def test_method_value_uses_through_self_and_class_body_are_references(self):
+        _, graph = graph_of({
+            "__init__.py": "",
+            "core.py": """\
+                class Base:
+                    def inherited(self):
+                        pass
+
+                class P(Base):
+                    def __init__(self):
+                        self.table = {'a': self.handle_a}
+                        self.run = lambda: self.handle_b
+                        self.handle_a()
+                        self.data = self.missing
+
+                    @classmethod
+                    def make(cls):
+                        return cls.handle_b
+
+                    def handle_a(self):
+                        pass
+
+                    def handle_b(self):
+                        pass
+
+                    DISPATCH = {'a': handle_a, 'i': inherited}
+
+                    def defaults(self, cb=handle_b):
+                        def handle_a():
+                            return handle_a
+                        return handle_a
+            """,
+        })
+        self.assertEqual(graph.references, {
+            "pkg.core.Base": [{"file": "pkg/core.py", "line": 5, "context": "referenced"}],
+            "pkg.core.P.handle_a": [
+                {"file": "pkg/core.py", "line": 7, "context": "value in dict literal"},
+                {"file": "pkg/core.py", "line": 22, "context": "value in dict literal DISPATCH"},
+            ],
+            "pkg.core.P.handle_b": [
+                {"file": "pkg/core.py", "line": 8, "context": "referenced"},
+                {"file": "pkg/core.py", "line": 14, "context": "returned from make"},
+                {"file": "pkg/core.py", "line": 24, "context": "default argument of defaults"},
+            ],
+            "pkg.core.Base.inherited": [
+                {"file": "pkg/core.py", "line": 22, "context": "value in dict literal DISPATCH"},
+            ],
+        })
+        self.assertEqual(graph.callers["pkg.core.P.handle_a"], [("pkg.core.P.__init__", "high")])
+
     def test_deep_expression_does_not_stop_the_reference_scan(self):
         source = 'def f():\n    pass\nTABLE = {"k": f}\nX = ' + " + ".join(["1"] * 1500) + "\n"
         src = [
@@ -629,6 +725,88 @@ class ReasonTest(unittest.TestCase):
         }])
         self.assertEqual(names(result), ["pkg.c.Cls", "pkg.c.Cls.apply", "pkg.c.set_state"])
 
+    def test_nested_scope_registration_is_referenced_not_called(self):
+        result = walk({
+            "__init__.py": "",
+            "core.py": """\
+                def _vuln(x):
+                    pass
+                REG = {}
+                def register(tag, fn):
+                    REG[tag] = fn
+                def setup():
+                    register('t', lambda n: _vuln(n))
+                def setup2():
+                    def inner(n):
+                        return _vuln(n)
+                    register('u', inner)
+            """,
+        }, ("pkg.core._vuln", "function"))
+        self.assertEqual(result["reasons"], [{
+            "item": "pkg.core._vuln", "kind": "referenced_not_called", "file": "pkg/core.py",
+            "references": [
+                {"file": "pkg/core.py", "line": 7, "context": "called inside a nested scope of setup"},
+                {"file": "pkg/core.py", "line": 10, "context": "called inside a nested scope of setup2"},
+            ],
+            "dead_ends": [],
+        }])
+        self.assertNotIn("pkg.core.setup", names(result))
+        self.assertNotIn("pkg.core.setup2", names(result))
+        self.assertEqual(result["entry_points"], [])
+
+    def test_self_dispatch_table_makes_a_dead_end(self):
+        files = {
+            "__init__.py": "",
+            "core.py": """\
+                class P:
+                    def __init__(self):
+                        self.table = {'a': self.handle_a}
+                    def process(self, k):
+                        return self.table[k]()
+                    def handle_a(self):
+                        return _parse()
+                def _parse():
+                    pass
+            """,
+        }
+        table = {"file": "pkg/core.py", "line": 3, "context": "value in dict literal"}
+        result = walk(files, ("pkg.core._parse", "function"))
+        self.assertEqual(result["reasons"], [{
+            "item": "pkg.core._parse", "kind": "dead_end_chain", "file": "pkg/core.py", "references": [],
+            "dead_ends": [{"name": "pkg.core.P.handle_a", "references": [table]}],
+        }])
+        result = walk(files, ("pkg.core.P.handle_a", "method"))
+        self.assertEqual(result["reasons"], [{
+            "item": "pkg.core.P.handle_a", "kind": "referenced_not_called", "file": "pkg/core.py",
+            "references": [table], "dead_ends": [],
+        }])
+
+    def test_class_body_dispatch_table_makes_a_dead_end(self):
+        files = {
+            "__init__.py": "",
+            "core.py": """\
+                class P:
+                    def handle_a(self, n):
+                        return _parse(n)
+                    DISPATCH = {'a': handle_a}
+                    def process(self, k, n):
+                        return self.DISPATCH[k](self, n)
+                def _parse(n):
+                    pass
+            """,
+        }
+        table = {"file": "pkg/core.py", "line": 4, "context": "value in dict literal DISPATCH"}
+        result = walk(files, ("pkg.core._parse", "function"))
+        self.assertEqual(result["reasons"], [{
+            "item": "pkg.core._parse", "kind": "dead_end_chain", "file": "pkg/core.py", "references": [],
+            "dead_ends": [{"name": "pkg.core.P.handle_a", "references": [table]}],
+        }])
+        result = walk(files, ("pkg.core.P.handle_a", "method"))
+        self.assertEqual(result["reasons"], [{
+            "item": "pkg.core.P.handle_a", "kind": "referenced_not_called", "file": "pkg/core.py",
+            "references": [table], "dead_ends": [],
+        }])
+
     def test_module_level_item_is_a_reason(self):
         result = walk({"__init__.py": "", "c.py": "X = 1\n"},
                       ("pkg.c", "module_level"), ("pkg.gone", "module_level"))
@@ -697,6 +875,17 @@ class ReasonTest(unittest.TestCase):
             {"item": "pkg.c._f", "kind": "no_reference", "file": "pkg/c.py", "references": [], "dead_ends": []},
         ])
         self.assertEqual(names(result), ["pkg.c.Cls", "pkg.c.Cls.m"])
+        self.assertEqual(result["notes"], [])
+        # The exemption follows the graph's kind, not the item's declared kind.
+        result = walk({
+            "__init__.py": "",
+            "c.py": """
+                class Cls:
+                    def m(self):
+                        pass
+            """,
+        }, ("pkg.c.Cls.m", "function"))
+        self.assertEqual([r["kind"] for r in result["reasons"]], ["no_reference"])
         self.assertEqual(result["notes"], [])
 
     def test_item_missing_from_tree_is_no_reference_with_detail(self):

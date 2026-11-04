@@ -3,8 +3,10 @@
 One JSON file per advisory. Confidence follows the commit a function was
 found in (high: passed the release check and not a bundle; medium
 otherwise), and a function named in the advisory text is raised to high.
-Hand overrides are applied after the pipeline runs and are listed in the
-record, so regenerating the database never loses a correction.
+Hand overrides apply in three passes (fix commits before the diff, vulnerable
+names before the entry-point walk, then entry points, the note and the review
+sign-off on the built record) and are listed in the record, so regenerating
+the database never loses a correction.
 """
 
 import copy

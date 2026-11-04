@@ -243,17 +243,20 @@ def main(argv=None):
 
     out_dir = Path(args.out)
     in_review = 0
-    for key in sorted(advisories):
-        merged = advisories[key]
-        spec = overrides.get(merged["id"])
-        rec = existing_record(out_dir, merged["id"])
-        if args.force or not is_fresh(rec, merged, spec):
-            rec = process_advisory(merged, Path(args.cache), out_dir, overrides)
-        folder = "review" if record.record_dir(rec, out_dir) != out_dir else "main"
-        in_review += folder == "review"
-        print(f"{merged['id']}  {rec['status']}  {folder}")
-    print(f"in review: {in_review}")
-    record.write_index(out_dir)
+    try:
+        for key in sorted(advisories):
+            merged = advisories[key]
+            spec = overrides.get(merged["id"])
+            rec = existing_record(out_dir, merged["id"])
+            if args.force or not is_fresh(rec, merged, spec):
+                rec = process_advisory(merged, Path(args.cache), out_dir, overrides)
+            folder = "review" if record.record_dir(rec, out_dir) != out_dir else "main"
+            in_review += folder == "review"
+            print(f"{merged['id']}  {rec['status']}  {folder}")
+        print(f"in review: {in_review}")
+    finally:
+        # An aborted run must not leave an index that disagrees with the folder.
+        record.write_index(out_dir)
     return 0
 
 

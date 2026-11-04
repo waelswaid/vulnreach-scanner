@@ -303,6 +303,45 @@ class RunTest(unittest.TestCase):
         self.assertEqual(rec["overrides_fingerprint"], None)
         self.assertEqual(self.read(self.out), rec)
 
+    def test_sign_off_moves_reviewed_record_from_review_to_main(self):
+        self.reasons = [REASON]
+        spec = {"note": "checked the registry by hand", "reviewed": ["pkg.core.parse"],
+                "signed_off": False}
+        self.overrides_path.write_text(json.dumps({ID: spec}), encoding="utf-8")
+        output = self.run_main("--all")
+        self.assertIn(f"{ID}  found  review", output)
+        rec = self.read(self.out / "review")
+        self.assertEqual(rec["review"]["status"], "open")
+        self.assertIn("reviewed: not applied, unsigned", rec["overrides_applied"])
+        self.assertFalse((self.out / f"{ID}.json").exists())
+
+        spec["signed_off"] = True
+        self.overrides_path.write_text(json.dumps({ID: spec}), encoding="utf-8")
+        output = self.run_main("--all")
+        self.assertEqual(len(self.walk_calls), 2)
+        self.assertIn(f"{ID}  found  main", output)
+        rec = self.read(self.out)
+        self.assertEqual(rec["review"]["status"], "resolved")
+        self.assertIn("reviewed pkg.core.parse", rec["overrides_applied"])
+        self.assertFalse((self.out / "review" / f"{ID}.json").exists())
+
+    def test_aborted_run_still_rebuilds_the_index(self):
+        real = run.process_advisory
+        calls = []
+
+        def second_fails(merged, *args):
+            calls.append(merged["id"])
+            if len(calls) == 2:
+                raise RuntimeError("interrupted")
+            return real(merged, *args)
+
+        with mock.patch.object(run, "process_advisory", second_fails):
+            with self.assertRaises(RuntimeError):
+                self.run_main("--all", merged=[advisory(self.c2), advisory(self.c2, advisory_id=OTHER_ID)])
+        self.assertEqual(calls, [ID, OTHER_ID])
+        index = json.loads((self.out / "index.json").read_text(encoding="utf-8"))
+        self.assertEqual(index, {ID: ID, "CVE-2026-0001": ID})
+
     def test_index_rebuilt_and_excludes_review(self):
         self.reasons = [REASON]
         self.process(advisory(self.c2, advisory_id=OTHER_ID))

@@ -4,11 +4,14 @@ The walker is strict: an edge exists only for a call it can resolve to a
 definition in the package (`high`), or for a method call on an object whose
 class it cannot resolve, matched by method name alone (`medium`). A function
 used as a value (a dict entry, an argument), a decorator, or a name built at
-runtime makes no edge. Walking `callers` backwards from a vulnerable item
+runtime makes no edge, and neither does a call inside a nested function,
+lambda or class body (it runs only when that nested scope does). Walking `callers` backwards from a vulnerable item
 gives every definition that can lead to it; the public ones are its entry
 points.
 
-Uses as a value are recorded separately as references. An item no clean root
+Uses as a value are recorded separately as references, and so are resolved
+calls inside a nested scope; inside a class, `self.m` and `cls.m` and bare
+method names in the class body resolve to the class's methods. An item no clean root
 (a public definition with no caller and no reference) reaches gets a review
 reason saying why.
 """
@@ -82,6 +85,9 @@ class _Builder:
         self.stars = {}       # __init__ module -> {name: binding} from `import *`
         self.all_names = {}   # module -> __all__ list of strings
         self.bodies = []      # (FQN, def node, enclosing class FQN or None, module)
+        self.class_nodes = {}   # id(ClassDef node) -> class FQN
+        self.method_class = {}  # id(method node) -> class FQN
+        self.nested_refs = []   # (callee FQN, reference) for calls inside nested scopes
         self._parse(sources)
         for module, (tree, path, _) in self.trees.items():
             self._collect(module, tree, path)
@@ -103,6 +109,9 @@ class _Builder:
                 continue
             try:
                 tree = ast.parse(source["source"])
+            except RecursionError:
+                self.graph.notes.append(f"{path}: does not parse (RecursionError), skipped")
+                continue
             except (SyntaxError, ValueError) as error:
                 line = getattr(error, "lineno", None) or 0
                 message = getattr(error, "msg", None) or str(error)
@@ -146,11 +155,13 @@ class _Builder:
                 if kind == "function":
                     self.bodies.append((fqn, node, None, module))
                 else:
+                    self.class_nodes[id(node)] = fqn
                     for child in _top_level(node):
                         if isinstance(child, _FUNC_TYPES):
                             method = f"{fqn}.{child.name}"
                             self._add_def(method, "method", module, path, child)
                             self.bodies.append((method, child, fqn, module))
+                            self.method_class[id(child)] = fqn
 
     def _add_def(self, fqn, kind, module, path, node):
         self.graph.defs[fqn] = {"kind": kind, "module": module, "file": path, "line": node.lineno}
@@ -280,8 +291,20 @@ class _Builder:
         edges = {}
         for caller, node, cls, module in self.bodies:
             local = _local_names(node)
-            for call in _calls(node.body):
-                for callee, confidence in self._targets(call, cls, module, local, methods_by_name):
+            path = self.trees[module][1]
+            for call, nested in _calls(node.body):
+                targets = self._targets(call, cls, module, local, methods_by_name)
+                if nested:
+                    # Runs only if the nested scope runs: a reference, not an
+                    # edge. Name-only (medium) matches are guesses, left out.
+                    for callee, confidence in targets:
+                        if confidence == "high":
+                            self.nested_refs.append((callee, {
+                                "file": path, "line": call.lineno,
+                                "context": f"called inside a nested scope of {node.name}",
+                            }))
+                    continue
+                for callee, confidence in targets:
                     key = (callee, caller)
                     if edges.get(key) != "high":
                         edges[key] = confidence
@@ -329,58 +352,89 @@ class _Builder:
     def _collect_references(self):
         for module, (tree, path, _) in self.trees.items():
             self._scan(tree, module, path)
+        for callee, reference in self.nested_refs:
+            self.graph.references.setdefault(callee, []).append(reference)
 
     def _scan(self, tree, module, path):
         """Record every Name or Attribute chain that resolves to a package
         definition and is not called. Iterative, so a deep expression cannot
         exhaust the stack. Each entry carries the node, its parent and the
         parent's parent (for the context), the names bound in the enclosing
-        function and that function's name."""
-        stack = [(tree, None, None, frozenset(), None)]
+        function, that function's name and the class scope (see
+        _scan_children)."""
+        stack = [(tree, None, None, frozenset(), None, None)]
         while stack:
-            node, parent, owner, local, def_name = stack.pop()
-            children = self._scan_children(node, local, def_name)
+            node, parent, owner, local, def_name, scope = stack.pop()
+            children = self._scan_children(node, local, def_name, scope)
             if isinstance(node, (ast.Name, ast.Attribute)):
-                self._reference(node, parent, owner, module, path, local, def_name)
-            for child, child_local, child_name in reversed(children):
-                stack.append((child, node, parent, child_local, child_name))
+                self._reference(node, parent, owner, module, path, local, def_name, scope)
+            for child, child_local, child_name, child_scope in reversed(children):
+                stack.append((child, node, parent, child_local, child_name, child_scope))
 
-    @staticmethod
-    def _scan_children(node, local, def_name):
-        """(child, local names, def name) for each child to scan. Decorators are
-        skipped; defaults, annotations and bases belong to the enclosing scope;
-        a definition's body sees its own local names."""
+    def _scan_children(self, node, local, def_name, scope):
+        """(child, local names, def name, class scope) for each child to scan.
+        Decorators are skipped; defaults, annotations and bases belong to the
+        enclosing scope; a definition's body sees its own local names. The
+        class scope is ("body", C) in the body of package class C and
+        ("self", C) in its methods and the functions and lambdas nested in
+        them; elsewhere None."""
         if isinstance(node, (ast.Name, ast.Attribute)):
             # The prefix of a chain (`Cls` in `Cls.m`) is not a value use of its own.
             base = node
             while isinstance(base, ast.Attribute):
                 base = base.value
-            return [] if isinstance(base, ast.Name) else [(base, local, def_name)]
+            return [] if isinstance(base, ast.Name) else [(base, local, def_name, scope)]
         if isinstance(node, ast.ClassDef):
-            return [(child, local, def_name) for child in node.bases + node.keywords + node.body]
+            cls = self.class_nodes.get(id(node))
+            body_scope = ("body", cls) if cls else None
+            return ([(child, local, def_name, scope) for child in node.bases + node.keywords]
+                    + [(child, local, def_name, body_scope) for child in node.body])
         if isinstance(node, _FUNC_TYPES + (ast.Lambda,)):
-            children = [(node.args, local, def_name)]
+            children = [(node.args, local, def_name, scope)]
             if getattr(node, "returns", None) is not None:
-                children.append((node.returns, local, def_name))
+                children.append((node.returns, local, def_name, scope))
             body_local = local | _local_names(node)
+            if id(node) in self.method_class:
+                body_scope = ("self", self.method_class[id(node)])
+            else:
+                body_scope = scope if scope and scope[0] == "self" else None
             if isinstance(node, ast.Lambda):
-                return children + [(node.body, body_local, def_name)]
-            return children + [(child, body_local, node.name) for child in node.body]
+                return children + [(node.body, body_local, def_name, body_scope)]
+            return children + [(child, body_local, node.name, body_scope) for child in node.body]
         if isinstance(node, (ast.ListComp, ast.SetComp, ast.DictComp, ast.GeneratorExp)):
             local = local | _local_names(node)
-        return [(child, local, def_name) for child in ast.iter_child_nodes(node)]
+        return [(child, local, def_name, scope) for child in ast.iter_child_nodes(node)]
 
-    def _reference(self, node, parent, owner, module, path, local, def_name):
-        if not isinstance(node.ctx, ast.Load) or _root_name(node) in local:
+    def _reference(self, node, parent, owner, module, path, local, def_name, scope):
+        if not isinstance(node.ctx, ast.Load):
             return
         if isinstance(parent, ast.Call) and parent.func is node:
             return
-        resolved = self._resolve_expr(node, module)
+        resolved = self._class_scoped(node, scope)
+        if resolved is None:
+            if _root_name(node) in local:
+                return
+            resolved = self._resolve_expr(node, module)
         if resolved is None or resolved[0] != "def":
             return
         self.graph.references.setdefault(resolved[1], []).append({
             "file": path, "line": node.lineno, "context": _context(node, parent, owner, def_name),
         })
+
+    def _class_scoped(self, node, scope):
+        """A method of the enclosing class named by `self.m` / `cls.m` in a
+        method, or by a bare name in the class body; None otherwise."""
+        if scope is None:
+            return None
+        kind, cls = scope
+        if (kind == "self" and isinstance(node, ast.Attribute)
+                and isinstance(node.value, ast.Name) and node.value.id in ("self", "cls")):
+            method = self._method(cls, node.attr)
+        elif kind == "body" and isinstance(node, ast.Name):
+            method = self._method(cls, node.id)
+        else:
+            return None
+        return ("def", method) if method else None
 
     # -- public names ------------------------------------------------------------
 
@@ -459,15 +513,23 @@ def _string_list(node):
 
 
 def _calls(body):
-    """Every ast.Call in a definition body, skipping decorators of nested definitions."""
-    stack = list(reversed(body))
+    """(call, nested) for every ast.Call in a definition body; nested is True
+    inside the body of a nested function, lambda or class. Defaults,
+    annotations and bases run with the enclosing scope; decorators of nested
+    definitions are skipped."""
+    stack = [(node, False) for node in reversed(body)]
     while stack:
-        node = stack.pop()
+        node, nested = stack.pop()
         if isinstance(node, ast.Call):
-            yield node
-        children = list(ast.iter_child_nodes(node))
-        if isinstance(node, _DEF_TYPES):
-            children = [c for c in children if c not in node.decorator_list]
+            yield node, nested
+        if isinstance(node, _FUNC_TYPES + (ast.Lambda,)):
+            outer = [node.args] + ([node.returns] if getattr(node, "returns", None) else [])
+            inner = [node.body] if isinstance(node, ast.Lambda) else node.body
+        elif isinstance(node, ast.ClassDef):
+            outer, inner = node.bases + node.keywords, node.body
+        else:
+            outer, inner = list(ast.iter_child_nodes(node)), []
+        children = [(child, nested) for child in outer] + [(child, True) for child in inner]
         stack.extend(reversed(children))
 
 
@@ -656,7 +718,7 @@ def _reason(graph, item, closure):
     if roots == [target]:
         if references:
             return reason("referenced_not_called")
-        if kind == "function" and target in graph.public:
+        if info["kind"] == "function" and target in graph.public:
             return _SELF_ONLY
         return reason("no_reference")
     if not roots:
