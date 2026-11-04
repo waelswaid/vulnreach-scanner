@@ -1,0 +1,112 @@
+{
+  "aliases": [
+    "CVE-2025-27516",
+    "PYSEC-2026-1471"
+  ],
+  "ecosystem": "PyPI",
+  "entry_points": [
+    {
+      "confidence": "high",
+      "defined_as": "jinja2.filters.do_attr",
+      "name": "jinja2.filters.do_attr",
+      "path": [
+        "jinja2.filters.do_attr"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "jinja2.sandbox.SandboxedEnvironment",
+      "name": "jinja2.sandbox.SandboxedEnvironment",
+      "path": [
+        "jinja2.sandbox.SandboxedEnvironment",
+        "jinja2.environment.Environment.__init__ (self.filters = DEFAULT_FILTERS.copy(), environment.py:351; DEFAULT_FILTERS is jinja2.filters.FILTERS, defaults.py:3)",
+        "compiled template: t_N = environment.filters['attr'] (written by jinja2.compiler.CodeGenerator.pull_dependencies, compiler.py:570), called at the filter use site",
+        "jinja2.filters.do_attr"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "jinja2.sandbox.ImmutableSandboxedEnvironment",
+      "name": "jinja2.sandbox.ImmutableSandboxedEnvironment",
+      "path": [
+        "jinja2.sandbox.ImmutableSandboxedEnvironment",
+        "jinja2.environment.Environment.__init__ (self.filters = DEFAULT_FILTERS.copy(), environment.py:351; DEFAULT_FILTERS is jinja2.filters.FILTERS, defaults.py:3)",
+        "compiled template: t_N = environment.filters['attr'] (written by jinja2.compiler.CodeGenerator.pull_dependencies, compiler.py:570), called at the filter use site",
+        "jinja2.filters.do_attr"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "jinja2.environment.Environment.call_filter",
+      "name": "jinja2.Environment.call_filter",
+      "path": [
+        "jinja2.environment.Environment.call_filter",
+        "jinja2.environment.Environment._filter_test_common (func = self.filters.get(name), environment.py:515; return func(...), :550)",
+        "jinja2.filters.do_attr"
+      ]
+    }
+  ],
+  "fix_commits": [
+    {
+      "bundle": false,
+      "in_fixed_release": true,
+      "sha": "90457bbf33b8662926ae65cdde4c4c32e756e403",
+      "source": "commit_link"
+    }
+  ],
+  "generated_at": "2026-11-04T04:10:20+00:00",
+  "id": "GHSA-cpwx-vrp4-4pq7",
+  "names_verified_for": [
+    ">=2.7, <3.2"
+  ],
+  "notes": [
+    "do_attr's only reference is the FILTERS dict literal (review reason: src/jinja2/filters.py:1825). defaults.py:3 imports FILTERS as DEFAULT_FILTERS and Environment.__init__ copies it into self.filters (environment.py:351). It runs two ways: compiled template code, where CodeGenerator.pull_dependencies (compiler.py:538, writeline at :570) emits t_N = environment.filters['attr'] and the |attr use site calls t_N; and Environment.call_filter (:552) -> _filter_test_common, which does func = self.filters.get(name) (:515) and calls it (:550). Exposure is sandbox-only (the plain getattr inside do_attr is what escapes the sandbox), so the entry points are the two sandbox classes (both inherit Environment.__init__ and its filter table) and call_filter, which they inherit; plain Environment and Template are deliberately not listed. Checked against the record's tree 033c200 (3.1.5-5-g033c2001, first parent of the fix) on 2026-11-04."
+  ],
+  "osv_modified": "2026-09-10T03:49:48.526758681Z",
+  "overrides_applied": [
+    "added entry point jinja2.filters.do_attr",
+    "added entry point jinja2.sandbox.SandboxedEnvironment",
+    "added entry point jinja2.sandbox.ImmutableSandboxedEnvironment",
+    "added entry point jinja2.Environment.call_filter",
+    "note added",
+    "reviewed: not applied, unsigned"
+  ],
+  "overrides_fingerprint": "640d0499f04cba5085a0de2c9d229a1aa8213cc5daf76d648001fe75fc88f59a",
+  "package": "jinja2",
+  "pipeline_version": "2",
+  "rejected_commits": [],
+  "repo": "https://github.com/pallets/jinja",
+  "review": {
+    "reasons": [
+      {
+        "dead_ends": [],
+        "file": "src/jinja2/filters.py",
+        "item": "jinja2.filters.do_attr",
+        "kind": "referenced_not_called",
+        "references": [
+          {
+            "context": "value in dict literal FILTERS",
+            "file": "src/jinja2/filters.py",
+            "line": 1825
+          }
+        ]
+      }
+    ],
+    "resolve": "Do not edit: resolve in data/overrides.json and rerun",
+    "status": "open",
+    "tree": "033c20015c7ca899ab52eb921bb0f08e6d3dd145"
+  },
+  "status": "found",
+  "vulnerable": [
+    {
+      "confidence": "high",
+      "evidence": [
+        "modified by the fix (lines 1414, 1415, 1416, 1421, 1422, 1423, 1424, 1425, 1426, 1427, 1428, 1429, 1430, 1431, 1432, 1433, 1434, 1435, 1436, 1437, 1438 before, 1415, 1416, 1417, 1421, 1422, 1423, 1425, 1426, 1427, 1428, 1429, 1430, 1431, 1432, 1433 after)",
+        "body changed, not only docstrings or formatting"
+      ],
+      "file": "src/jinja2/filters.py",
+      "kind": "function",
+      "name": "jinja2.filters.do_attr"
+    }
+  ]
+}

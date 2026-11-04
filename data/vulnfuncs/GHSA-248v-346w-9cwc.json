@@ -1,0 +1,35 @@
+{
+  "aliases": [
+    "CVE-2024-39689",
+    "PYSEC-2024-230"
+  ],
+  "ecosystem": "PyPI",
+  "entry_points": [],
+  "fix_commits": [
+    {
+      "bundle": true,
+      "in_fixed_release": null,
+      "sha": "bd8153872e9c6fc98f4023df9c2deaffea2fa463",
+      "source": "git_range"
+    }
+  ],
+  "generated_at": "2026-11-04T04:07:26+00:00",
+  "id": "GHSA-248v-346w-9cwc",
+  "names_verified_for": [],
+  "notes": [],
+  "osv_modified": "2026-09-10T03:50:15.994602411Z",
+  "overrides_applied": [],
+  "overrides_fingerprint": null,
+  "package": "certifi",
+  "pipeline_version": "2",
+  "rejected_commits": [],
+  "repo": "https://github.com/certifi/python-certifi",
+  "review": {
+    "reasons": [],
+    "resolve": "Do not edit: resolve in data/overrides.json and rerun",
+    "status": "none",
+    "tree": null
+  },
+  "status": "not_code",
+  "vulnerable": []
+}

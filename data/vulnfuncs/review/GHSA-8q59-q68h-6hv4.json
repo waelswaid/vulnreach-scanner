@@ -1,0 +1,180 @@
+{
+  "aliases": [
+    "CVE-2020-14343",
+    "PYSEC-2021-142"
+  ],
+  "ecosystem": "PyPI",
+  "entry_points": [
+    {
+      "confidence": "high",
+      "defined_as": "yaml.load",
+      "name": "yaml.load",
+      "path": [
+        "yaml.load",
+        "Loader defaults to FullLoader (lib3/yaml/__init__.py:110), loader = Loader(stream)",
+        "yaml.constructor.BaseConstructor.get_single_data",
+        "yaml.constructor.BaseConstructor.construct_document",
+        "yaml.constructor.BaseConstructor.construct_object",
+        "lookup: self.yaml_multi_constructors[tag_prefix] for the python/module:, python/object: and python/object/new: prefixes (lib3/yaml/constructor.py:82-85, called at :102), a table filled by the module-level FullConstructor.add_multi_constructor registrations at :713-723",
+        "yaml.constructor"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "yaml.load_all",
+      "name": "yaml.load_all",
+      "path": [
+        "yaml.load_all",
+        "Loader defaults to FullLoader (lib3/yaml/__init__.py:125), loader = Loader(stream)",
+        "yaml.constructor.BaseConstructor.get_data",
+        "yaml.constructor.BaseConstructor.construct_document",
+        "yaml.constructor.BaseConstructor.construct_object",
+        "lookup: self.yaml_multi_constructors[tag_prefix] for the python/module:, python/object: and python/object/new: prefixes (lib3/yaml/constructor.py:82-85, called at :102), a table filled by the module-level FullConstructor.add_multi_constructor registrations at :713-723",
+        "yaml.constructor"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "yaml.full_load",
+      "name": "yaml.full_load",
+      "path": [
+        "yaml.full_load",
+        "yaml.load (Loader=FullLoader, lib3/yaml/__init__.py:142)",
+        "yaml.constructor.BaseConstructor.get_single_data",
+        "yaml.constructor.BaseConstructor.construct_document",
+        "yaml.constructor.BaseConstructor.construct_object",
+        "lookup: self.yaml_multi_constructors[tag_prefix] for the python/module:, python/object: and python/object/new: prefixes (lib3/yaml/constructor.py:82-85, called at :102), a table filled by the module-level FullConstructor.add_multi_constructor registrations at :713-723",
+        "yaml.constructor"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "yaml.full_load_all",
+      "name": "yaml.full_load_all",
+      "path": [
+        "yaml.full_load_all",
+        "yaml.load_all (Loader=FullLoader, lib3/yaml/__init__.py:152)",
+        "yaml.constructor.BaseConstructor.get_data",
+        "yaml.constructor.BaseConstructor.construct_document",
+        "yaml.constructor.BaseConstructor.construct_object",
+        "lookup: self.yaml_multi_constructors[tag_prefix] for the python/module:, python/object: and python/object/new: prefixes (lib3/yaml/constructor.py:82-85, called at :102), a table filled by the module-level FullConstructor.add_multi_constructor registrations at :713-723",
+        "yaml.constructor"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "yaml.loader.FullLoader",
+      "name": "yaml.FullLoader",
+      "path": [
+        "yaml.loader.FullLoader",
+        "yaml.constructor.BaseConstructor.get_single_data",
+        "yaml.constructor.BaseConstructor.construct_document",
+        "yaml.constructor.BaseConstructor.construct_object",
+        "lookup: self.yaml_multi_constructors[tag_prefix] for the python/module:, python/object: and python/object/new: prefixes (lib3/yaml/constructor.py:82-85, called at :102), a table filled by the module-level FullConstructor.add_multi_constructor registrations at :713-723",
+        "yaml.constructor"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "yaml.cyaml.CFullLoader",
+      "name": "yaml.CFullLoader",
+      "path": [
+        "yaml.cyaml.CFullLoader",
+        "yaml.constructor.BaseConstructor.get_single_data",
+        "yaml.constructor.BaseConstructor.construct_document",
+        "yaml.constructor.BaseConstructor.construct_object",
+        "lookup: self.yaml_multi_constructors[tag_prefix] for the python/module:, python/object: and python/object/new: prefixes (lib3/yaml/constructor.py:82-85, called at :102), a table filled by the module-level FullConstructor.add_multi_constructor registrations at :713-723",
+        "yaml.constructor"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "yaml.constructor.FullConstructor",
+      "name": "yaml.constructor.FullConstructor",
+      "path": [
+        "yaml.constructor.FullConstructor",
+        "yaml.constructor.BaseConstructor.construct_document",
+        "yaml.constructor.BaseConstructor.construct_object",
+        "lookup: self.yaml_multi_constructors[tag_prefix] for the python/module:, python/object: and python/object/new: prefixes (lib3/yaml/constructor.py:82-85, called at :102), a table filled by the module-level FullConstructor.add_multi_constructor registrations at :713-723",
+        "yaml.constructor"
+      ]
+    }
+  ],
+  "fix_commits": [
+    {
+      "bundle": false,
+      "in_fixed_release": true,
+      "sha": "a001f2782501ad2d24986959f0239a354675f9dc",
+      "source": "commit_link"
+    }
+  ],
+  "generated_at": "2026-11-04T04:08:09+00:00",
+  "id": "GHSA-8q59-q68h-6hv4",
+  "names_verified_for": [
+    ">=3.1, <5.5"
+  ],
+  "notes": [
+    "yaml.constructor: source before the fix does not parse (line 330: 'u' and 'r' prefixes are incompatible); skipped",
+    "lib/yaml/constructor.py: does not parse (line 330: 'u' and 'r' prefixes are incompatible), skipped",
+    "lib/yaml/resolver.py: does not parse (line 172: 'u' and 'r' prefixes are incompatible), skipped",
+    "lib3/yaml/__init__.py: duplicate module yaml, skipped",
+    "lib3/yaml/composer.py: duplicate module yaml.composer, skipped",
+    "lib3/yaml/cyaml.py: duplicate module yaml.cyaml, skipped",
+    "lib3/yaml/dumper.py: duplicate module yaml.dumper, skipped",
+    "lib3/yaml/emitter.py: duplicate module yaml.emitter, skipped",
+    "lib3/yaml/error.py: duplicate module yaml.error, skipped",
+    "lib3/yaml/events.py: duplicate module yaml.events, skipped",
+    "lib3/yaml/loader.py: duplicate module yaml.loader, skipped",
+    "lib3/yaml/nodes.py: duplicate module yaml.nodes, skipped",
+    "lib3/yaml/parser.py: duplicate module yaml.parser, skipped",
+    "lib3/yaml/reader.py: duplicate module yaml.reader, skipped",
+    "lib3/yaml/representer.py: duplicate module yaml.representer, skipped",
+    "lib3/yaml/scanner.py: duplicate module yaml.scanner, skipped",
+    "lib3/yaml/serializer.py: duplicate module yaml.serializer, skipped",
+    "lib3/yaml/tokens.py: duplicate module yaml.tokens, skipped",
+    "Review reason: module_level yaml.constructor (lib3/yaml/constructor.py). The vulnerable code is not a function but three module-level statements, FullConstructor.add_multi_constructor for the python/module:, python/object: and python/object/new: tag prefixes (:713-723), which the fix moves to UnsafeConstructor. They run when yaml.constructor is imported and store construct_python_module, construct_python_object and construct_python_object_new in FullConstructor.yaml_multi_constructors (add_multi_constructor, :166). BaseConstructor.construct_object (:67) looks every node's tag prefix up in that table (:82-85) and calls the constructor (:102), so any FullConstructor-based load of a document with one of those tags uses the registrations. construct_object is reached from get_single_data / get_data -> construct_document (:47, :42, :54), which yaml.load and yaml.load_all call on the loader they build (__init__.py:114, :130); both default to FullLoader (:110, :125), and full_load / full_load_all pass FullLoader explicitly (:142, :152). FullLoader (loader.py:21) and CFullLoader (cyaml.py:30, exported as yaml.CFullLoader only when libyaml is installed) inherit FullConstructor and so its table. Paths end at the module item yaml.constructor. Checked against the record's tree fe15062 (5.3.1-15-gfe15062, first parent of the fix a001f27, which is in 5.4b1 and 5.4) on 2026-11-04, lib3/ copy (lib/ is the Python 2 copy)."
+  ],
+  "osv_modified": "2026-02-04T03:33:10.792778Z",
+  "overrides_applied": [
+    "added entry point yaml.load",
+    "added entry point yaml.load_all",
+    "added entry point yaml.full_load",
+    "added entry point yaml.full_load_all",
+    "added entry point yaml.FullLoader",
+    "added entry point yaml.CFullLoader",
+    "added entry point yaml.constructor.FullConstructor",
+    "note added",
+    "reviewed: not applied, unsigned"
+  ],
+  "overrides_fingerprint": "6f29b812847cd4a4ecf8ab8ca55fe2a749af40db2079cdf82464e39c7918268d",
+  "package": "pyyaml",
+  "pipeline_version": "2",
+  "rejected_commits": [],
+  "repo": "https://github.com/yaml/pyyaml",
+  "review": {
+    "reasons": [
+      {
+        "dead_ends": [],
+        "file": "lib3/yaml/constructor.py",
+        "item": "yaml.constructor",
+        "kind": "module_level",
+        "references": []
+      }
+    ],
+    "resolve": "Do not edit: resolve in data/overrides.json and rerun",
+    "status": "open",
+    "tree": "fe150624146ee631bb0f95e45731e8b01281fed6"
+  },
+  "status": "found",
+  "vulnerable": [
+    {
+      "confidence": "high",
+      "evidence": [
+        "module-level statement changed or removed: FullConstructor.add_multi_constructor('tag:yaml.org,2002:python/module:', FullConstructor.construct_; FullConstructor.add_multi_constructor('tag:yaml.org,2002:python/object:', FullConstructor.construct_; FullConstructor.add_multi_constructor('tag:yaml.org,2002:python/object/new:', FullConstructor.constr"
+      ],
+      "file": "lib3/yaml/constructor.py",
+      "kind": "module_level",
+      "name": "yaml.constructor"
+    }
+  ]
+}

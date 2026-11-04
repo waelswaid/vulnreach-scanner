@@ -1,0 +1,14 @@
+{
+  "CVE-2018-18074": "GHSA-x84v-xcm2-53pg",
+  "CVE-2023-32681": "GHSA-j8r2-6x86-q33q",
+  "CVE-2024-39689": "GHSA-248v-346w-9cwc",
+  "CVE-2024-47081": "GHSA-9hjg-9r4m-mvj7",
+  "GHSA-248v-346w-9cwc": "GHSA-248v-346w-9cwc",
+  "GHSA-9hjg-9r4m-mvj7": "GHSA-9hjg-9r4m-mvj7",
+  "GHSA-j8r2-6x86-q33q": "GHSA-j8r2-6x86-q33q",
+  "GHSA-x84v-xcm2-53pg": "GHSA-x84v-xcm2-53pg",
+  "PYSEC-2018-28": "GHSA-x84v-xcm2-53pg",
+  "PYSEC-2023-74": "GHSA-j8r2-6x86-q33q",
+  "PYSEC-2024-230": "GHSA-248v-346w-9cwc",
+  "PYSEC-2026-1872": "GHSA-9hjg-9r4m-mvj7"
+}

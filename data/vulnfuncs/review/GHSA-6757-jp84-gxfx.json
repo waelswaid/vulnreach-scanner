@@ -1,0 +1,272 @@
+{
+  "aliases": [
+    "CVE-2020-1747",
+    "PYSEC-2020-96"
+  ],
+  "ecosystem": "PyPI",
+  "entry_points": [
+    {
+      "confidence": "high",
+      "defined_as": "yaml.constructor.FullConstructor.construct_python_object",
+      "name": "yaml.constructor.Constructor.construct_python_object",
+      "path": [
+        "yaml.constructor.FullConstructor.construct_python_object",
+        "yaml.constructor.FullConstructor.set_python_instance_state"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "yaml.constructor.FullConstructor.construct_python_object_apply",
+      "name": "yaml.constructor.Constructor.construct_python_object_apply",
+      "path": [
+        "yaml.constructor.FullConstructor.construct_python_object_apply",
+        "yaml.constructor.FullConstructor.set_python_instance_state"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "yaml.constructor.FullConstructor.construct_python_object_new",
+      "name": "yaml.constructor.Constructor.construct_python_object_new",
+      "path": [
+        "yaml.constructor.FullConstructor.construct_python_object_new",
+        "yaml.constructor.FullConstructor.construct_python_object_apply",
+        "yaml.constructor.FullConstructor.set_python_instance_state"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "yaml.constructor.FullConstructor.set_python_instance_state",
+      "name": "yaml.constructor.Constructor.set_python_instance_state",
+      "path": [
+        "yaml.constructor.FullConstructor.set_python_instance_state"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "yaml.load",
+      "name": "yaml.load",
+      "path": [
+        "yaml.load",
+        "Loader defaults to FullLoader (lib3/yaml/__init__.py:110), loader = Loader(stream)",
+        "yaml.constructor.BaseConstructor.get_single_data",
+        "yaml.constructor.BaseConstructor.construct_document",
+        "yaml.constructor.BaseConstructor.construct_object",
+        "lookup: self.yaml_multi_constructors['tag:yaml.org,2002:python/object/new:'] (registered by FullConstructor.add_multi_constructor, lib3/yaml/constructor.py:698-700)",
+        "yaml.constructor.FullConstructor.construct_python_object_new",
+        "yaml.constructor.FullConstructor.construct_python_object_apply",
+        "yaml.constructor.FullConstructor.set_python_instance_state"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "yaml.load_all",
+      "name": "yaml.load_all",
+      "path": [
+        "yaml.load_all",
+        "Loader defaults to FullLoader (lib3/yaml/__init__.py:125), loader = Loader(stream)",
+        "yaml.constructor.BaseConstructor.get_data",
+        "yaml.constructor.BaseConstructor.construct_document",
+        "yaml.constructor.BaseConstructor.construct_object",
+        "lookup: self.yaml_multi_constructors['tag:yaml.org,2002:python/object/new:'] (registered by FullConstructor.add_multi_constructor, lib3/yaml/constructor.py:698-700)",
+        "yaml.constructor.FullConstructor.construct_python_object_new",
+        "yaml.constructor.FullConstructor.construct_python_object_apply",
+        "yaml.constructor.FullConstructor.set_python_instance_state"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "yaml.full_load",
+      "name": "yaml.full_load",
+      "path": [
+        "yaml.full_load",
+        "yaml.load (Loader=FullLoader, lib3/yaml/__init__.py:142)",
+        "yaml.constructor.BaseConstructor.get_single_data",
+        "yaml.constructor.BaseConstructor.construct_document",
+        "yaml.constructor.BaseConstructor.construct_object",
+        "lookup: self.yaml_multi_constructors['tag:yaml.org,2002:python/object/new:'] (registered by FullConstructor.add_multi_constructor, lib3/yaml/constructor.py:698-700)",
+        "yaml.constructor.FullConstructor.construct_python_object_new",
+        "yaml.constructor.FullConstructor.construct_python_object_apply",
+        "yaml.constructor.FullConstructor.set_python_instance_state"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "yaml.full_load_all",
+      "name": "yaml.full_load_all",
+      "path": [
+        "yaml.full_load_all",
+        "yaml.load_all (Loader=FullLoader, lib3/yaml/__init__.py:152)",
+        "yaml.constructor.BaseConstructor.get_data",
+        "yaml.constructor.BaseConstructor.construct_document",
+        "yaml.constructor.BaseConstructor.construct_object",
+        "lookup: self.yaml_multi_constructors['tag:yaml.org,2002:python/object/new:'] (registered by FullConstructor.add_multi_constructor, lib3/yaml/constructor.py:698-700)",
+        "yaml.constructor.FullConstructor.construct_python_object_new",
+        "yaml.constructor.FullConstructor.construct_python_object_apply",
+        "yaml.constructor.FullConstructor.set_python_instance_state"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "yaml.loader.FullLoader",
+      "name": "yaml.FullLoader",
+      "path": [
+        "yaml.loader.FullLoader",
+        "yaml.constructor.BaseConstructor.get_single_data",
+        "yaml.constructor.BaseConstructor.construct_document",
+        "yaml.constructor.BaseConstructor.construct_object",
+        "lookup: self.yaml_multi_constructors['tag:yaml.org,2002:python/object/new:'] (registered by FullConstructor.add_multi_constructor, lib3/yaml/constructor.py:698-700)",
+        "yaml.constructor.FullConstructor.construct_python_object_new",
+        "yaml.constructor.FullConstructor.construct_python_object_apply",
+        "yaml.constructor.FullConstructor.set_python_instance_state"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "yaml.cyaml.CFullLoader",
+      "name": "yaml.CFullLoader",
+      "path": [
+        "yaml.cyaml.CFullLoader",
+        "yaml.constructor.BaseConstructor.get_single_data",
+        "yaml.constructor.BaseConstructor.construct_document",
+        "yaml.constructor.BaseConstructor.construct_object",
+        "lookup: self.yaml_multi_constructors['tag:yaml.org,2002:python/object/new:'] (registered by FullConstructor.add_multi_constructor, lib3/yaml/constructor.py:698-700)",
+        "yaml.constructor.FullConstructor.construct_python_object_new",
+        "yaml.constructor.FullConstructor.construct_python_object_apply",
+        "yaml.constructor.FullConstructor.set_python_instance_state"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "yaml.constructor.FullConstructor",
+      "name": "yaml.constructor.FullConstructor",
+      "path": [
+        "yaml.constructor.FullConstructor",
+        "yaml.constructor.BaseConstructor.construct_document",
+        "yaml.constructor.BaseConstructor.construct_object",
+        "lookup: self.yaml_multi_constructors['tag:yaml.org,2002:python/object/new:'] (registered by FullConstructor.add_multi_constructor, lib3/yaml/constructor.py:698-700)",
+        "yaml.constructor.FullConstructor.construct_python_object_new",
+        "yaml.constructor.FullConstructor.construct_python_object_apply",
+        "yaml.constructor.FullConstructor.set_python_instance_state"
+      ]
+    }
+  ],
+  "fix_commits": [
+    {
+      "bundle": false,
+      "in_fixed_release": true,
+      "sha": "5080ba513377b6355a0502104846ee804656f1e0",
+      "source": "pr_link"
+    }
+  ],
+  "generated_at": "2026-11-04T04:07:37+00:00",
+  "id": "GHSA-6757-jp84-gxfx",
+  "names_verified_for": [
+    ">=5.1, <5.4"
+  ],
+  "notes": [
+    "yaml.constructor: source before the fix does not parse (line 322: 'u' and 'r' prefixes are incompatible); skipped",
+    "fix adds yaml.constructor.BaseConstructor.check_state_key, yaml.constructor.FullConstructor.get_state_keys_blacklist, yaml.constructor.FullConstructor.get_state_keys_blacklist_regexp, yaml.constructor.UnsafeConstructor.set_python_instance_state",
+    "lib/yaml/constructor.py: does not parse (line 322: 'u' and 'r' prefixes are incompatible), skipped",
+    "lib/yaml/resolver.py: does not parse (line 172: 'u' and 'r' prefixes are incompatible), skipped",
+    "lib3/yaml/__init__.py: duplicate module yaml, skipped",
+    "lib3/yaml/composer.py: duplicate module yaml.composer, skipped",
+    "lib3/yaml/cyaml.py: duplicate module yaml.cyaml, skipped",
+    "lib3/yaml/dumper.py: duplicate module yaml.dumper, skipped",
+    "lib3/yaml/emitter.py: duplicate module yaml.emitter, skipped",
+    "lib3/yaml/error.py: duplicate module yaml.error, skipped",
+    "lib3/yaml/events.py: duplicate module yaml.events, skipped",
+    "lib3/yaml/loader.py: duplicate module yaml.loader, skipped",
+    "lib3/yaml/nodes.py: duplicate module yaml.nodes, skipped",
+    "lib3/yaml/parser.py: duplicate module yaml.parser, skipped",
+    "lib3/yaml/reader.py: duplicate module yaml.reader, skipped",
+    "lib3/yaml/representer.py: duplicate module yaml.representer, skipped",
+    "lib3/yaml/scanner.py: duplicate module yaml.scanner, skipped",
+    "lib3/yaml/serializer.py: duplicate module yaml.serializer, skipped",
+    "lib3/yaml/tokens.py: duplicate module yaml.tokens, skipped",
+    "set_python_instance_state is called by construct_python_object (constructor.py:598) and construct_python_object_apply (:627); construct_python_object_new calls construct_python_object_apply (:636). The walker stops because construct_python_object and construct_python_object_new are only referenced as arguments to add_multi_constructor (review reasons: lib3/yaml/constructor.py:696 and :700). Those registrations put them in FullConstructor.yaml_multi_constructors under the python/object: and python/object/new: tag prefixes, and BaseConstructor.construct_object (:74-95) looks the node's tag prefix up in that table and calls the constructor, so a document with !!python/object/new: (or !!python/object:) and a state reaches set_python_instance_state. construct_object is reached from get_single_data / get_data -> construct_document, which yaml.load and yaml.load_all call on the loader they build; both default to FullLoader in 5.3 (__init__.py:110, :125), and full_load / full_load_all pass FullLoader explicitly (:142, :152). FullLoader (loader.py:21) and CFullLoader (cyaml.py:30, exported as yaml.CFullLoader only when libyaml is installed) inherit FullConstructor and so its table. Checked against the record's tree 2f463cf (tag 5.3), lib3/ copy (lib/ is the Python 2 copy of the same code) on 2026-11-04."
+  ],
+  "osv_modified": "2026-05-04T08:57:14.897560893Z",
+  "overrides_applied": [
+    "added entry point yaml.load",
+    "added entry point yaml.load_all",
+    "added entry point yaml.full_load",
+    "added entry point yaml.full_load_all",
+    "added entry point yaml.FullLoader",
+    "added entry point yaml.CFullLoader",
+    "added entry point yaml.constructor.FullConstructor",
+    "note added",
+    "reviewed: not applied, unsigned"
+  ],
+  "overrides_fingerprint": "918448b52f5d4b04ff6c3efd279285c99cc41e95300356933cd45490a0c20f05",
+  "package": "pyyaml",
+  "pipeline_version": "2",
+  "rejected_commits": [
+    {
+      "reason": "unresolved",
+      "sha": null,
+      "source": "pr_link",
+      "url": "https://github.com/github/advisory-database/pull/4942"
+    },
+    {
+      "reason": "release check: not in 5.3.1",
+      "sha": "0afa8ac5e13ffef72120161ae766746ae77096d3",
+      "source": "pr_link",
+      "url": "https://github.com/yaml/pyyaml/pull/386"
+    },
+    {
+      "reason": "release check: already in 5.3",
+      "sha": "0cedb2a0697b2bc49e4f3841b8d4590b6b15657e",
+      "source": "commit_link",
+      "url": "https://github.com/yaml/pyyaml/commit/0cedb2a0697b2bc49e4f3841b8d4590b6b15657e"
+    }
+  ],
+  "repo": "https://github.com/yaml/pyyaml",
+  "review": {
+    "reasons": [
+      {
+        "dead_ends": [
+          {
+            "name": "yaml.constructor.FullConstructor.construct_python_object",
+            "references": [
+              {
+                "context": "argument to add_multi_constructor",
+                "file": "lib3/yaml/constructor.py",
+                "line": 696
+              }
+            ]
+          },
+          {
+            "name": "yaml.constructor.FullConstructor.construct_python_object_new",
+            "references": [
+              {
+                "context": "argument to add_multi_constructor",
+                "file": "lib3/yaml/constructor.py",
+                "line": 700
+              }
+            ]
+          }
+        ],
+        "file": "lib3/yaml/constructor.py",
+        "item": "yaml.constructor.FullConstructor.set_python_instance_state",
+        "kind": "dead_end_chain",
+        "references": []
+      }
+    ],
+    "resolve": "Do not edit: resolve in data/overrides.json and rerun",
+    "status": "open",
+    "tree": "2f463cf5b0e98a52bc20e348d1e69761bf263b86"
+  },
+  "status": "found",
+  "vulnerable": [
+    {
+      "confidence": "high",
+      "evidence": [
+        "modified by the fix (lines 577 before, 595, 603, 604, 605, 610, 611 after)",
+        "body changed, not only docstrings or formatting"
+      ],
+      "file": "lib3/yaml/constructor.py",
+      "kind": "method",
+      "name": "yaml.constructor.FullConstructor.set_python_instance_state"
+    }
+  ]
+}

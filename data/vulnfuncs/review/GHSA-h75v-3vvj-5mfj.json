@@ -1,0 +1,238 @@
+{
+  "aliases": [
+    "CVE-2024-34064",
+    "PYSEC-2026-1474"
+  ],
+  "ecosystem": "PyPI",
+  "entry_points": [
+    {
+      "confidence": "high",
+      "defined_as": "jinja2.filters.do_xmlattr",
+      "name": "jinja2.filters.do_xmlattr",
+      "path": [
+        "jinja2.filters.do_xmlattr"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "jinja2.environment.Environment",
+      "name": "jinja2.Environment",
+      "path": [
+        "jinja2.environment.Environment",
+        "jinja2.environment.Environment.__init__ (self.filters = DEFAULT_FILTERS.copy(), environment.py:351; DEFAULT_FILTERS is jinja2.filters.FILTERS, defaults.py:3)",
+        "compiled template: t_N = environment.filters['xmlattr'] (written by jinja2.compiler.CodeGenerator.pull_dependencies, compiler.py:570), called at the filter use site",
+        "jinja2.filters.do_xmlattr"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "jinja2.environment.Template",
+      "name": "jinja2.Template",
+      "path": [
+        "jinja2.environment.Template",
+        "jinja2.environment.Template.render",
+        "compiled template root_render_func(ctx) (environment.py:1302)",
+        "compiled template: t_N = environment.filters['xmlattr'] (written by jinja2.compiler.CodeGenerator.pull_dependencies, compiler.py:570), called at the filter use site",
+        "jinja2.filters.do_xmlattr"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "jinja2.environment.Template.render",
+      "name": "jinja2.Template.render",
+      "path": [
+        "jinja2.environment.Template.render",
+        "compiled template root_render_func(ctx) (environment.py:1302)",
+        "compiled template: t_N = environment.filters['xmlattr'] (written by jinja2.compiler.CodeGenerator.pull_dependencies, compiler.py:570), called at the filter use site",
+        "jinja2.filters.do_xmlattr"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "jinja2.environment.Template.render_async",
+      "name": "jinja2.Template.render_async",
+      "path": [
+        "jinja2.environment.Template.render_async",
+        "compiled template root_render_func(ctx) (environment.py:1324)",
+        "compiled template: t_N = environment.filters['xmlattr'] (written by jinja2.compiler.CodeGenerator.pull_dependencies, compiler.py:570), called at the filter use site",
+        "jinja2.filters.do_xmlattr"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "jinja2.environment.Template.generate",
+      "name": "jinja2.Template.generate",
+      "path": [
+        "jinja2.environment.Template.generate",
+        "compiled template root_render_func(ctx) (environment.py:1355)",
+        "compiled template: t_N = environment.filters['xmlattr'] (written by jinja2.compiler.CodeGenerator.pull_dependencies, compiler.py:570), called at the filter use site",
+        "jinja2.filters.do_xmlattr"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "jinja2.environment.Template.generate_async",
+      "name": "jinja2.Template.generate_async",
+      "path": [
+        "jinja2.environment.Template.generate_async",
+        "compiled template root_render_func(ctx) (environment.py:1373)",
+        "compiled template: t_N = environment.filters['xmlattr'] (written by jinja2.compiler.CodeGenerator.pull_dependencies, compiler.py:570), called at the filter use site",
+        "jinja2.filters.do_xmlattr"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "jinja2.environment.Template.stream",
+      "name": "jinja2.Template.stream",
+      "path": [
+        "jinja2.environment.Template.stream",
+        "jinja2.environment.Template.generate",
+        "compiled template root_render_func(ctx) (environment.py:1355)",
+        "compiled template: t_N = environment.filters['xmlattr'] (written by jinja2.compiler.CodeGenerator.pull_dependencies, compiler.py:570), called at the filter use site",
+        "jinja2.filters.do_xmlattr"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "jinja2.environment.Template.make_module",
+      "name": "jinja2.Template.make_module",
+      "path": [
+        "jinja2.environment.Template.make_module",
+        "jinja2.environment.TemplateModule.__init__ (template.root_render_func(context))",
+        "compiled template: t_N = environment.filters['xmlattr'] (written by jinja2.compiler.CodeGenerator.pull_dependencies, compiler.py:570), called at the filter use site",
+        "jinja2.filters.do_xmlattr"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "jinja2.environment.Template.make_module_async",
+      "name": "jinja2.Template.make_module_async",
+      "path": [
+        "jinja2.environment.Template.make_module_async",
+        "compiled template root_render_func(ctx) (environment.py:1425)",
+        "compiled template: t_N = environment.filters['xmlattr'] (written by jinja2.compiler.CodeGenerator.pull_dependencies, compiler.py:570), called at the filter use site",
+        "jinja2.filters.do_xmlattr"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "jinja2.environment.Environment.call_filter",
+      "name": "jinja2.Environment.call_filter",
+      "path": [
+        "jinja2.environment.Environment.call_filter",
+        "jinja2.environment.Environment._filter_test_common (func = self.filters.get(name), environment.py:512; return func(...), :547)",
+        "jinja2.filters.do_xmlattr"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "jinja2.sandbox.SandboxedEnvironment",
+      "name": "jinja2.sandbox.SandboxedEnvironment",
+      "path": [
+        "jinja2.sandbox.SandboxedEnvironment",
+        "jinja2.environment.Environment.__init__ (self.filters = DEFAULT_FILTERS.copy(), environment.py:351; DEFAULT_FILTERS is jinja2.filters.FILTERS, defaults.py:3)",
+        "compiled template: t_N = environment.filters['xmlattr'] (written by jinja2.compiler.CodeGenerator.pull_dependencies, compiler.py:570), called at the filter use site",
+        "jinja2.filters.do_xmlattr"
+      ]
+    },
+    {
+      "confidence": "high",
+      "defined_as": "jinja2.sandbox.ImmutableSandboxedEnvironment",
+      "name": "jinja2.sandbox.ImmutableSandboxedEnvironment",
+      "path": [
+        "jinja2.sandbox.ImmutableSandboxedEnvironment",
+        "jinja2.environment.Environment.__init__ (self.filters = DEFAULT_FILTERS.copy(), environment.py:351; DEFAULT_FILTERS is jinja2.filters.FILTERS, defaults.py:3)",
+        "compiled template: t_N = environment.filters['xmlattr'] (written by jinja2.compiler.CodeGenerator.pull_dependencies, compiler.py:570), called at the filter use site",
+        "jinja2.filters.do_xmlattr"
+      ]
+    }
+  ],
+  "fix_commits": [
+    {
+      "bundle": false,
+      "in_fixed_release": true,
+      "sha": "0668239dc6b44ef38e7a6c9f91f312fd4ca581cb",
+      "source": "commit_link"
+    }
+  ],
+  "generated_at": "2026-11-04T04:10:47+00:00",
+  "id": "GHSA-h75v-3vvj-5mfj",
+  "names_verified_for": [
+    ">=2.7, <3.2"
+  ],
+  "notes": [
+    "Two review reasons. (1) do_xmlattr's only reference is the FILTERS dict literal (src/jinja2/filters.py:1852). defaults.py:3 imports FILTERS as DEFAULT_FILTERS, Environment.__init__ copies it into self.filters (environment.py:351), and the filter runs from compiled template code (CodeGenerator.pull_dependencies, compiler.py:538, emits t_N = environment.filters['xmlattr'] at :570, called at the |xmlattr use site) or from Environment.call_filter (:549) -> _filter_test_common (self.filters.get(name) at :512, called at :547). Compiled code runs from Template.render (root_render_func at :1302), render_async (:1324), generate (:1355), generate_async (:1373), stream (via generate, :1333), make_module (TemplateModule, :1408) and make_module_async (:1425). No sandbox is needed for the injection, so plain Environment and Template are listed with the sandbox classes. (2) module_level jinja2.filters (src/jinja2/filters.py): the changed module statement is _space_re = re.compile(r'\\s') (:253), whose only use is inside do_xmlattr (:292), so it is reached exactly when do_xmlattr is; the same entry points cover it and the paths end at do_xmlattr. Checked against the record's tree a7863ba (3.1.3-8-ga7863ba9, first parent of the fix) on 2026-11-04."
+  ],
+  "osv_modified": "2026-09-10T03:50:13.786450101Z",
+  "overrides_applied": [
+    "added entry point jinja2.filters.do_xmlattr",
+    "added entry point jinja2.Environment",
+    "added entry point jinja2.Template",
+    "added entry point jinja2.Template.render",
+    "added entry point jinja2.Template.render_async",
+    "added entry point jinja2.Template.generate",
+    "added entry point jinja2.Template.generate_async",
+    "added entry point jinja2.Template.stream",
+    "added entry point jinja2.Template.make_module",
+    "added entry point jinja2.Template.make_module_async",
+    "added entry point jinja2.Environment.call_filter",
+    "added entry point jinja2.sandbox.SandboxedEnvironment",
+    "added entry point jinja2.sandbox.ImmutableSandboxedEnvironment",
+    "note added",
+    "reviewed: not applied, unsigned"
+  ],
+  "overrides_fingerprint": "24b5c85965224322be5d3bf70b67e73dd7c34aa33d13dc4200cc015ff3a5cf99",
+  "package": "jinja2",
+  "pipeline_version": "2",
+  "rejected_commits": [],
+  "repo": "https://github.com/pallets/jinja",
+  "review": {
+    "reasons": [
+      {
+        "dead_ends": [],
+        "file": "src/jinja2/filters.py",
+        "item": "jinja2.filters.do_xmlattr",
+        "kind": "referenced_not_called",
+        "references": [
+          {
+            "context": "value in dict literal FILTERS",
+            "file": "src/jinja2/filters.py",
+            "line": 1852
+          }
+        ]
+      },
+      {
+        "dead_ends": [],
+        "file": "src/jinja2/filters.py",
+        "item": "jinja2.filters",
+        "kind": "module_level",
+        "references": []
+      }
+    ],
+    "resolve": "Do not edit: resolve in data/overrides.json and rerun",
+    "status": "open",
+    "tree": "a7863ba9d3521f1450f821119c50d19d7ecea329"
+  },
+  "status": "found",
+  "vulnerable": [
+    {
+      "confidence": "high",
+      "evidence": [
+        "modified by the fix (lines 262, 263, 292, 293 before, 264, 265, 266, 267, 268, 269, 270, 271, 291, 292, 293, 294, 304, 305 after)",
+        "body changed, not only docstrings or formatting"
+      ],
+      "file": "src/jinja2/filters.py",
+      "kind": "function",
+      "name": "jinja2.filters.do_xmlattr"
+    },
+    {
+      "confidence": "high",
+      "evidence": [
+        "module-level statement changed or removed: _space_re = re.compile('\\\\s', flags=re.ASCII)"
+      ],
+      "file": "src/jinja2/filters.py",
+      "kind": "module_level",
+      "name": "jinja2.filters"
+    }
+  ]
+}
