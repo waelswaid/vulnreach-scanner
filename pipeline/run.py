@@ -52,9 +52,8 @@ def _analyse(merged, repo, cache_dir, spec):
 
     analysis = record.override_commits(analysis, spec)
     status_overridden = bool(spec) and "status" in spec
-    if not analysis["fix_commits"]:
-        if not status_overridden:
-            analysis["notes"].append("no usable fix commit")
+    if not analysis["fix_commits"] and not status_overridden:
+        analysis["notes"].append("no usable fix commit")
         return analysis
 
     groups = commits.group_backports(repo_dir, [c["sha"] for c in analysis["fix_commits"]])
@@ -71,7 +70,9 @@ def _analyse(merged, repo, cache_dir, spec):
             analysis["notes"].append(
                 "fix changes library code but no function or module-level statement")
 
-    if analysis["status"] == "found" and vulnerable:
+    if analysis["status"] == "found" and vulnerable and not analysed:
+        analysis["notes"].append("no fix commit to walk from; entry points need an override")
+    elif analysis["status"] == "found" and vulnerable:
         names = [v["name"] for v in vulnerable]
         analysis["names_verified_for"] = verify.verify_names(
             repo_dir, package, names, merged["affected_versions"])

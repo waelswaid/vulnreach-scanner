@@ -223,6 +223,24 @@ class RunTest(unittest.TestCase):
         self.assertIn("no usable fix commit", rec["notes"])
         self.assertTrue((self.out / f"{ID}.json").exists())
 
+    def test_overridden_status_and_added_vulnerable_without_fix_commit(self):
+        spec = {"status": "found", "note": "named by hand",
+                "add_vulnerable": [{"name": "pkg.core.parse", "file": "src/pkg/core.py"}]}
+        rec = self.process(advisory(self.c3), {ID: spec})
+        self.assertEqual(rec["status"], "found")
+        self.assertEqual(rec["fix_commits"], [])
+        self.assertEqual([(v["name"], v["confidence"]) for v in rec["vulnerable"]],
+                         [("pkg.core.parse", "high")])
+        self.assertIn("added vulnerable pkg.core.parse", rec["overrides_applied"])
+        self.assertIn("status set to found", rec["overrides_applied"])
+        self.assertIn("no fix commit to walk from; entry points need an override", rec["notes"])
+        self.assertNotIn("no usable fix commit", rec["notes"])
+        self.assertEqual(rec["entry_points"], [])
+        self.assertEqual(rec["review"]["reasons"], [])
+        self.assertEqual(self.walk_calls, [])
+        self.assertEqual(self.read(self.out), rec)
+        self.assertFalse((self.out / "review" / f"{ID}.json").exists())
+
     def test_no_repo_gives_unknown_with_note(self):
         with mock.patch.object(repos, "find_repo_url", lambda merged: None):
             rec = self.process(advisory(self.c2, links=[]))
