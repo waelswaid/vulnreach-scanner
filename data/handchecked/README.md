@@ -20,9 +20,9 @@ solve every one of them (each has a usable fix link in OSV):
 | 4 | GHSA-j8r2-6x86-q33q | requests 2.31.0 | Clean one-line fix; entry points through the redirect chain. |
 | 5 | GHSA-9hjg-9r4m-mvj7 | requests 2.32.4 | Vulnerable function in `utils`, reached through `Session.prepare_request`. |
 | 6 | GHSA-q2x7-8rv6-6q7h | jinja2 3.1.5 | Deleted functions count as vulnerable; "Merge commit from fork". |
-| 7 | GHSA-h75v-3vvj-5mfj | jinja2 3.1.4 | A function plus a substantive module-level change (the regex). |
+| 7 | GHSA-h75v-3vvj-5mfj | jinja2 3.1.4 | A function plus a substantive module-level change (the regex). Entry points through the filter table: the render API. |
 | 8 | GHSA-gmj6-6f8f-6699 | jinja2 3.1.5 | Two-parent commit where `git show` prints nothing; entry points via the `Environment` compile chain. |
-| 9 | GHSA-cpwx-vrp4-4pq7 | jinja2 3.1.6 | Single function, clean; sandbox exposure. |
+| 9 | GHSA-cpwx-vrp4-4pq7 | jinja2 3.1.6 | Single function, clean; sandbox exposure. Entry points through the filter table: the sandbox classes only. |
 | 10 | GHSA-248v-346w-9cwc | certifi 2024.7.4 | `not_code`, with a linked commit that also bumps a `.py` version string. |
 
 `deferred/` holds 18 more drafted answers (the rest of pyyaml, requests,
@@ -118,11 +118,22 @@ public is also an entry point.
 - Only recall is measured on entry points, so a pipeline that reports more
   entry points than the truth file is not penalised. The truth lists the ones
   that must not be missed.
-- Jinja template filters (`xmlattr`, `attr`) are reached from templates
-  through the filter table, not through a Python call. Their truth files list
-  the filter function as the entry point and say in the evidence that Python
-  call analysis cannot see template usage. This is a known gap for the scan
-  side, not something the pipeline can fix.
+- Jinja template filters (`xmlattr`, `attr`) are never called by name inside
+  Jinja: `jinja2.filters.FILTERS` holds them, every `Environment` copies that
+  table into `self.filters`, and compiled template code or
+  `Environment.call_filter` looks them up by string. Their truth files list
+  the filter function plus the public names that render templates or call
+  filters. This follows the same rule that lists the `Environment` compile
+  API for GHSA-gmj6-6f8f-6699, where `visit_FromImport` is reached by
+  dynamic dispatch and only for templates containing `{% from %}`. For the
+  `attr` advisory only the sandbox classes and `call_filter` are listed, since
+  the filter is harmless without a sandbox (the unsafe-by-design rule above).
+  A call-graph walker cannot derive these entry points, because the only
+  reference to the filter function is the dict literal, so they are expected
+  to come from `data/overrides.json`. What stays unseeable is whether a given
+  template uses the filter: a match on these entry points means "reachable,
+  template content not checked", and the scan side must not turn silence
+  about template content into "not found".
 
 **Status.** `not_code` for certifi (a distrusted root certificate in
 `cacert.pem`); the fix commit also bumps `__version__` in
@@ -146,6 +157,9 @@ Cases a naive pipeline gets wrong, each recorded in the file's
 - **Cosmetic change inside the fix commit** (docstring edits in
   GHSA-h75v-3vvj-5mfj and GHSA-cpwx-vrp4-4pq7).
 - **A `.py` change that is only a version string** (GHSA-248v-346w-9cwc).
+- **Vulnerable function referenced only from a data table**
+  (GHSA-h75v-3vvj-5mfj, GHSA-cpwx-vrp4-4pq7): no call-graph edge leads to
+  `do_xmlattr` or `do_attr`; the entry points come from the overrides file.
 
 The deferred files add: a version-bump-only link, a reverted commit that is
 still an ancestor of the fixed tag, an incomplete prior fix linked as the fix

@@ -18,14 +18,19 @@
     }
   ],
   "entry_points": [
-    "jinja2.filters.do_attr"
+    "jinja2.filters.do_attr",
+    "jinja2.sandbox.SandboxedEnvironment",
+    "jinja2.sandbox.ImmutableSandboxedEnvironment",
+    "jinja2.Environment.call_filter"
   ],
   "truth_evidence": [
     "Affected every release before 3.1.6; fixed in 3.1.6 (the attr filter used plain getattr, so |attr('format') reached an unsandboxed str.format).",
     "Fix commit 90457bb 'Merge commit from fork / attr filter uses env.getattr', in tag 3.1.6 and not in 3.1.5. https://github.com/pallets/jinja/commit/90457bbf33b8662926ae65cdde4c4c32e756e403",
     "do_attr: the getattr + is_safe_attribute body is replaced by getattr_static probing followed by environment.getattr(obj, name), which applies the sandbox.",
-    "This function is a template filter. Templates reach it through the filter table (jinja2.filters.FILTERS), not through a Python call, so a project that uses the filter in a template has no Python call to it. Python-level call analysis cannot see template usage; the scan side must not report not_found on the strength of Python calls alone for filter advisories.",
-    "The exposure is in sandboxed environments (the filter is harmless where there is no sandbox to escape)."
+    "do_attr is a template filter. Nothing in Jinja calls it by name: filters.FILTERS holds it, Environment.__init__ copies that table into self.filters (DEFAULT_FILTERS.copy()), and it runs either from compiled template code (compiler.py pull_dependencies writes t_N = environment.filters['attr'] into the generated module and the filter use site calls t_N(environment, value, 'format')) or from Environment.call_filter('attr', ...), which looks the name up in self.filters and calls it.",
+    "Filter calls bypass SandboxedEnvironment.call: the compiler routes only Call nodes through environment.call(context, ...), never filter invocations, so the plain getattr inside do_attr was the sandbox's only check.",
+    "Entry points: the sandbox classes (every instance carries the filter table and renders templates that may use |attr) and Environment.call_filter, which they inherit. Plain jinja2.Environment and jinja2.Template are not listed: the filter is harmless where there is no sandbox to escape, so for this advisory their use is unsafe by design, as yaml.Loader is for the FullLoader advisories.",
+    "A call-graph walker cannot derive these entry points, since the only reference to do_attr in the source is the FILTERS dict literal; they are expected from data/overrides.json. The scan side can see that a project uses the sandbox classes; it cannot see whether a template uses |attr, so a match on these entry points means 'reachable, template content not checked', not a confirmed use of the filter."
   ],
   "notes": [],
   "signed_off": false
