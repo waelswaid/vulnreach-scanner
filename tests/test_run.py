@@ -241,6 +241,25 @@ class RunTest(unittest.TestCase):
         self.assertEqual(self.read(self.out), rec)
         self.assertFalse((self.out / "review" / f"{ID}.json").exists())
 
+    def test_pre_release_carrying_the_fix_is_not_the_last_vulnerable_tag(self):
+        run_git(self.repo, "tag", "v1.1b1", self.c2)
+        rec = self.process(advisory(self.c2, affected_versions=["1.0", "1.1b1"]))
+        self.assertEqual(rec["status"], "found")
+        self.assertEqual(rec["rejected_commits"], [])
+        self.assertEqual([(c["sha"], c["in_fixed_release"]) for c in rec["fix_commits"]],
+                         [(self.c2, True)])
+
+    def test_all_pre_release_affected_versions_use_the_largest(self):
+        self.assertEqual(run._last_vulnerable_version(["1.0", "1.1b1", "1.0.post1"]), "1.0.post1")
+        self.assertEqual(run._last_vulnerable_version(["1.1a1", "1.1b1"]), "1.1b1")
+        self.assertIsNone(run._last_vulnerable_version([]))
+        run_git(self.repo, "tag", "v1.1a1", self.c1)
+        run_git(self.repo, "tag", "v1.1b1", self.c2)
+        rec = self.process(advisory(self.c2, affected_versions=["1.1a1", "1.1b1"]))
+        self.assertEqual([c["reason"] for c in rec["rejected_commits"]],
+                         ["release check: already in v1.1b1"])
+        self.assertEqual(rec["status"], "unknown")
+
     def test_no_repo_gives_unknown_with_note(self):
         with mock.patch.object(repos, "find_repo_url", lambda merged: None):
             rec = self.process(advisory(self.c2, links=[]))

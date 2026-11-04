@@ -96,8 +96,10 @@ def _select_fix_commits(merged, repo, repo_dir):
     candidates = commits.resolve_candidates(
         commits.collect_candidates(merged), repo_dir, repo_url=repo)
     package = merged["package"]
-    fixed_tag = _tag(repo_dir, package, merged.get("fixed_versions"), min)
-    last_vulnerable_tag = _tag(repo_dir, package, merged.get("affected_versions"), max)
+    fixed = merged.get("fixed_versions") or []
+    fixed_tag = _tag(repo_dir, package, min(fixed, key=depscan.version_key, default=None))
+    last_vulnerable_tag = _tag(
+        repo_dir, package, _last_vulnerable_version(merged.get("affected_versions") or []))
 
     fix_commits, rejected, seen = [], [], set()
     for candidate in candidates:
@@ -131,11 +133,18 @@ def _rejected(candidate, reason):
             "source": candidate["source"], "reason": reason}
 
 
-def _tag(repo_dir, package, versions, pick):
-    """The tag of the smallest (min) or largest (max) version, or None."""
-    if not versions:
-        return None
-    return repos.tag_for_version(repo_dir, package, pick(versions, key=depscan.version_key))
+def _tag(repo_dir, package, version):
+    """The repo tag for a version, or None (also for no version)."""
+    return repos.tag_for_version(repo_dir, package, version) if version else None
+
+
+def _last_vulnerable_version(affected_versions):
+    """The largest affected final release; the largest affected version when all are pre-releases.
+
+    OSV ranges often list pre-releases that already carry the fix (pyyaml 5.4b2).
+    """
+    finals = [v for v in affected_versions if depscan.version_key(v)[1][0] != 0]
+    return max(finals or affected_versions, key=depscan.version_key, default=None)
 
 
 def _find_functions(repo_dir, shas, package):
