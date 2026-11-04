@@ -211,11 +211,12 @@ already outputs.)*
    - Each entry point records the call path that leads to the vulnerable
      function, as evidence.
 
-   The call graph inside a package has the same blind spots as any static
-   analysis: dynamic dispatch, `getattr`, and calls through objects. An entry
-   point found only through a guessed edge (for example, a method call matched
-   by name alone) is marked `medium`. The resolution rules are the builder's to
-   tune against the hand-checked set.
+   The call graph inside a package has edges only from resolved calls
+   (`high`) and from method calls matched by name alone (`medium`); value
+   references and registrations add no edges. Items the walker cannot connect
+   send the record to `data/vulnfuncs/review/` with a reason, resolved through
+   the overrides file (see
+   `docs/superpowers/specs/2026-11-04-review-folder-design.md`).
 10. **Write the record** (below).
 
 ### Record format
@@ -280,7 +281,8 @@ A hand-written overrides file can correct any record: add or remove
 functions, mark an advisory `not_code`, or pin the fix commit. Overrides are
 applied after the pipeline runs and recorded in the record's evidence, so
 regenerating the database never loses a hand correction. This replaces the
-"small hand-made mapping" in the original plan.
+"small hand-made mapping" in the original plan. A `reviewed` override
+requires a `note` and is gated by `signed_off`.
 
 ### The hand-checked set and measuring accuracy
 
@@ -465,6 +467,8 @@ These limits are why `unknown` is the default whenever there's doubt.
    The full PyPI run (build step 6) happens only after the pipeline meets this
    bar. Reachability stays behind `--experimental-reachability` until the full
    pipeline, including entry points, meets it.
+5. **Strict walker and review folder (2026-11-04):** see
+   `docs/superpowers/specs/2026-11-04-review-folder-design.md`.
 
 ## Build order
 

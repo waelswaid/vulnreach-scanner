@@ -129,8 +129,9 @@ public is also an entry point.
   `attr` advisory only the sandbox classes and `call_filter` are listed, since
   the filter is harmless without a sandbox (the unsafe-by-design rule above).
   A call-graph walker cannot derive these entry points, because the only
-  reference to the filter function is the dict literal, so they are expected
-  to come from `data/overrides.json`. What stays unseeable is whether a given
+  reference to the filter function is the dict literal, so they come
+  from `data/overrides.json`, drafted by the pipeline builder and signed off
+  per entry by the owner. What stays unseeable is whether a given
   template uses the filter: a match on these entry points means "reachable,
   template content not checked", and the scan side must not turn silence
   about template content into "not found".
