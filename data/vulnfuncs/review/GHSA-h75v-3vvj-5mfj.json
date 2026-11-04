@@ -120,7 +120,7 @@
       "name": "jinja2.Environment.call_filter",
       "path": [
         "jinja2.environment.Environment.call_filter",
-        "jinja2.environment.Environment._filter_test_common (func = self.filters.get(name), environment.py:512; return func(...), :547)",
+        "jinja2.environment.Environment._filter_test_common (func = env_map.get(name) with env_map = self.filters, environment.py:512; return func(...), :547)",
         "jinja2.filters.do_xmlattr"
       ]
     },
@@ -155,13 +155,13 @@
       "source": "commit_link"
     }
   ],
-  "generated_at": "2026-11-04T04:25:04+00:00",
+  "generated_at": "2026-11-04T04:49:19+00:00",
   "id": "GHSA-h75v-3vvj-5mfj",
   "names_verified_for": [
     ">=2.7, <3.2"
   ],
   "notes": [
-    "Two review reasons. (1) do_xmlattr's only reference is the FILTERS dict literal (src/jinja2/filters.py:1852). defaults.py:3 imports FILTERS as DEFAULT_FILTERS, Environment.__init__ copies it into self.filters (environment.py:351), and the filter runs from compiled template code (CodeGenerator.pull_dependencies, compiler.py:538, emits t_N = environment.filters['xmlattr'] at :570, called at the |xmlattr use site) or from Environment.call_filter (:549) -> _filter_test_common (self.filters.get(name) at :512, called at :547). Compiled code runs from Template.render (root_render_func at :1302), render_async (:1324), generate (:1355), generate_async (:1373), stream (via generate, :1333), make_module (TemplateModule, :1408) and make_module_async (:1425). No sandbox is needed for the injection, so plain Environment and Template are listed with the sandbox classes. (2) module_level jinja2.filters (src/jinja2/filters.py): the changed module statement is _space_re = re.compile(r'\\s') (:253), whose only use is inside do_xmlattr (:292), so it is reached exactly when do_xmlattr is; the same entry points cover it and the paths end at do_xmlattr. Checked against the record's tree a7863ba (3.1.3-8-ga7863ba9, first parent of the fix) on 2026-11-04."
+    "Two review reasons. (1) do_xmlattr's only reference is the FILTERS dict literal (src/jinja2/filters.py:1852). defaults.py:3 imports FILTERS as DEFAULT_FILTERS, Environment.__init__ copies it into self.filters (environment.py:351), and the filter runs from compiled template code (CodeGenerator.pull_dependencies, compiler.py:538, emits t_N = environment.filters['xmlattr'] at :570, called at the |xmlattr use site) or from Environment.call_filter (:549) -> _filter_test_common (env_map.get(name) with env_map = self.filters at :512, called at :547). Compiled code runs from Template.render (root_render_func at :1302), render_async (:1324), generate (:1355), generate_async (:1373), stream (via generate, :1333), make_module (TemplateModule, :1408) and make_module_async (:1425). No sandbox is needed for the injection, so plain Environment and Template are listed with the sandbox classes. (2) module_level jinja2.filters (src/jinja2/filters.py): the changed module statement is _space_re = re.compile(r'\\s') (:253), whose only use is inside do_xmlattr (:292), so it is reached exactly when do_xmlattr is; the same entry points cover it and the paths end at do_xmlattr. Checked against the record's tree a7863ba (3.1.3-8-ga7863ba9, first parent of the fix) on 2026-11-04."
   ],
   "osv_modified": "2026-09-10T03:50:13.786450101Z",
   "overrides_applied": [
@@ -181,7 +181,7 @@
     "note added",
     "reviewed: not applied, unsigned"
   ],
-  "overrides_fingerprint": "24b5c85965224322be5d3bf70b67e73dd7c34aa33d13dc4200cc015ff3a5cf99",
+  "overrides_fingerprint": "6f69123d02449d428de6a8c9c49283260775c588877f480de37f8eb35d972b78",
   "package": "jinja2",
   "pipeline_version": "2",
   "rejected_commits": [],

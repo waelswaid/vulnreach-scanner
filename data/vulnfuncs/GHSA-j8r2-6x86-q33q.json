@@ -699,6 +699,7 @@
       "path": [
         "requests.utils.get_environ_proxies",
         "requests.utils.should_bypass_proxies",
+        "requests.utils.set_environ",
         "requests.sessions.Session.get",
         "requests.sessions.Session.request",
         "requests.sessions.Session.send",
@@ -778,6 +779,7 @@
       "name": "requests.utils.should_bypass_proxies",
       "path": [
         "requests.utils.should_bypass_proxies",
+        "requests.utils.set_environ",
         "requests.sessions.Session.get",
         "requests.sessions.Session.request",
         "requests.sessions.Session.send",
@@ -794,7 +796,7 @@
       "source": "git_range"
     }
   ],
-  "generated_at": "2026-11-04T04:27:00+00:00",
+  "generated_at": "2026-11-04T04:49:56+00:00",
   "id": "GHSA-j8r2-6x86-q33q",
   "names_verified_for": [
     ">=2.3, <2.31"

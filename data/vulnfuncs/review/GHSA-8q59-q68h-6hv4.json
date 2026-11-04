@@ -108,7 +108,7 @@
       "source": "commit_link"
     }
   ],
-  "generated_at": "2026-11-04T04:20:29+00:00",
+  "generated_at": "2026-11-04T04:48:01+00:00",
   "id": "GHSA-8q59-q68h-6hv4",
   "names_verified_for": [
     ">=3.1, <5.5"

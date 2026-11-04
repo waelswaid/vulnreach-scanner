@@ -678,6 +678,7 @@
       "path": [
         "requests.utils.get_environ_proxies",
         "requests.utils.should_bypass_proxies",
+        "requests.utils.set_environ",
         "requests.sessions.Session.get",
         "requests.sessions.Session.request",
         "requests.sessions.Session.prepare_request",
@@ -747,6 +748,7 @@
       "name": "requests.utils.should_bypass_proxies",
       "path": [
         "requests.utils.should_bypass_proxies",
+        "requests.utils.set_environ",
         "requests.sessions.Session.get",
         "requests.sessions.Session.request",
         "requests.sessions.Session.prepare_request",
@@ -762,7 +764,7 @@
       "source": "commit_link"
     }
   ],
-  "generated_at": "2026-11-04T04:23:32+00:00",
+  "generated_at": "2026-11-04T04:48:54+00:00",
   "id": "GHSA-9hjg-9r4m-mvj7",
   "names_verified_for": [
     ">=0.10, <2.33"

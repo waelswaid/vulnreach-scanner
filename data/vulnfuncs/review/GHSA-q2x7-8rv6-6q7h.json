@@ -70,298 +70,6 @@
     },
     {
       "confidence": "medium",
-      "defined_as": "jinja2.filters.async_select_or_reject",
-      "name": "jinja2.filters.async_select_or_reject",
-      "path": [
-        "jinja2.filters.async_select_or_reject",
-        "jinja2.filters.prepare_select_or_reject",
-        "jinja2.filters.make_attrgetter",
-        "jinja2.sandbox.SandboxedEnvironment.getitem"
-      ]
-    },
-    {
-      "confidence": "medium",
-      "defined_as": "jinja2.filters.do_groupby",
-      "name": "jinja2.filters.do_groupby",
-      "path": [
-        "jinja2.filters.do_groupby",
-        "jinja2.filters.make_attrgetter",
-        "jinja2.sandbox.SandboxedEnvironment.getitem"
-      ]
-    },
-    {
-      "confidence": "medium",
-      "defined_as": "jinja2.filters.do_join",
-      "name": "jinja2.filters.do_join",
-      "path": [
-        "jinja2.filters.do_join",
-        "jinja2.filters.sync_do_join",
-        "jinja2.filters.make_attrgetter",
-        "jinja2.sandbox.SandboxedEnvironment.getitem"
-      ]
-    },
-    {
-      "confidence": "medium",
-      "defined_as": "jinja2.filters.do_map",
-      "name": "jinja2.filters.do_map",
-      "path": [
-        "jinja2.filters.do_map",
-        "jinja2.filters.prepare_map",
-        "jinja2.filters.make_attrgetter",
-        "jinja2.sandbox.SandboxedEnvironment.getitem"
-      ]
-    },
-    {
-      "confidence": "medium",
-      "defined_as": "jinja2.filters.do_max",
-      "name": "jinja2.filters.do_max",
-      "path": [
-        "jinja2.filters.do_max",
-        "jinja2.filters._min_or_max",
-        "jinja2.filters.make_attrgetter",
-        "jinja2.sandbox.SandboxedEnvironment.getitem"
-      ]
-    },
-    {
-      "confidence": "medium",
-      "defined_as": "jinja2.filters.do_min",
-      "name": "jinja2.filters.do_min",
-      "path": [
-        "jinja2.filters.do_min",
-        "jinja2.filters._min_or_max",
-        "jinja2.filters.make_attrgetter",
-        "jinja2.sandbox.SandboxedEnvironment.getitem"
-      ]
-    },
-    {
-      "confidence": "medium",
-      "defined_as": "jinja2.filters.do_reject",
-      "name": "jinja2.filters.do_reject",
-      "path": [
-        "jinja2.filters.do_reject",
-        "jinja2.filters.async_select_or_reject",
-        "jinja2.filters.prepare_select_or_reject",
-        "jinja2.filters.make_attrgetter",
-        "jinja2.sandbox.SandboxedEnvironment.getitem"
-      ]
-    },
-    {
-      "confidence": "medium",
-      "defined_as": "jinja2.filters.do_rejectattr",
-      "name": "jinja2.filters.do_rejectattr",
-      "path": [
-        "jinja2.filters.do_rejectattr",
-        "jinja2.filters.async_select_or_reject",
-        "jinja2.filters.prepare_select_or_reject",
-        "jinja2.filters.make_attrgetter",
-        "jinja2.sandbox.SandboxedEnvironment.getitem"
-      ]
-    },
-    {
-      "confidence": "medium",
-      "defined_as": "jinja2.filters.do_select",
-      "name": "jinja2.filters.do_select",
-      "path": [
-        "jinja2.filters.do_select",
-        "jinja2.filters.async_select_or_reject",
-        "jinja2.filters.prepare_select_or_reject",
-        "jinja2.filters.make_attrgetter",
-        "jinja2.sandbox.SandboxedEnvironment.getitem"
-      ]
-    },
-    {
-      "confidence": "medium",
-      "defined_as": "jinja2.filters.do_selectattr",
-      "name": "jinja2.filters.do_selectattr",
-      "path": [
-        "jinja2.filters.do_selectattr",
-        "jinja2.filters.async_select_or_reject",
-        "jinja2.filters.prepare_select_or_reject",
-        "jinja2.filters.make_attrgetter",
-        "jinja2.sandbox.SandboxedEnvironment.getitem"
-      ]
-    },
-    {
-      "confidence": "medium",
-      "defined_as": "jinja2.filters.do_sort",
-      "name": "jinja2.filters.do_sort",
-      "path": [
-        "jinja2.filters.do_sort",
-        "jinja2.filters.make_multi_attrgetter",
-        "jinja2.sandbox.SandboxedEnvironment.getitem"
-      ]
-    },
-    {
-      "confidence": "medium",
-      "defined_as": "jinja2.filters.do_sum",
-      "name": "jinja2.filters.do_sum",
-      "path": [
-        "jinja2.filters.do_sum",
-        "jinja2.filters.make_attrgetter",
-        "jinja2.sandbox.SandboxedEnvironment.getitem"
-      ]
-    },
-    {
-      "confidence": "medium",
-      "defined_as": "jinja2.filters.do_unique",
-      "name": "jinja2.filters.do_unique",
-      "path": [
-        "jinja2.filters.do_unique",
-        "jinja2.filters.sync_do_unique",
-        "jinja2.filters.make_attrgetter",
-        "jinja2.sandbox.SandboxedEnvironment.getitem"
-      ]
-    },
-    {
-      "confidence": "medium",
-      "defined_as": "jinja2.filters.make_attrgetter",
-      "name": "jinja2.filters.make_attrgetter",
-      "path": [
-        "jinja2.filters.make_attrgetter",
-        "jinja2.sandbox.SandboxedEnvironment.getitem"
-      ]
-    },
-    {
-      "confidence": "medium",
-      "defined_as": "jinja2.filters.make_multi_attrgetter",
-      "name": "jinja2.filters.make_multi_attrgetter",
-      "path": [
-        "jinja2.filters.make_multi_attrgetter",
-        "jinja2.sandbox.SandboxedEnvironment.getitem"
-      ]
-    },
-    {
-      "confidence": "medium",
-      "defined_as": "jinja2.filters.prepare_map",
-      "name": "jinja2.filters.prepare_map",
-      "path": [
-        "jinja2.filters.prepare_map",
-        "jinja2.filters.make_attrgetter",
-        "jinja2.sandbox.SandboxedEnvironment.getitem"
-      ]
-    },
-    {
-      "confidence": "medium",
-      "defined_as": "jinja2.filters.prepare_select_or_reject",
-      "name": "jinja2.filters.prepare_select_or_reject",
-      "path": [
-        "jinja2.filters.prepare_select_or_reject",
-        "jinja2.filters.make_attrgetter",
-        "jinja2.sandbox.SandboxedEnvironment.getitem"
-      ]
-    },
-    {
-      "confidence": "medium",
-      "defined_as": "jinja2.filters.select_or_reject",
-      "name": "jinja2.filters.select_or_reject",
-      "path": [
-        "jinja2.filters.select_or_reject",
-        "jinja2.filters.prepare_select_or_reject",
-        "jinja2.filters.make_attrgetter",
-        "jinja2.sandbox.SandboxedEnvironment.getitem"
-      ]
-    },
-    {
-      "confidence": "medium",
-      "defined_as": "jinja2.filters.sync_do_groupby",
-      "name": "jinja2.filters.sync_do_groupby",
-      "path": [
-        "jinja2.filters.sync_do_groupby",
-        "jinja2.filters.make_attrgetter",
-        "jinja2.sandbox.SandboxedEnvironment.getitem"
-      ]
-    },
-    {
-      "confidence": "medium",
-      "defined_as": "jinja2.filters.sync_do_join",
-      "name": "jinja2.filters.sync_do_join",
-      "path": [
-        "jinja2.filters.sync_do_join",
-        "jinja2.filters.make_attrgetter",
-        "jinja2.sandbox.SandboxedEnvironment.getitem"
-      ]
-    },
-    {
-      "confidence": "medium",
-      "defined_as": "jinja2.filters.sync_do_map",
-      "name": "jinja2.filters.sync_do_map",
-      "path": [
-        "jinja2.filters.sync_do_map",
-        "jinja2.filters.prepare_map",
-        "jinja2.filters.make_attrgetter",
-        "jinja2.sandbox.SandboxedEnvironment.getitem"
-      ]
-    },
-    {
-      "confidence": "medium",
-      "defined_as": "jinja2.filters.sync_do_reject",
-      "name": "jinja2.filters.sync_do_reject",
-      "path": [
-        "jinja2.filters.sync_do_reject",
-        "jinja2.filters.select_or_reject",
-        "jinja2.filters.prepare_select_or_reject",
-        "jinja2.filters.make_attrgetter",
-        "jinja2.sandbox.SandboxedEnvironment.getitem"
-      ]
-    },
-    {
-      "confidence": "medium",
-      "defined_as": "jinja2.filters.sync_do_rejectattr",
-      "name": "jinja2.filters.sync_do_rejectattr",
-      "path": [
-        "jinja2.filters.sync_do_rejectattr",
-        "jinja2.filters.select_or_reject",
-        "jinja2.filters.prepare_select_or_reject",
-        "jinja2.filters.make_attrgetter",
-        "jinja2.sandbox.SandboxedEnvironment.getitem"
-      ]
-    },
-    {
-      "confidence": "medium",
-      "defined_as": "jinja2.filters.sync_do_select",
-      "name": "jinja2.filters.sync_do_select",
-      "path": [
-        "jinja2.filters.sync_do_select",
-        "jinja2.filters.select_or_reject",
-        "jinja2.filters.prepare_select_or_reject",
-        "jinja2.filters.make_attrgetter",
-        "jinja2.sandbox.SandboxedEnvironment.getitem"
-      ]
-    },
-    {
-      "confidence": "medium",
-      "defined_as": "jinja2.filters.sync_do_selectattr",
-      "name": "jinja2.filters.sync_do_selectattr",
-      "path": [
-        "jinja2.filters.sync_do_selectattr",
-        "jinja2.filters.select_or_reject",
-        "jinja2.filters.prepare_select_or_reject",
-        "jinja2.filters.make_attrgetter",
-        "jinja2.sandbox.SandboxedEnvironment.getitem"
-      ]
-    },
-    {
-      "confidence": "medium",
-      "defined_as": "jinja2.filters.sync_do_sum",
-      "name": "jinja2.filters.sync_do_sum",
-      "path": [
-        "jinja2.filters.sync_do_sum",
-        "jinja2.filters.make_attrgetter",
-        "jinja2.sandbox.SandboxedEnvironment.getitem"
-      ]
-    },
-    {
-      "confidence": "medium",
-      "defined_as": "jinja2.filters.sync_do_unique",
-      "name": "jinja2.filters.sync_do_unique",
-      "path": [
-        "jinja2.filters.sync_do_unique",
-        "jinja2.filters.make_attrgetter",
-        "jinja2.sandbox.SandboxedEnvironment.getitem"
-      ]
-    },
-    {
-      "confidence": "medium",
       "defined_as": "jinja2.nodes.Add",
       "name": "jinja2.nodes.Add",
       "path": [
@@ -696,27 +404,6 @@
     },
     {
       "confidence": "medium",
-      "defined_as": "jinja2.nodes.Slice",
-      "name": "jinja2.nodes.Slice",
-      "path": [
-        "jinja2.nodes.Slice",
-        "jinja2.nodes.Slice.as_const",
-        "jinja2.nodes.Getitem.as_const",
-        "jinja2.sandbox.SandboxedEnvironment.getitem"
-      ]
-    },
-    {
-      "confidence": "medium",
-      "defined_as": "jinja2.nodes.Slice.as_const",
-      "name": "jinja2.nodes.Slice.as_const",
-      "path": [
-        "jinja2.nodes.Slice.as_const",
-        "jinja2.nodes.Getitem.as_const",
-        "jinja2.sandbox.SandboxedEnvironment.getitem"
-      ]
-    },
-    {
-      "confidence": "medium",
       "defined_as": "jinja2.nodes.Test",
       "name": "jinja2.nodes.Test",
       "path": [
@@ -879,7 +566,7 @@
       "source": "commit_link"
     }
   ],
-  "generated_at": "2026-11-04T04:27:41+00:00",
+  "generated_at": "2026-11-04T04:50:11+00:00",
   "id": "GHSA-q2x7-8rv6-6q7h",
   "names_verified_for": [
     ">=2.8, <3.2"
@@ -909,14 +596,6 @@
       {
         "dead_ends": [
           {
-            "name": "jinja2.ext.InternationalizationExtension._install",
-            "references": []
-          },
-          {
-            "name": "jinja2.ext.InternationalizationExtension._install_null",
-            "references": []
-          },
-          {
             "name": "jinja2.ext._gettext_alias",
             "references": [
               {
@@ -935,14 +614,6 @@
       {
         "dead_ends": [
           {
-            "name": "jinja2.ext.InternationalizationExtension._install",
-            "references": []
-          },
-          {
-            "name": "jinja2.ext.InternationalizationExtension._install_null",
-            "references": []
-          },
-          {
             "name": "jinja2.ext._gettext_alias",
             "references": [
               {
@@ -960,14 +631,6 @@
       },
       {
         "dead_ends": [
-          {
-            "name": "jinja2.ext.InternationalizationExtension._install",
-            "references": []
-          },
-          {
-            "name": "jinja2.ext.InternationalizationExtension._install_null",
-            "references": []
-          },
           {
             "name": "jinja2.ext._gettext_alias",
             "references": [
