@@ -290,10 +290,14 @@ class WalkTest(unittest.TestCase):
             """,
         })
         self.assertEqual(graph.callers, {})
-        self.assertEqual(graph.references, {})
+        self.assertEqual(graph.references, {"pkg.f._v": [
+            {"file": "pkg/f.py", "line": 7, "context": "value in dict literal TABLE"},
+            {"file": "pkg/f.py", "line": 11, "context": "element of list literal"},
+            {"file": "pkg/f.py", "line": 11, "context": "argument to sorted"},
+        ]})
         result = entrypoints.walk(src, "pkg", [{"name": "pkg.f._v", "kind": "function"}])
         self.assertEqual(result["entry_points"], [])
-        self.assertEqual(result["reasons"], [])
+        self.assertEqual([r["kind"] for r in result["reasons"]], ["referenced_not_called"])
 
     def test_duplicate_module_keeps_parsing_copy(self):
         # Review Focus 1: a lib/ copy with a Python 2 print, the lib3/ copy is used.
@@ -450,6 +454,279 @@ class GraphTest(unittest.TestCase):
         self.assertEqual(graph.callers["pkg.base.Reader.peek"], [("pkg.loader.Loader.load", "high")])
         result = entrypoints.walk(src, "pkg", [{"name": "pkg.base.Reader.peek", "kind": "method"}])
         self.assertEqual(by_name(result)["pkg.loader.Loader.load"]["confidence"], "high")
+
+
+    def test_reference_contexts(self):
+        _, graph = graph_of({
+            "__init__.py": "",
+            "c.py": """\
+                def f():
+                    pass
+
+                LIST = [f]
+                PAIR = (f, 1)
+                BAG = {f}
+                alias = f
+                OPTIONS = [{"k": f}]
+
+                def g(cb=f, *, other=f):
+                    return f
+
+                def h(f):
+                    return {"k": f}
+
+                x = f if True else None
+                obj.attr = f
+            """,
+        })
+        self.assertEqual(graph.references, {"pkg.c.f": [
+            {"file": "pkg/c.py", "line": 4, "context": "element of list literal"},
+            {"file": "pkg/c.py", "line": 5, "context": "element of tuple literal"},
+            {"file": "pkg/c.py", "line": 6, "context": "element of set literal"},
+            {"file": "pkg/c.py", "line": 7, "context": "assigned to alias"},
+            {"file": "pkg/c.py", "line": 8, "context": "value in dict literal"},
+            {"file": "pkg/c.py", "line": 10, "context": "default argument of g"},
+            {"file": "pkg/c.py", "line": 10, "context": "default argument of g"},
+            {"file": "pkg/c.py", "line": 11, "context": "returned from g"},
+            {"file": "pkg/c.py", "line": 16, "context": "referenced"},
+            {"file": "pkg/c.py", "line": 17, "context": "assigned to obj.attr"},
+        ]})
+
+
+class ReasonTest(unittest.TestCase):
+    def test_dict_value_registration_is_referenced_not_called(self):
+        result = walk({
+            "__init__.py": "",
+            "filters.py": """\
+                def do_attr(obj):
+                    return obj
+                FILTERS = {"attr": do_attr}
+
+                def table(do_attr):
+                    return {"attr": do_attr}
+            """,
+        }, ("pkg.filters.do_attr", "function"))
+        self.assertEqual(result["reasons"], [{
+            "item": "pkg.filters.do_attr", "kind": "referenced_not_called", "file": "pkg/filters.py",
+            "references": [{"file": "pkg/filters.py", "line": 3, "context": "value in dict literal FILTERS"}],
+            "dead_ends": [],
+        }])
+        self.assertEqual(names(result), ["pkg.filters.do_attr"])
+        self.assertEqual(result["notes"], [])
+
+    def test_argument_registration_names_the_callee(self):
+        src, graph = graph_of({
+            "__init__.py": "",
+            "c.py": """\
+                class Cls:
+                    @classmethod
+                    def add_multi_constructor(cls, tag, fn):
+                        pass
+
+                    def construct_new(self, node):
+                        pass
+
+                Cls.add_multi_constructor("tag", Cls.construct_new)
+                Cls.add_multi_constructor("tag", fn=Cls.construct_new)
+            """,
+        })
+        expected = [
+            {"file": "pkg/c.py", "line": 9, "context": "argument to add_multi_constructor"},
+            {"file": "pkg/c.py", "line": 10, "context": "argument to add_multi_constructor"},
+        ]
+        self.assertEqual(graph.references, {"pkg.c.Cls.construct_new": expected})
+        result = entrypoints.walk(src, "pkg", [{"name": "pkg.c.Cls.construct_new", "kind": "method"}])
+        self.assertEqual(result["reasons"], [{
+            "item": "pkg.c.Cls.construct_new", "kind": "referenced_not_called", "file": "pkg/c.py",
+            "references": expected, "dead_ends": [],
+        }])
+
+    def test_dead_end_chain_lists_registered_roots(self):
+        result = walk({
+            "__init__.py": "",
+            "c.py": """\
+                def set_state(obj):
+                    pass
+
+                class Cls:
+                    @classmethod
+                    def add_multi_constructor(cls, tag, fn):
+                        pass
+
+                    def apply(self, node):
+                        set_state(node)
+
+                Cls.add_multi_constructor("tag", Cls.apply)
+            """,
+        }, ("pkg.c.set_state", "function"))
+        self.assertEqual(result["reasons"], [{
+            "item": "pkg.c.set_state", "kind": "dead_end_chain", "file": "pkg/c.py", "references": [],
+            "dead_ends": [{"name": "pkg.c.Cls.apply", "references": [
+                {"file": "pkg/c.py", "line": 12, "context": "argument to add_multi_constructor"},
+            ]}],
+        }])
+        self.assertEqual(names(result), ["pkg.c.Cls.apply", "pkg.c.set_state"])
+
+    def test_module_level_item_is_a_reason(self):
+        result = walk({"__init__.py": "", "c.py": "X = 1\n"},
+                      ("pkg.c", "module_level"), ("pkg.gone", "module_level"))
+        self.assertEqual(result["reasons"], [
+            {"item": "pkg.c", "kind": "module_level", "file": "pkg/c.py", "references": [], "dead_ends": []},
+            {"item": "pkg.gone", "kind": "module_level", "file": None, "references": [], "dead_ends": []},
+        ])
+        self.assertEqual(result["entry_points"], [])
+
+    def test_class_level_public_class_is_connected_private_is_not(self):
+        files = {
+            "__init__.py": "",
+            "c.py": """\
+                class Retry:
+                    DEFAULT = 3
+
+                class _Pool:
+                    SIZE = 1
+
+                def connect(retries=Retry, pool=_Pool):
+                    pass
+            """,
+        }
+        public = walk(files, ("pkg.c.Retry", "class_level"))
+        self.assertEqual(public["reasons"], [])
+        self.assertEqual(public["entry_points"], [{
+            "name": "pkg.c.Retry", "defined_as": "pkg.c.Retry", "confidence": "high",
+            "path": ["pkg.c.Retry"],
+        }])
+        private = walk(files, ("pkg.c._Pool", "class_level"))
+        self.assertEqual(private["reasons"], [{
+            "item": "pkg.c._Pool", "kind": "class_level", "file": "pkg/c.py",
+            "references": [{"file": "pkg/c.py", "line": 7, "context": "default argument of connect"}],
+            "dead_ends": [],
+        }])
+        self.assertEqual(private["entry_points"], [])
+
+    def test_self_only_public_function_is_exempt_with_note(self):
+        result = walk({
+            "__init__.py": "",
+            "c.py": """
+                def run():
+                    pass
+            """,
+        }, ("pkg.c.run", "function"))
+        self.assertEqual(result["reasons"], [])
+        self.assertEqual(names(result), ["pkg.c.run"])
+        self.assertEqual(result["entry_points"][0]["path"], ["pkg.c.run"])
+        self.assertEqual(result["notes"],
+                         ["self-only entry point: pkg.c.run has no caller or reference inside the package"])
+
+    def test_method_with_no_caller_or_reference_is_no_reference(self):
+        result = walk({
+            "__init__.py": "",
+            "c.py": """
+                class Cls:
+                    def m(self):
+                        pass
+
+                def _f():
+                    pass
+            """,
+        }, ("pkg.c.Cls.m", "method"), ("pkg.c._f", "function"))
+        self.assertEqual(result["reasons"], [
+            {"item": "pkg.c.Cls.m", "kind": "no_reference", "file": "pkg/c.py", "references": [], "dead_ends": []},
+            {"item": "pkg.c._f", "kind": "no_reference", "file": "pkg/c.py", "references": [], "dead_ends": []},
+        ])
+        self.assertEqual(names(result), ["pkg.c.Cls.m"])
+        self.assertEqual(result["notes"], [])
+
+    def test_item_missing_from_tree_is_no_reference_with_detail(self):
+        # Review Focus 2
+        result = walk({"__init__.py": "", "c.py": "X = 1\n"}, ("pkg.c.gone", "function"))
+        self.assertEqual(result["reasons"], [{
+            "item": "pkg.c.gone", "kind": "no_reference", "file": None, "references": [], "dead_ends": [],
+            "detail": "not defined in the analysed tree",
+        }])
+        self.assertEqual(result["entry_points"], [])
+
+    def test_cycle_without_root_is_dead_end_with_empty_list(self):
+        # Review Focus 3
+        result = walk({
+            "__init__.py": "",
+            "c.py": """
+                def _a():
+                    _b()
+
+                def _b():
+                    _a()
+            """,
+        }, ("pkg.c._a", "function"))
+        self.assertEqual(result["reasons"], [{
+            "item": "pkg.c._a", "kind": "dead_end_chain", "file": "pkg/c.py", "references": [],
+            "dead_ends": [], "detail": "no root: every caller is itself called",
+        }])
+
+    def test_connected_item_has_no_reason_even_with_a_dead_chain(self):
+        result = walk({
+            "__init__.py": "",
+            "c.py": """
+                def _v():
+                    pass
+
+                def run():
+                    _v()
+
+                class Cls:
+                    @classmethod
+                    def reg(cls, tag, fn):
+                        pass
+
+                    def apply(self):
+                        _v()
+
+                Cls.reg("tag", Cls.apply)
+            """,
+        }, ("pkg.c._v", "function"))
+        self.assertEqual(result["reasons"], [])
+        self.assertEqual(names(result), ["pkg.c.Cls.apply", "pkg.c.run"])
+
+    def test_medium_only_chain_is_connected(self):
+        result = walk({
+            "__init__.py": "",
+            "c.py": """
+                class A:
+                    def m(self):
+                        pass
+
+                def go(x):
+                    x.m()
+            """,
+        }, ("pkg.c.A.m", "method"))
+        self.assertEqual(result["reasons"], [])
+        self.assertEqual(by_name(result)["pkg.c.go"]["confidence"], "medium")
+
+    def test_decorator_is_not_a_reference(self):
+        # Cls.run's only "use" is inside a decorator; it stays a clean root.
+        src, graph = graph_of({
+            "__init__.py": "",
+            "c.py": """
+                def register(fn):
+                    return lambda g: g
+
+                def _v():
+                    pass
+
+                class Cls:
+                    @property
+                    def run(self):
+                        _v()
+
+                @register(Cls.run)
+                def other():
+                    pass
+            """,
+        })
+        self.assertEqual(graph.references, {})
+        result = entrypoints.walk(src, "pkg", [{"name": "pkg.c._v", "kind": "function"}])
+        self.assertEqual(result["reasons"], [])
+        self.assertEqual(names(result), ["pkg.c.Cls.run"])
 
 
 if __name__ == "__main__":

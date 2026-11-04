@@ -7,6 +7,10 @@ used as a value (a dict entry, an argument), a decorator, or a name built at
 runtime makes no edge. Walking `callers` backwards from a vulnerable item
 gives every definition that can lead to it; the public ones are its entry
 points.
+
+Uses as a value are recorded separately as references. An item no clean root
+(a public definition with no caller and no reference) reaches gets a review
+reason saying why.
 """
 
 import ast
@@ -58,9 +62,10 @@ class Graph:
         self.defs = {}        # FQN -> {"kind", "module", "file", "line"}
         self.callers = {}     # callee FQN -> [(caller FQN, "high" | "medium")]
         self.public = {}      # FQN -> shortest public import path
-        self.references = {}  # filled by Task 3
+        self.references = {}  # FQN -> [{"file", "line", "context"}] where it is used as a value
         self.notes = []       # skipped files
         self.bases = {}       # class FQN -> base class FQNs in the package
+        self.modules = {}     # module -> file of the copy that was analysed
 
 
 def build_graph(sources, package):
@@ -85,6 +90,7 @@ class _Builder:
         for module, (tree, _, _) in self.trees.items():
             self._collect_bases(module, tree)
         self._collect_edges()
+        self._collect_references()
         self._collect_public()
 
     # -- pass 1: modules, definitions, name tables --------------------------
@@ -104,6 +110,7 @@ class _Builder:
                 continue
             is_init = path == "__init__.py" or path.endswith("/__init__.py")
             self.trees[module] = (tree, path, is_init)
+            self.graph.modules[module] = path
 
     def _collect(self, module, tree, path):
         table = self.tables[module] = {}
@@ -317,6 +324,65 @@ class _Builder:
             return [(self._constructor(resolved[1]), "high")]
         return [(resolved[1], "high")]
 
+    # -- pass 3: value references ---------------------------------------------
+
+    def _collect_references(self):
+        for module, (tree, path, _) in self.trees.items():
+            self._scan(tree, [], module, path, frozenset(), None)
+
+    def _scan(self, node, parents, module, path, local, def_name):
+        """Record every Name or Attribute chain that resolves to a package
+        definition and is not called. `parents` is the ancestor stack, `local`
+        the names bound in the enclosing function, `def_name` its name."""
+        if isinstance(node, (ast.Name, ast.Attribute)):
+            self._reference(node, parents, module, path, local, def_name)
+            # The prefix of a chain (`Cls` in `Cls.m`) is not a value use of its own.
+            base = node
+            while isinstance(base, ast.Attribute):
+                base = base.value
+            if not isinstance(base, ast.Name):
+                self._scan(base, parents + [node], module, path, local, def_name)
+            return
+        if isinstance(node, _DEF_TYPES + (ast.Lambda,)):
+            self._scan_definition(node, parents, module, path, local, def_name)
+            return
+        if isinstance(node, (ast.ListComp, ast.SetComp, ast.DictComp, ast.GeneratorExp)):
+            local = local | _local_names(node)
+        for child in ast.iter_child_nodes(node):
+            self._scan(child, parents + [node], module, path, local, def_name)
+
+    def _scan_definition(self, node, parents, module, path, local, def_name):
+        """Decorators are skipped; defaults, annotations and bases belong to the
+        enclosing scope; the body sees the definition's own local names."""
+        inside = parents + [node]
+        if isinstance(node, ast.ClassDef):
+            for child in node.bases + node.keywords:
+                self._scan(child, inside, module, path, local, def_name)
+            for child in node.body:
+                self._scan(child, inside, module, path, local, def_name)
+            return
+        self._scan(node.args, inside, module, path, local, def_name)
+        if getattr(node, "returns", None) is not None:
+            self._scan(node.returns, inside, module, path, local, def_name)
+        body_local = local | _local_names(node)
+        body_name = def_name if isinstance(node, ast.Lambda) else node.name
+        body = [node.body] if isinstance(node, ast.Lambda) else node.body
+        for child in body:
+            self._scan(child, inside, module, path, body_local, body_name)
+
+    def _reference(self, node, parents, module, path, local, def_name):
+        if not isinstance(node.ctx, ast.Load) or _root_name(node) in local:
+            return
+        parent = parents[-1] if parents else None
+        if isinstance(parent, ast.Call) and parent.func is node:
+            return
+        resolved = self._resolve_expr(node, module)
+        if resolved is None or resolved[0] != "def":
+            return
+        self.graph.references.setdefault(resolved[1], []).append({
+            "file": path, "line": node.lineno, "context": _context(node, parents, def_name),
+        })
+
     # -- public names ------------------------------------------------------------
 
     def _collect_public(self):
@@ -413,6 +479,38 @@ def _local_names(node):
     return bound - declared_global
 
 
+_LITERALS = {ast.List: "list", ast.Tuple: "tuple", ast.Set: "set"}
+
+
+def _context(node, parents, def_name):
+    """Where a reference sits, in words, from its parent node."""
+    parent = parents[-1] if parents else None
+    owner = parents[-2] if len(parents) > 1 else None
+    if isinstance(parent, ast.Dict) and any(value is node for value in parent.values):
+        if (isinstance(owner, ast.Assign) and owner.value is parent and len(owner.targets) == 1
+                and isinstance(owner.targets[0], ast.Name)):
+            return f"value in dict literal {owner.targets[0].id}"
+        return "value in dict literal"
+    if type(parent) in _LITERALS:
+        return f"element of {_LITERALS[type(parent)]} literal"
+    if isinstance(parent, ast.keyword):
+        parent = owner
+    if isinstance(parent, ast.Call):
+        if isinstance(parent.func, ast.Name):
+            return f"argument to {parent.func.id}"
+        if isinstance(parent.func, ast.Attribute):
+            return f"argument to {parent.func.attr}"
+    if isinstance(parent, ast.Assign) and parent.value is node:
+        return "assigned to " + " = ".join(ast.unparse(target) for target in parent.targets)
+    if isinstance(parent, ast.AnnAssign) and parent.value is node:
+        return f"assigned to {ast.unparse(parent.target)}"
+    if isinstance(parent, ast.arguments):
+        return f"default argument of {getattr(owner, 'name', 'lambda')}"
+    if isinstance(parent, ast.Return) and def_name:
+        return f"returned from {def_name}"
+    return "referenced"
+
+
 def _root_name(node):
     """The Name at the start of an attribute chain (`a` in `a.b.c`), or None."""
     while isinstance(node, ast.Attribute):
@@ -448,11 +546,16 @@ def walk(sources, package, vulnerable):
     """Entry points of the vulnerable items: every public definition whose call
     chains reach an item, with the shortest chain as evidence."""
     graph = build_graph(sources, package)
-    entries = {}
+    entries, reasons, notes = {}, [], list(graph.notes)
     for item in vulnerable:
         target = item["name"]
         any_next = _backward(graph, target, ("high", "medium"))
         high_next = _backward(graph, target, ("high",))
+        reason = _reason(graph, item, any_next)
+        if reason is _SELF_ONLY:
+            notes.append(f"self-only entry point: {target} has no caller or reference inside the package")
+        elif reason is not None:
+            reasons.append(reason)
         for fqn in any_next:
             if fqn not in graph.public:
                 continue
@@ -468,9 +571,54 @@ def walk(sources, package, vulnerable):
                 entries[entry["name"]] = entry
     return {
         "entry_points": [entries[name] for name in sorted(entries)],
-        "reasons": [],
-        "notes": list(graph.notes),
+        "reasons": reasons,
+        "notes": notes,
     }
+
+
+_SELF_ONLY = "self-only"
+
+
+def _reason(graph, item, closure):
+    """The review reason for one vulnerable item, None when it is connected
+    (a clean root other than itself reaches it), or _SELF_ONLY for a public
+    function nothing in the package calls or references."""
+    target, kind = item["name"], item["kind"]
+    roots = sorted(fqn for fqn in closure if not graph.callers.get(fqn))
+    if any(root != target and root in graph.public and not graph.references.get(root)
+           for root in roots):
+        return None
+    references = list(graph.references.get(target, []))
+    info = graph.defs.get(target)
+    if kind == "module_level":
+        file = graph.modules.get(target)
+    else:
+        file = info["file"] if info else None
+
+    def reason(reason_kind, dead_ends=(), detail=None):
+        found = {"item": target, "kind": reason_kind, "file": file,
+                 "references": references, "dead_ends": list(dead_ends)}
+        if detail:
+            found["detail"] = detail
+        return found
+
+    if kind == "module_level":
+        return reason("module_level")
+    if kind == "class_level":
+        return None if target in graph.public else reason("class_level")
+    if info is None:
+        return reason("no_reference", detail="not defined in the analysed tree")
+    if roots == [target]:
+        if references:
+            return reason("referenced_not_called")
+        if kind == "function" and target in graph.public:
+            return _SELF_ONLY
+        return reason("no_reference")
+    if not roots:
+        return reason("dead_end_chain", detail="no root: every caller is itself called")
+    return reason("dead_end_chain", [
+        {"name": root, "references": list(graph.references.get(root, []))} for root in roots
+    ])
 
 
 def _backward(graph, target, confidences):
