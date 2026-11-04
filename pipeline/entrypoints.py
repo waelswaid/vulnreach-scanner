@@ -406,16 +406,37 @@ class _Builder:
             best = _shortest(p for p in candidates if _is_public(p))
             if best:
                 self.graph.public[fqn] = best
+        subclasses = {}
+        for cls, bases in self.graph.bases.items():
+            for base in bases:
+                subclasses.setdefault(base, []).append(cls)
         for fqn, info in self.graph.defs.items():
             if info["kind"] != "method":
                 continue
             cls, name = fqn.rsplit(".", 1)
-            if cls not in self.graph.public:
+            if not _is_dunder(name) and name.startswith("_"):
                 continue
-            if _is_dunder(name):
-                self.graph.public[fqn] = self.graph.public[cls]
-            elif not name.startswith("_"):
-                self.graph.public[fqn] = f"{self.graph.public[cls]}.{name}"
+            # The defining class and every package subclass that inherits the
+            # method without overriding it: users reach it through any of them.
+            paths = []
+            for owner in _descendants(cls, subclasses):
+                if owner in self.graph.public and self._method(owner, name) == fqn:
+                    path = self.graph.public[owner]
+                    paths.append(path if _is_dunder(name) else f"{path}.{name}")
+            best = _shortest(paths)
+            if best:
+                self.graph.public[fqn] = best
+
+
+def _descendants(cls, subclasses):
+    """cls and every package class below it in `bases`, each once."""
+    found, stack = [], [cls]
+    while stack:
+        current = stack.pop()
+        if current not in found:
+            found.append(current)
+            stack.extend(subclasses.get(current, []))
+    return found
 
 
 def _top_level(node):

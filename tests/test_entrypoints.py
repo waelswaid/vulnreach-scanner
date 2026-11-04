@@ -503,6 +503,46 @@ class GraphTest(unittest.TestCase):
             {"file": "pkg/c.py", "line": 3, "context": "value in dict literal TABLE"},
         ]})
 
+    def test_inherited_method_named_under_shortest_public_subclass(self):
+        result = walk({
+            "__init__.py": "from .sessions import Session as Session\n",
+            "sessions.py": """
+                class Mixin:
+                    def resolve(self):
+                        self._v()
+
+                    def _v(self):
+                        pass
+
+                class Session(Mixin):
+                    pass
+            """,
+        }, ("pkg.sessions.Mixin._v", "method"))
+        self.assertEqual(result["entry_points"], [{
+            "name": "pkg.Session.resolve", "defined_as": "pkg.sessions.Mixin.resolve",
+            "confidence": "high", "path": ["pkg.sessions.Mixin.resolve", "pkg.sessions.Mixin._v"],
+        }])
+
+    def test_overridden_method_keeps_the_defining_class_path(self):
+        _, graph = graph_of({
+            "__init__.py": "from .sessions import Session as Session\n",
+            "sessions.py": """
+                class Mixin:
+                    def __init__(self):
+                        pass
+
+                    def resolve(self):
+                        pass
+
+                class Session(Mixin):
+                    def resolve(self):
+                        pass
+            """,
+        })
+        self.assertEqual(graph.public["pkg.sessions.Mixin.resolve"], "pkg.sessions.Mixin.resolve")
+        self.assertEqual(graph.public["pkg.sessions.Session.resolve"], "pkg.Session.resolve")
+        self.assertEqual(graph.public["pkg.sessions.Mixin.__init__"], "pkg.Session")
+
 
 class ReasonTest(unittest.TestCase):
     def test_dict_value_registration_is_referenced_not_called(self):
